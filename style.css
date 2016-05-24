@@ -8,8 +8,6 @@ body {
   color: #23ef18;
   text-shadow: 0 0 5px #42e833,0 0 5px #42e833;
   font-family: 'Source Code Pro';
-  padding-top: 50px;
-  padding-bottom: 10px;
 }
 
 #title {
@@ -26,6 +24,32 @@ body {
   width: 550px;
   margin-left: auto;
   margin-right: auto;
-  padding: 0px;
   line-height: 150%;
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+
+#bbb {
+  display:flex;justify-content:center;align-items:flex-end;
+  text-align: right;
+}
+.parallax {
+  perspective: 1px;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.parallax__layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.parallax__layer--base {
+  transform: translateZ(0);
+}
+.parallax__layer--back {
+  transform: translateZ(-10px) scale(12);
+  opacity:0.5;
 }
