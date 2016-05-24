@@ -1,0 +1,31 @@
+*{
+  margin:0;
+  padding:0;
+}
+
+body {
+  background-color: #000000;
+  color: #23ef18;
+  text-shadow: 0 0 5px #42e833,0 0 5px #42e833;
+  font-family: 'Source Code Pro';
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+
+#title {
+  box-shadow: 0 0 20px #42e833;
+  padding: 20px;
+  margin: 0px 200px 50px 200px;
+  border: double;
+  border-color: #16500d;
+  text-align: center;
+}
+
+#main {
+  text-align: justify;
+  width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0px;
+  line-height: 150%;
+}
