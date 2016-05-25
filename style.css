@@ -14,6 +14,19 @@ body {
   color: #FFFFFF;
 }
 
+#arrow {
+	width: 0;
+	height: 0;
+  margin-top: 550px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 200px;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-top: 100px solid #FFFFFF;
+  opacity: 0.2;
+}
+
 #command {
   font-family: 'VT323';
   font-size: 150%;
@@ -27,20 +40,23 @@ body {
   text-align: justify;
   width: 100%;
   height: 800px;
-  margin-top: 1000px;
   background-color: #353535;
   font-family: 'Source Code Pro';
 }
 
 #aaa {
-  opacity: 1;
   width: 100%;
   padding: 50px;
+  opacity: 0.5;
+  background-color: #424242;
+}
+#words {
   font-family: 'Source Code Pro';
   text-align: center;
-  background-color: #424242;
-  opacity: 0.5;
   line-height: 1.8;
+  margin-left: auto;
+  margin-right: auto;
+  width: 950px;
 }
 #main2 {
   padding-top: 100px;
@@ -61,10 +77,11 @@ body {
 }
 
 #bottom {
+  text-align: center;
   display:flex;
   justify-content:center;
   align-items:flex-end;
-  padding-top: 1500px;
+  padding-top: 1450px;
 }
 
 img {
@@ -92,7 +109,7 @@ span#green{
   transform: translateZ(0);
 }
 .parallax__layer--back {
-  transform: translateZ(-3px) translateX(1000px) scale(7);
+  transform: translateZ(-3px) scale(7);
   position: relative;
   top: 0;
   left: 0;
