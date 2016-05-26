@@ -46,17 +46,17 @@ body {
 
 #aaa {
   width: 100%;
-  padding: 50px;
   opacity: 0.5;
   background-color: #424242;
 }
 #words {
+  padding: 50px 20px 50px 20px;
   font-family: 'Source Code Pro';
   text-align: center;
   line-height: 1.8;
   margin-left: auto;
   margin-right: auto;
-  width: 950px;
+  max-width: 950px;
 }
 #main2 {
   padding-top: 100px;
@@ -69,8 +69,8 @@ body {
 }
 
 #response {
-  padding: 50px;
-  width: 600px;
+  padding: 50px 20px 50px 20px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   text-align: justify;
@@ -123,7 +123,6 @@ span#green{
 
 
 #buttons {
-  padding: 60px;
   margin-left: auto;
   margin-right: auto;
   width: 600px;
