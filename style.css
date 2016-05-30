@@ -93,7 +93,7 @@ body {
 /* image rules for bgs */
 
 #pc {
-  background-image: url('oldcomputer.jpg');
+  background-image: url('oldcomputer.png');
   background-size: cover;
   background-position: 20% 80%;
 }
