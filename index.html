@@ -1,62 +1,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8" />
-<meta property="og:title" name="Title" content=">xyzzy"/>
-<meta property="og:description" name="Description" content='A hollow voice says "Cretin"'/>
-<meta property="og:image" name="Image" content="http://xyzzy.roadcrosser.xyz/icon.png"/>
-<title>xyzzy</title>
-<meta name="viewport" content="initial-scale=1">
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="stylesheet" type="text/css" href="style.css" media="all">
-<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Anonymous+Pro' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Alegreya' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8" />
+  <meta property="og:title" name="Title" content=">xyzzy"/>
+  <meta property="og:description" name="Description" content='A hollow voice says "Cretin"'/>
+  <meta property="og:image" name="Image" content="http://xyzzy.roadcrosser.xyz/icon.png"/>
+  <title>xyzzy</title>
+  <meta name="viewport" content="initial-scale=1">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" type="text/css" href="style.css" media="all">
+  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Anonymous+Pro' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Alegreya' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
 </head>
-<div class="parallax">
-  <div class="parallax__group">
-  <div class="parallax__layer parallax__layer--back">
-  <img src="oldcomputer.jpg">
-</div>
-<div class="parallax__layer parallax__layer--base">
-<div id="arrow"></div>
-<div id='main'>
-<div id='command'>>look</div>
-<div id='response'><b>Server Room</b><br>
-<br>
-Mechanical whirrs are heard from throughout the complex, but you don't have time to worry about that right now. The construct stands before you, xyzzy.</div>
-<div id='command'>>x xyzzy</div>
-<div id='response'>The construct appears to you as an ancient computer, one from the Old Age, a cream-colored CRT Monitor with a cream-colored keyboard in front of it. The tower sits next to the monitor, whirring away. You sense a magical aura connecting this construct to Discord's servers.<br>
-<br>
-A single line is displayed on the monitor, which reads <span id='green'>AWAITING INPUT</span>.</div>
-<div id='command'>>press key</div>
-<div id='response'>You press a key on the keyboard, and the screen goes blank. The whirring intensifies, as it feels to be coming from all around you. You soon feel a sense of dizziness, before passing out.</div>
-</div>
-<div id='aaa'>
-<div id='words'>
-<span style="font-family: 'Anonymous Pro';">You are standing in an open field west of a white house, with a boarded front door.</span><br>
-<br><span style="font-family: 'Comfortaa';">The first ray of sunlight lances through the slats in the window-blind. It strikes your eyes, and you feel yourself <i>go</i></span>.<br>
-<br><span style="font-family: 'Ubuntu', sans-serif;">Oh, no - how long have you been asleep? Sure, it was a tough night, but... This is bad. This is very bad.</span><br>
-<br><span style="font-family: 'Architects Daughter', cursive;">Pig lost! Boss say that it Grunk fault.</span><br>
-<br><span style="font-family: 'Alegreya', serif;">You take a deep breath of salty air as the first raindrops begin to spatter the pavement, and the swollen, slate-colored clouds that blanket the sky mutter ominous portents amongst themselves over the little coastal town of Anchorhead.</span><br>
-<br><span style="font-family: 'Kaushan Script', cursive;">You come around a corner, away from the noise of the opening. There is only one exhibit.</span>
-</div></div>
-<div id='main2'>
-<div id='command'>>about</div>
-<div id='response'>xyzzy is a Discord Bot that plays IF games. It's also currently in development. I wasted too much of my time making this webpage as well. The buttons don't even work, don't bother trying to click them.</div>
-<div id='buttons'><a href="#" class="button bbb">join server</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="button bbb">invite bot</a></div>
-<div id='bottom'><p>There is nothing left;<br>
-to be seen;<br>
-and nothing left;<br>
-to be heard.<br>
-All that remains;<br>
-is the void that envelops us all.</p>
-</div>
-</div>
-</div>
+<body>
+  <div class="parallax">
+    <div class="parallax__group" style="z-index: 1;">
+      <div class="parallax__layer parallax__layer--back" id="pc">
+        <!-- <img src="oldcomputer.jpg"> -->
+      </div>
+      <div class="parallax__layer parallax__layer--base">
+        <div id="arrow">▼</div>
+      </div>
+    </div>
+    <div class="parallax__group" style="z-index: 2;">
+      <div class="parallax__layer parallax__layer--base">
+        <div class="colored">
+          <div class='command'>>look</div>
+          <div class='response'>
+            <p class='status'>Server Room</p>
+            <p>Mechanical whirrs are heard from throughout the complex, but you don't have time to worry about that right now. The construct stands before you, xyzzy.</p>
+          </div>
+          <div class='command'>>x xyzzy</div>
+          <div class='response'>
+            <p>The construct appears to you as an ancient computer, one from the Old Age, a cream-colored CRT Monitor with a cream-colored keyboard in front of it. The tower sits next to the monitor, whirring away. You sense a magical aura connecting this construct to Discord's servers.</p>
+            <p>A single line is displayed on the monitor, which reads <span class='green'>AWAITING INPUT</span>.</p>
+          </div>
+          <div class='command'>>press key</div>
+          <div class='response'>
+            <p>You press a key on the keyboard, and the screen goes blank. The whirring intensifies, as it feels to be coming from all around you. You soon feel a sense of dizziness, before passing out.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="parallax__group" style="z-index: 1;">
+      <div class="parallax__layer parallax__layer--back" id="sharpc"></div>
+      <div class="parallax__layer parallax__layer--base">
+        <div id='quotes'>
+          <p style="font-family: 'Anonymous Pro';">You are standing in an open field west of a white house, with a boarded front door.</p>
+          <p style="font-family: 'Comfortaa';">The first ray of sunlight lances through the slats in the window-blind. It strikes your eyes, and you feel yourself <i>go</i>.</p>
+          <p style="font-family: 'Ubuntu', sans-serif;">Oh, no - how long have you been asleep? Sure, it was a tough night, but... This is bad. This is very bad.</p>
+          <p style="font-family: 'Architects Daughter', cursive;">Pig lost! Boss say that it Grunk fault.</p>
+          <p style="font-family: 'Alegreya', serif;">You take a deep breath of salty air as the first raindrops begin to spatter the pavement, and the swollen, slate-colored clouds that blanket the sky mutter ominous portents amongst themselves over the little coastal town of Anchorhead.</p>
+          <p style="font-family: 'Kaushan Script', cursive;">You come around a corner, away from the noise of the opening. There is only one exhibit.</p>
+        </div>
+      </div>
+    </div>
+    <div class="parallax__group" style="z-index: 2;">
+      <div class="parallax__layer--base">
+        <div class="colored">
+          <div class='command'>>about</div>
+          <div class='response'>xyzzy is a Discord Bot designed to bridge the gap between shell-based Interactive Fiction interpreters and Discord chat rooms, allowing people to enjoy these wonderful stories with friends. While the bot is currently in development, you can track our progress and join our private server to see xyzzy in action.</div>
+          <div id='buttons'>
+            <a href="#" class="button">Join Server</a><a href="#" class="button">View Trello</a><a href="#" class="button disabled">Invite Bot</a>
+            <!-- Due to a dumb thing where browsers will interpret the whitespace between inline elements as text, you have to smoosh these As together to avoid a space character being generated between them. -->
+          </div>
+          <div id='bottom'>
+            <p>There is nothing left;<br>
+            to be seen;<br>
+            and nothing left;<br>
+            to be heard.<br>
+            All that remains;<br>
+            is the void that envelops us all.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

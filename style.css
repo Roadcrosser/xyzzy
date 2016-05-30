@@ -1,33 +1,77 @@
+/* frames for arrow animation */
+
+@-webkit-keyframes slowbob{
+  0% {
+    -webkit-transform: translateY(0);
+  }
+  50% {
+    -webkit-transform: translateY(10px);
+  }
+  100% {
+    -webkit-transform: translateY(0);
+  }
+}
+@keyframes slowbob{
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* main rules */
+
 * {
   margin:0;
   padding:0;
 }
 
+html, body { min-height: 100%; }
+
 body {
   background-color: #424242;
   margin-left:auto;
   margin-right:auto;
-  top: 0;
+  color: #FFFFFF;
+
+  font-family: 'Source Code Pro';
+}
+
+/* css3 shape */
+#arrow {
+  /* hang at bottom of div */
+  position: absolute;
+  left: 0;
   right: 0;
   bottom: 0;
-  left: 0;
-  color: #FFFFFF;
-}
+  margin-bottom: 50px;
 
-#arrow {
+  font-size: 100px;
+  text-align: center;
+
+  /* defining the shape
 	width: 0;
-	height: 0;
-  margin-top: 550px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 200px;
-	border-left: 50px solid transparent;
-	border-right: 50px solid transparent;
-	border-top: 100px solid #FFFFFF;
-  opacity: 0.2;
+	border-left: 25px solid transparent;
+	border-right: 25px solid transparent;
+	border-top: 50px solid #FFFFFF;
+  padding: 0;
+  */
+
+  /* prettiness */
+  color: white;
+  opacity: 0.4;
+  animation: slowbob 2s infinite;
 }
 
-#command {
+/* text content styles */
+
+.command {
   font-family: 'VT323';
   font-size: 150%;
   text-align: center;
@@ -35,139 +79,196 @@ body {
   padding: 0;
 }
 
-#main {
-  padding-top: 100px;
-  text-align: justify;
-  width: 100%;
-  height: 800px;
-  background-color: #353535;
-  font-family: 'Source Code Pro';
+.response {
+  padding: 50px 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#aaa {
-  width: 100%;
-  opacity: 0.5;
-  background-color: #424242;
+.status {
+  font-weight: bold;
 }
-#words {
+
+/* image rules for bgs */
+
+#pc {
+  background-image: url('oldcomputer.jpg');
+  background-size: cover;
+  background-position: 20% 80%;
+}
+
+#sharpc {
+  height: 150vh
+}
+
+#sharpc::before {
+  content: '';
+
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+
+  background-image: url('sharpcalc.jpg');
+  background-size: auto 100%;
+  background-position: 40% top;
+
+  -webkit-filter: blur(2px);
+  filter: blur(2px);
+
+  opacity: 0.5
+}
+
+.colored {
+  text-align: justify;
+  padding: 100px 20px;
+  background-color: #353535;
+}
+
+p {
+  margin: 1em 0;
+}
+
+#quotes {
   padding: 50px 20px 50px 20px;
-  font-family: 'Source Code Pro';
   text-align: center;
   line-height: 1.8;
   margin-left: auto;
   margin-right: auto;
   max-width: 950px;
-}
-#main2 {
-  padding-top: 100px;
-  text-align: justify;
-  width: 100%;
-  height: 2000px;
-  margin-bottom: 0;
-  background-color: #353535;
-  font-family: 'Source Code Pro';
+  text-shadow: 0 0 5px #141414;
+  font-size: 18px;
 }
 
-#response {
-  padding: 50px 20px 50px 20px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: justify;
+#quotes p {
+  margin: 2em 0;
 }
 
-#bottom {
-  text-align: center;
-  display:flex;
-  justify-content:center;
-  align-items:flex-end;
-  padding-top: 1450px;
-}
-
-img {
-  height: 1000px;
-}
-
-span#green{
+span.green{
   color: #24f311;
   font-weight: bold;
 }
 
-.parallax {
-  perspective: 1px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.parallax__layer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-.parallax__layer--base {
-  transform: translateZ(0);
-}
-.parallax__layer--back {
-  transform: translateZ(-3px) scale(7);
-  position: relative;
-  top: 0;
-  left: 0;
-}
-
-.parallax__group {
-  position: relative;
-  height: 100vh;
-  transform-style: preserve-3d;
-}
-
-
 #buttons {
-  margin-left: auto;
-  margin-right: auto;
-  width: 600px;
   text-align: center;
 }
 
 .button {
-  background-color: #424242;
-  border: none;
-  color: #FFFFFF;
-  padding: 15px 32px 15px 32px;
+  /* positioning */
+  display: inline-block;
+  margin: 5px;
+  padding: 15px 32px;
   text-align: center;
+  min-width: 100px;
+
+  /* override <a> defaults */
+  text-decoration: none;
+  color: #FFFFFF;
+
+  /* pretty it up */
+  background-color: #424242;
   font-family: 'VT323';
   font-size: 125%;
-  text-decoration: none;
-}
-.bbb {
-  display: inline-block;
-  vertical-align: middle;
+  box-shadow: 0 0 1px rgba(0,0,0,0);
+
+  /* webkit hack to make transforms look good */
+  /* because will-change isn't supported everywhere */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
-  box-shadow: 0 0 1px rgba(0,0,0,0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   -moz-osx-font-smoothing: grayscale;
+
+  /* relative positioning to hook ::before to element */
   position: relative;
-  -webkit-transition-duration: 0.1s;
-  transition-duration: 0.1s;
 }
-.bbb:before {
+
+.button.disabled {
+  color: #AAAAAA;
+}
+
+.button::before {
   content: ">";
   position: absolute;
   left: 1em;
   padding: 0 1px;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-transition-duration: 0.1s;
-  transition-duration: 0.1s;
-  -webkit-transition-property: transform;
-  transition-property: transform;
-  -webkit-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
+
+  /* set up for transition */
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+
+  /* dear roadcrosser: why didn't you use the shorthand?!?!? */
+  -webkit-transition: 0.1s transform ease-out;
+  transition: 0.1s transform ease-out;
 }
-.bbb:hover:before,
-.bbb:active:before {
+
+.button:not(.disabled):hover::before,
+.button:not(.disabled):active::before {
   -webkit-transform: translateX(4px);
   transform: translateX(4px);
+}
+
+
+#bottom {
+  text-align: center;
+  justify-content:center;
+  margin-top: 80%;
+  margin-top: 80vh;
+}
+
+/*                                               */
+/* Parallax Code: From http://keithclark.co.uk/. */
+/*                                               */
+
+.parallax {
+  height: 500px; /* fallback for older browsers */
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-perspective: 300px;
+  perspective: 300px;
+  -webkit-perspective-origin-x: 98%;
+  perspective-origin-x: 98%;
+}
+
+.parallax__group {
+  position: relative;
+  min-height: 500px; /* fallback for older browsers */
+  min-height: 100vh;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.parallax__layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-transform-origin-x: 100%;
+  transform-origin-x: 100%;
+}
+
+.parallax__layer--base {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+
+  position: static; /* allows layer to grow with content */
+  min-height: 100vh;
+}
+
+.parallax__layer--back {
+  -webkit-transform: translateZ(-300px) scale(2);
+  transform: translateZ(-300px) scale(2);
+
+  width: 150vw;
+}
+
+body.debug .parallax__group {
+    -webkit-transform: translate3d(800px, 0, -800px) rotateY(30deg);
+    transform: translate3d(700px, 0, -800px) rotateY(30deg);
+}
+
+body.debug .parallax__layer {
+    box-shadow: 0 0 0 2px #000;
+    opacity: 0.9;
 }
