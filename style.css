@@ -99,7 +99,7 @@ body {
 }
 
 #sharpc {
-  height: 150vh
+  height: 150vh;
 }
 
 #sharpc::before {
@@ -108,14 +108,14 @@ body {
   position: absolute;
   left: 0; right: 0; top: 0; bottom: 0;
 
-  background-image: url('sharpcalc.jpg');
-  background-size: auto 100%;
-  background-position: 40% top;
+  background-image: url('sharpcalc.jpg'), linear-gradient(rgba(66,66,66,0.5),rgba(66,66,66,0.5));;
+  background-size: cover;
+  background-position: 50% 80%;
 
   -webkit-filter: blur(2px);
   filter: blur(2px);
 
-  opacity: 0.5
+  /* opacity: 0.5; */
 }
 
 .colored {
@@ -232,8 +232,6 @@ span.green{
 
 .parallax__group {
   position: relative;
-  min-height: 500px; /* fallback for older browsers */
-  min-height: 100vh;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
@@ -253,7 +251,6 @@ span.green{
   transform: translateZ(0);
 
   position: static; /* allows layer to grow with content */
-  min-height: 100vh;
 }
 
 .parallax__layer--back {
