@@ -1,2 +1,2 @@
-# xyzzy
-A hollow voice says "Cretin".
+# >xyzzy
+A hollow voice says "cretin".
