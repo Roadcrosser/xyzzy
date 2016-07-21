@@ -335,19 +335,19 @@ class XYZZYbot(discord.Client):
                             self.user_preferences['backticks'].remove(message.author.id)
                             yield from self.send_message(message.channel, '```diff\n+Commands from you now require backticks. (They should look `{}like this`)```'.format(self.invoker))
                         else:
-                            yield from self.send_message(message.channel, '```diff\n!Your preferences are already set to require backticks for commands.')
+                            yield from self.send_message(message.channel, '```diff\n!Your preferences are already set to require backticks for commands.```')
                             return
                     else:
                         if message.author.id not in self.user_preferences['backticks']:
                             self.user_preferences['backticks'].append(message.author.id)
                             yield from self.send_message(message.channel, '```diff\n+Commands from you no longer require backticks. (They should look {}like this)\n+XYZZY will still accept backticked commands in case you forget you set this option.```'.format(self.invoker, self.invoker*2))
                         else:
-                            yield from self.send_message(message.channel, '```diff\n!Your preferences are already set such that backticks are not required for commands.')
+                            yield from self.send_message(message.channel, '```diff\n!Your preferences are already set such that backticks are not required for commands.```')
                             return
                     with open('./bot-data/userprefs.json', 'w') as x:
                         json.dump(self.user_preferences, x)
                 else:
-                    yield from self.send_messages(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.')
+                    yield from self.send_message(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.```')
             if cmd.startswith('nowplaying'):
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
