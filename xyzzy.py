@@ -243,6 +243,9 @@ class XYZZYbot(discord.Client):
                 self.channels[message.channel.id]['owner'] = message.author
                 # "owner", for lack of a better word, and that's my best excuse.
 
+                self.channels[message.channel.id]['channelname'] = message.channel.name
+                self.channels[message.channel.id]['servername'] = message.server.name
+
                 yield from self.send_message(message.channel, '```py\nLoaded "{}".```'.format(
                     self.channels[message.channel.id]['game']
                     ))
@@ -345,6 +348,12 @@ class XYZZYbot(discord.Client):
                         json.dump(self.user_preferences, x)
                 else:
                     yield from self.send_messages(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.')
+            if cmd.startswith('nowplaying'):
+                msg = '```md\n## Currently playing games: ##\n'
+                for x in self.channels:
+                    msg += '[{}]({}) {}\n'.format(self.channels[x]['servername'],self.channels[x]['channelname'],self.channels[x]['game'])
+                msg += '```'
+                yield from self.send_message(message.author, msg)
 
             return
 
