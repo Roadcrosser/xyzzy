@@ -356,6 +356,44 @@ class XYZZYbot(discord.Client):
                     return
                 yield from self.send_message(message.author, msg)
 
+            if cmd.startswith('shutdown'):
+                if message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
+                    return
+
+                if self.channels:
+                    yield from self.send_message(message.channel, '```diff\n!There are currently {} games running on my system.\n-If you shut me down now, all unsaved data regarding these games could be lost!\n(Use `{}nowplaying` for a list of currently running games.)```'.format(len(self.channels), self.invoker*2))
+
+                while True:
+                    yield from self.send_message(message.channel, '```md\n## Are you sure you want to shut down the bot? ##\n[Y]( to shutdown the bot    )\n[N]( to cancel the shutdown )\n```')
+
+                    msg = yield from self.wait_for_message(channel=message.channel, author=message.author, timeout=30)
+
+                    if not msg:
+                        yield from self.send_message(message.channel, '```css\nMessage timeout: Shutdown aborted.```')
+                        return
+
+                    x = msg.content.lower()
+                    if x == 'y' or\
+                     x == 'yes' or\
+                     x == '`{}yes`'.format(self.invoker * 2) or\
+                     x == '`{}y`'.format(self.invoker * 2) or\
+                     x == '{}yes'.format(self.invoker * 2) or\
+                     x == '{}y'.format(self.invoker * 2):
+                        yield from self.send_message(message.channel, '```asciidoc\n.Xyzzy.\n// Now Shutting down...```')
+                        yield from self.close()
+
+                    if x == 'n' or\
+                     x == 'no' or\
+                     x == '`{}no`'.format(self.invoker * 2) or\
+                     x == '`{}n`'.format(self.invoker * 2) or\
+                     x == '{}no'.format(self.invoker * 2) or\
+                     x == '{}n'.format(self.invoker * 2):
+                         yield from self.send_message(message.channel, '```css\nShutdown aborted.```')
+                         return
+
+                    yield from self.send_message(message.channel, '```md\n# Invalid response. #```')
+
             if cmd.startswith('nowplaying'):
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
