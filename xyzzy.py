@@ -56,6 +56,11 @@ class XYZZYbot(discord.Client):
             self.home_channel_id = self.config['home_channel']
             self.home_channel = None
 
+        self.owner_ids = []
+        if 'owner_ids' in self.config:
+            for x in self.config['owner_ids'].split(','):
+                self.owner_ids.append(x.strip())
+
         print('Reading story database...')
 
         self.stories = {}
@@ -278,7 +283,8 @@ class XYZZYbot(discord.Client):
                 return
 
             if cmd.startswith('debug '):
-                if message.author.id not in ['88401933936640000', '116138050710536192']:
+                if message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.')
                     return
                 if cmd.startswith('debug await '.format(self.invoker * 2)):
                     response = yield from eval(cmd.split(None, 2)[2])
