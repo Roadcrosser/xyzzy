@@ -348,6 +348,14 @@ class XYZZYbot(discord.Client):
                         json.dump(self.user_preferences, x)
                 else:
                     yield from self.send_message(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.```')
+
+            if cmd.startswith('list'):
+                msg = '```md\n# Here are all of the games I have available: #\n{}```'.format('\n'.join(self.stories))
+                if cmd.startswith('list here'):
+                    yield from self.send_message(message.channel, msg)
+                    return
+                yield from self.send_message(message.author, msg)
+
             if cmd.startswith('nowplaying'):
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
