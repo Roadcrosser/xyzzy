@@ -185,11 +185,11 @@ a.button {
   position: relative;
 }
 
-.button.disabled {
+a.button.disabled {
   color: #AAAAAA;
 }
 
-.button::before {
+a.button::before {
   content: ">";
   position: absolute;
   left: 1em;
@@ -204,8 +204,8 @@ a.button {
   transition: 0.1s transform ease-out;
 }
 
-.button:not(.disabled):hover::before,
-.button:not(.disabled):active::before {
+a.button:not(.disabled):hover::before,
+a.button:not(.disabled):active::before {
   -webkit-transform: translateX(4px);
   transform: translateX(4px);
 }
@@ -261,14 +261,4 @@ a.button {
   transform: translateZ(-300px) scale(2);
 
   width: 150vw;
-}
-
-body.debug .parallax__group {
-    -webkit-transform: translate3d(800px, 0, -800px) rotateY(30deg);
-    transform: translate3d(700px, 0, -800px) rotateY(30deg);
-}
-
-body.debug .parallax__layer {
-    box-shadow: 0 0 0 2px #000;
-    opacity: 0.9;
 }
