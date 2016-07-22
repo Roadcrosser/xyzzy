@@ -152,17 +152,20 @@ span.green{
   text-align: center;
 }
 
-.button {
+a {
+  /* override <a> defaults */
+  text-decoration: none;
+  color: #FFFFFF;
+  /* This will have to change (".quotes a, a.button") if we ever add more links but for now, this works. */
+}
+
+a.button {
   /* positioning */
   display: inline-block;
   margin: 5px;
   padding: 15px 32px;
   text-align: center;
   min-width: 100px;
-
-  /* override <a> defaults */
-  text-decoration: none;
-  color: #FFFFFF;
 
   /* pretty it up */
   background-color: #424242;
