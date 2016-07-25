@@ -140,20 +140,19 @@ class XYZZYbot(discord.Client):
                 self.invoker
                 )
             )
-        self.home_channel = discord.utils.get(self.servers, id=self.home_channel_id)
+        self.home_channel = self.get_channel(self.home_channel_id)
 
     @asyncio.coroutine
     def on_server_join(self, server):
         print('I have been invited to tell stories in "{}".'.format(server.name))
         if self.home_channel:
-            self.send_message(self.home_channel, 'I have been invited to tell stories in "{}".'.format(server.name))
+            yield from self.send_message(self.home_channel, 'I have been invited to tell stories in "{}". (ID: {})'.format(server.name, server.id))
 
     @asyncio.coroutine
     def on_server_remove(self, server):
         print('I have been removed from "{}".'.format(server.name))
         if self.home_channel:
-            self.send_message(self.home_channel, 'I have been removed from "{}".'.format(server.name))
-
+            yield from self.send_message(self.home_channel, 'I have been removed from "{}". (ID: {})'.format(server.name, server.id))
 
     @asyncio.coroutine
     def on_message(self, message):
@@ -300,6 +299,7 @@ class XYZZYbot(discord.Client):
                             out = obuffer.decode('utf-8')
                             msg = ''
                             for line in out.splitlines():
+                                line.replace('*','\*').replace('__','\_\_').replace('~~','\~\~')
                                 if len(msg + line[self.channels[message.channel.id]['indent']:] + '\n') < 2000:
                                     msg += line[self.channels[message.channel.id]['indent']:] + '\n'
                                 else:
@@ -322,7 +322,7 @@ class XYZZYbot(discord.Client):
 
             if cmd.startswith('debug '):
                 if message.author.id not in self.owner_ids:
-                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.')
+                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
                     return
                 if cmd.startswith('debug await '.format(self.invoker * 2)):
                     response = yield from eval(cmd.split(None, 2)[2])
