@@ -5,6 +5,7 @@ if sys.platform == 'win32':
 
 import os # for checking if files exist.
 import asyncio # for asyncio's subprocess capabilities
+import traceback # for printing tracebacks
 
 import json # for reading and writing to cfgs
 
@@ -471,6 +472,40 @@ class XYZZYbot(discord.Client):
             else:
                 cmd = message.content[len(self.invoker) + 1:-1] + '\n'
             self.channels[message.channel.id]['process'].stdin.write(cmd.encode('utf-8'))
+
+    @asyncio.coroutine
+    def on_error(self, e, *args):
+        print('\nAn error has been caught.')
+        print(traceback.format_exc())
+        if len(args) > 0:
+            if isinstance(args[0], discord.Message):
+                if args[0].author.id != self.user.id:
+                    if args[0].channel.is_private:
+                        print('This error was caused by a DM with {}.\n'.format(args[0].author.name))
+                    else:
+                        print(
+                            'This error was caused by a message.\nServer: {}. Channel: #{}.\n'.format(
+                                args[0].server.name,
+                                args[0].channel.name
+                                )
+                            )
+
+                    if self.home_channel:
+                        yield from self.send_message(
+                            self.home_channel, "```{}```\nInvoker: {}\nCommand: {}".format(
+                                traceback.format_exc(),
+                                args[0].author,
+                                args[0].content
+                                )
+                            )
+
+                    yield from self.send_message(
+                        args[0].channel,
+                        '```asciidoc\n!!!ERROR!!!\n===========\n// An error has been caught.\n\nCommand:: {}\nInvoker:: {}\nError type:: {}\n\n[This error has been logged to the Xyzzy console, as well as any applicable Xyzzy home channel to notify the bot maintainers.]```'.format(
+                            args[0].content,
+                            args[0].author,
+                            sys.exc_info()[0].__name__)
+                        )
 
 if __name__ == '__main__':
     # Only start the bot if it is being run directly
