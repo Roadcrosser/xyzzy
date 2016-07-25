@@ -3,7 +3,7 @@ import sys # subprocesses aren't available on win32's asyncio implementation.
 if sys.platform == 'win32':
     raise Exception('Xyzzy requires Asyncio\'s subprocess capabilities, which currently are not available on Windows platforms. Sorry.')
 
-import os.path # for checking if files exist.
+import os # for checking if files exist.
 import asyncio # for asyncio's subprocess capabilities
 
 import json # for reading and writing to cfgs
@@ -14,8 +14,20 @@ from subprocess import PIPE
 import discord
 # https://github.com/Rapptz/discord.py/tree/async
 
+class bcolours:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class XYZZYbot(discord.Client):
     def __init__(self):
+        print(bcolours.HEADER + 'Welcome to Xyzzy.' + bcolours.ENDC)
+
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
         self.config = {}
@@ -78,17 +90,33 @@ class XYZZYbot(discord.Client):
 
                         self.stories[x[1].strip()] = x[0].strip()
 
-        if os.path.exists('./bot-data/'):
+        if not os.path.exists('./bot-data/'):
+            print('I couldn\'t find a folder to store runtime data in, so I\'m going to make one really quick. The file will be "./bot-data/". I\'ll use it to store stuff like user preferences and server settings.')
+            os.makedirs('./bot-data/')
+
+        try:
             print('Loading user preferences...')
             with open('./bot-data/userprefs.json') as x:
                 self.user_preferences = json.load(x)
-        else:
-            print('I couldn\'t find a folder to store runtime data in, so I\'m going to make one really quick. The file will be "./bot-data/". I\'ll use it to store stuff like user preferences and server settings.')
-            print('Writing user preferences...')
-            os.makedirs('./bot-data/')
+        except FileNotFoundError:
+            print(bcolours.WARNING + 'User preferences not found. Creating new User Preferences file...' + bcolours.ENDC)
             with open('./bot-data/userprefs.json', 'w') as x:
                 x.write('{ "version" : 1, "backticks" : [] }')
                 self.user_preferences = { 'version' : 1, 'backticks' : [] }
+
+        try:
+            print('Loading blocked user list...')
+            with open('./bot-data/blocked_users.json') as x:
+                self.blocked_users = json.load(x)
+        except FileNotFoundError:
+            print(bcolours.WARNING + 'Blocked user list not found. Creating new blocked user list...' + bcolours.ENDC)
+            with open('./bot-data/blocked_users.json', 'w') as x:
+                x.write('{}')
+                self.user_preferences = {}
+
+        # print('Loading channel black/whitelists...')
+        # for file in blacklist directory:
+        #     load json file for each server
 
         self.game = None
 
@@ -98,6 +126,7 @@ class XYZZYbot(discord.Client):
 
         self.channels = {}
 
+        print(bcolours.OKGREEN + 'Initialization complete! Now connecting to Discord...' + bcolours.ENDC)
         # run any initialization discord.py needs to do for this class.
         super().__init__()
 
@@ -145,6 +174,11 @@ class XYZZYbot(discord.Client):
 
         # Disallow bot accounts from submitting commands.
         if message.author.bot:
+            return
+
+        # Disallow blocked users from submitting commands.
+        if not message.channel.is_private and message.server.id in self.blocked_users and message.author.id in self.blocked_users[message.server.id]:
+            yield from self.send_message(message.author, '```diff\n!An administrator has disabled your ability to submit commands in "{}".```'.format(message.server.name))
             return
 
         if message.content.startswith(
@@ -327,6 +361,34 @@ class XYZZYbot(discord.Client):
                      x == '{}yes'.format(self.invoker * 2) or\
                      x == '{}y'.format(self.invoker * 2):
                         self.channels[message.channel.id]['process'].terminate()
+
+            if cmd.startswith('plugh ') or cmd.startswith('block '):
+                if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!Only users with the permission to kick other users can use this command.```')
+                    return
+
+                if message.server.id not in self.blocked_users:
+                    self.blocked_users[message.server.id] = []
+
+                for x in message.mentions:
+                    self.blocked_users[message.server.id].append(x.id)
+                    yield from self.send_message(message.channel, '```xl\n"{}" has been restricted from entering commands in this server.```'.format(x.display_name))
+
+                with open('./bot-data/blocked_users.json', 'w') as x:
+                    json.dump(self.blocked_users, x)
+
+            if cmd.startswith('unblock '):
+                if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!Only users with the permission to kick other users can use this command.```')
+                    return
+
+                for x in message.mentions:
+                    if x.id in self.blocked_users[message.server.id]:
+                        self.blocked_users[message.server.id].remove(x.id)
+                        yield from self.send_message(message.channel, '```xl\n"{}" is now allowed to submit commands.```'.format(x.display_name))
+
+                with open('./bot-data/blocked_users.json', 'w') as x:
+                    json.dump(self.blocked_users, x)
 
             if cmd.startswith('backticks '):
                 if cmd.endswith('on') or cmd.endswith('off'):
