@@ -301,7 +301,7 @@ class XYZZYbot(discord.Client):
                             out = obuffer.decode('utf-8')
                             msg = ''
                             for i, line in enumerate(out.splitlines()):
-                                line.replace('*','\*').replace('__','\_\_').replace('~~','\~\~')
+                                line = line.replace('*','\*').replace('__','\_\_').replace('~~','\~\~')
                                 if self.channels[message.channel.id]['bold_stbar'] and i == 0:
                                     msg += '__**'
                                 if len(msg + line[self.channels[message.channel.id]['indent']:] + '\n') < 2000:
