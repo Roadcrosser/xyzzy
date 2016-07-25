@@ -162,6 +162,7 @@ class XYZZYbot(discord.Client):
         # This is the most disgusting conditional I have ever written.
         if not (message.content.startswith('`{}'.format(self.invoker)) and message.content.endswith('`')) and \
          not (message.content.startswith('{}'.format(self.invoker)) and message.author.id in self.user_preferences['backticks']):
+            # If you need to debug, pop this big-ass print statement open.
             # print(
             #     message.content.startswith('`{}'.format(self.invoker)),
             #     message.content.endswith('`'),
@@ -278,8 +279,7 @@ class XYZZYbot(discord.Client):
                 self.channels[message.channel.id]['owner'] = message.author
                 # "owner", for lack of a better word, and that's my best excuse.
 
-                self.channels[message.channel.id]['channelname'] = message.channel.name
-                self.channels[message.channel.id]['servername'] = message.server.name
+                self.channels[message.channel.id]['channel'] = message.channel
 
                 yield from self.send_message(message.channel, '```py\nLoaded "{}".```'.format(
                     self.channels[message.channel.id]['game']
@@ -331,6 +331,14 @@ class XYZZYbot(discord.Client):
 
                 yield from self.send_message(message.channel, eval(cmd.split(None, 1)[1]))
                 return
+
+            if cmd.startswith('announce '):
+                if message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
+                    return
+                announcement = cmd.split(None, 1)[1]
+                for x in self.channels:
+                    yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
 
             if cmd.startswith('indent '):
                 if message.channel.id in self.channels:
@@ -460,7 +468,7 @@ class XYZZYbot(discord.Client):
             if cmd.startswith('nowplaying'):
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
-                    msg += '[{}]({}) {}\n'.format(self.channels[x]['servername'],self.channels[x]['channelname'],self.channels[x]['game'])
+                    msg += '[{}]({}) {}\n'.format(self.channels[x]['channel'].server.name,self.channels[x]['channel'].name,self.channels[x]['game'])
                 msg += '```'
                 yield from self.send_message(message.author, msg)
 
