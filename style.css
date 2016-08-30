@@ -33,7 +33,7 @@
 html, body { min-height: 100%; }
 
 body {
-  background-color: #424242;
+  background-color: #36393E;
   margin-left:auto;
   margin-right:auto;
   color: #FFFFFF;
@@ -121,7 +121,7 @@ body {
 .colored {
   text-align: justify;
   padding: 100px 20px;
-  background-color: #353535;
+  background-color: #36393E;
 }
 
 p {
