@@ -1,0 +1,40 @@
+body {
+    background: #222;
+    color: #BBB;
+    font-family: sans;
+}
+
+header {
+    font-size: 4em;
+    text-align: center;
+}
+
+code {
+    display: inline-block;
+    background: #444;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: #DDD;
+    padding: 2px 4px;
+}
+code.block {
+    display: block;
+    padding: 0.65em;
+
+}
+.options {
+    font-style: italic;
+    font-weight: normal;
+}
+
+a, a:visited { color: #88F; }
+a:hover { color: #DDF; }
+
+p.todo {
+    font-style: italic;
+    font-weight: bold;
+}
+p.todo::before {
+    content: 'TODO: ';
+    color: #D44;
+}
