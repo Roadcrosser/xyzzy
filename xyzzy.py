@@ -119,6 +119,23 @@ class XYZZYbot(discord.Client):
         # for file in blacklist directory:
         #     load json file for each server
 
+        self.helpdesk = {
+            'backticks' : '>>backticks [ on | off ]\nEnables or disables the requirement for Xyzzy to require backticks before and after each command. This is on by default.\nUsing this command only changes the setting for you.',
+            'play' : '>>play [ Game name ]\nTells xyzzy to start playing the game specified in [Game name] in the current channel. If no game is found with that name, xyzzy will show you all games with the text of [Game name] in their name. If only one game is found with that text in it\'s name, it will start that game.',
+            'indent' : '>>indent [ indent level ]\nWill make xyzzy scrap the first [indent level] characters for each line in his output. If you\'re noticing random spaces after each line break, use this command.\n[Indent level] must be an integer between 0 and the total console width. (Usually 80.)',
+            'forcequit': '>>forcequit or >>mortim\nAfter confirmation, terminates the process running the xyzzy game you are playing. [It is recommended to try to exit the game using an in-game method before using this command.] >quit usually works.\nThis command has an alias in >>mortim',
+            'mortim': '>>forcequit or >>mortim\nAfter confirmation, terminates the process running the xyzzy game you are playing. [It is recommended to try to exit the game using an in-game method before using this command.] >quit usually works.\nThis command has an alias in >>mortim',
+            'list': '>>list\nSends you a direct message containing all stories in xyzzy\'s library.',
+            'nowplaying' : '>>nowplaying\nSends you a direct message containing all currently running xyzzy instances across Discord.',
+            'block' : '>>block [ @User Mention#1234 ] or >>plugh\nFor each user mentioned, disables their ability to send commands to the bot in the server this command was invoked.\nBlocked users will be sent a Direct Message stating that they are blocked when they try to send a command.\nThis command has an alias in >>plugh\n[A user may only use this command if they have permission to kick other users.]',
+            'plugh' : '>>block [ @User Mention#1234 ] or >>plugh\nFor each user mentioned, disables their ability to send commands to the bot in the server this command was invoked.\nBlocked users will be sent a Direct Message stating that they are blocked when they try to send a command.\nThis command has an alias in >>plugh\n[A user may only use this command if they have permission to kick other users.]',
+            'unblock' : '>>unblock [ @User Mention#1234 ]\nFor each user mentioned, reenables their ability to send commands to the bot in the server this command was invoked.\nIf the user was never blocked, this command fails silently.\n[A user may only use this command if they have permission to kick other users.]',
+            'debug' : '>>debug [ python ]\nExecutes arbitrary Python code.\n[This command may only be used by trusted individuals.]',
+            'announce' : '>>announce [ Announcement ]\nFor each channel currently playing a game, sends the text in [Announcement].\n[This command may only be used by trusted individuals.]',
+            'output' : '>>output\nToggles whether the text being sent to this channel from a currently playing story also should be printed to the terminal. This is functionally useless in most cases.',
+            'shutdown' : '>>shutdown\nAfter confirmation, shuts down the bot and all running games.\n[This command may only be used by trusted individuals.]'
+        }
+
         self.game = None
 
         self.process = None
@@ -344,18 +361,29 @@ class XYZZYbot(discord.Client):
                 if message.channel.id in self.channels:
                     try:
                         self.channels[message.channel.id]['indent'] = int(cmd.split(None, 1)[1])
-                        yield from self.send_message(message.channel, '```xl\nIndent Level is now "{}".```'.format(self.channels[message.channel.id]['indent']))
                     except ValueError:
+                        yield from self.send_message(message.channel, '```basic\n"Indent Level" is now {}.```'.format(self.channels[message.channel.id]['indent']))
                         yield from self.send_message(message.channel, '```diff\n!ERROR: {} is not a number.```'.format(message.content.split(None, 1)[1][:-1]))
 
             if cmd.startswith('output'):
                 if message.channel.id in self.channels:
                     if self.channels[message.channel.id]['output']:
                         self.channels[message.channel.id]['output'] = False
-                        yield from self.send_message(message.channel, '```xl\nTerminal Output is now OFF.```'.format(self.channels[message.channel.id]['indent']))
+                        yield from self.send_message(message.channel, '```basic\n"Terminal Output" is now OFF.```'.format(self.channels[message.channel.id]['indent']))
                     else:
                         self.channels[message.channel.id]['output'] = True
-                        yield from self.send_message(message.channel, '```xl\nTerminal Output is now ON.```'.format(self.channels[message.channel.id]['indent']))
+                        yield from self.send_message(message.channel, '```basic\n"Terminal Output" is now ON.```'.format(self.channels[message.channel.id]['indent']))
+                return
+
+            if cmd.startswith('help'):
+                splot = cmd.split(None, 1)
+                if len(splot) < 2:
+                    yield from self.send_message(message.channel, '```inform7\nDetailed help can be found at the link below.\nFor quick information on a command, type ">help (command)"\n```\nhttp://xyzzy.roadcrosser.xyz/help/')
+                else:
+                    if splot[1] not in self.helpdesk:
+                        yield from self.send_message(message.channel, '```diff\n-No information found on "{}".```'.format(splot[1]))
+                        return
+                    yield from self.send_message(message.channel, '```inform7\n"{}"```\nMore information: http://xyzzy.roadcrosser.xyz/help/#{}'.format(self.helpdesk[splot[1]], splot[1]))
                 return
 
             if cmd.startswith('forcequit') or cmd.startswith('mortim'):
@@ -381,7 +409,7 @@ class XYZZYbot(discord.Client):
 
                 for x in message.mentions:
                     self.blocked_users[message.server.id].append(x.id)
-                    yield from self.send_message(message.channel, '```xl\n"{}" has been restricted from entering commands in this server.```'.format(x.display_name))
+                    yield from self.send_message(message.channel, '```diff\n- "{}" has been restricted from entering commands in this server.```'.format(x.display_name))
 
                 with open('./bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
@@ -394,7 +422,7 @@ class XYZZYbot(discord.Client):
                 for x in message.mentions:
                     if x.id in self.blocked_users[message.server.id]:
                         self.blocked_users[message.server.id].remove(x.id)
-                        yield from self.send_message(message.channel, '```xl\n"{}" is now allowed to submit commands.```'.format(x.display_name))
+                        yield from self.send_message(message.channel, '```diff\n+ "{}" is now allowed to submit commands.```'.format(x.display_name))
 
                 with open('./bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
