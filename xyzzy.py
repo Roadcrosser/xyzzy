@@ -113,7 +113,7 @@ class XYZZYbot(discord.Client):
             print(bcolours.WARNING + 'Blocked user list not found. Creating new blocked user list...' + bcolours.ENDC)
             with open('./bot-data/blocked_users.json', 'w') as x:
                 x.write('{}')
-                self.user_preferences = {}
+                self.blocked_users = {}
 
         # print('Loading channel black/whitelists...')
         # for file in blacklist directory:
