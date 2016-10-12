@@ -378,7 +378,7 @@ class XYZZYbot(discord.Client):
             if cmd.startswith('help'):
                 splot = cmd.split(None, 1)
                 if len(splot) < 2:
-                    yield from self.send_message(message.channel, '```inform7\nDetailed help can be found at the link below.\nFor quick information on a command, type ">help (command)"\n```\nhttp://xyzzy.roadcrosser.xyz/help/')
+                    yield from self.send_message(message.channel, '```inform7\nDetailed help can be found at the link below.\nFor quick information on a command, type "{}help (command)"\n```\nhttp://xyzzy.roadcrosser.xyz/help/'.format(self.invoker * 2))
                 else:
                     if splot[1] not in self.helpdesk:
                         yield from self.send_message(message.channel, '```diff\n-No information found on "{}".```'.format(splot[1]))
