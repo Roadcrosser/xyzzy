@@ -278,8 +278,6 @@ class XYZZYbot(discord.Client):
                 self.channels[message.channel.id]['owner'] = message.author
                 # "owner", for lack of a better word, and that's my best excuse.
 
-                self.channels[message.channel.id]['bold_stbar'] = True
-
                 self.channels[message.channel.id]['channel'] = message.channel
 
                 yield from self.send_message(message.channel, '```py\nLoaded "{}".```'.format(
@@ -302,15 +300,11 @@ class XYZZYbot(discord.Client):
                             msg = ''
                             for i, line in enumerate(out.splitlines()):
                                 line = line.replace('*','\*').replace('__','\_\_').replace('~~','\~\~')
-                                if self.channels[message.channel.id]['bold_stbar'] and i == 0:
-                                    msg += '__**'
                                 if len(msg + line[self.channels[message.channel.id]['indent']:] + '\n') < 2000:
                                     msg += line[self.channels[message.channel.id]['indent']:] + '\n'
                                 else:
                                     yield from self.send_message(message.channel, msg)
                                     msg = line[self.channels[message.channel.id]['indent']:]
-                                if self.channels[message.channel.id]['bold_stbar'] and i == 0:
-                                    msg += '**__'
 
                             msg = msg.strip()
 
@@ -353,15 +347,6 @@ class XYZZYbot(discord.Client):
                         yield from self.send_message(message.channel, '```xl\nIndent Level is now "{}".```'.format(self.channels[message.channel.id]['indent']))
                     except ValueError:
                         yield from self.send_message(message.channel, '```diff\n!ERROR: {} is not a number.```'.format(message.content.split(None, 1)[1][:-1]))
-
-            if cmd.startswith('statusbar'):
-                if message.channel.id in self.channels:
-                    if self.channels[message.channel.id]['bold_stbar']:
-                        self.channels[message.channel.id]['bold_stbar'] = False
-                        yield from self.send_message(message.channel, '```xl\nEmboldened Status Bar is now OFF.```')
-                    else:
-                        self.channels[message.channel.id]['bold_stbar'] = True
-                        yield from self.send_message(message.channel, '```xl\nEmboldened Status Bar is now ON.```')
 
             if cmd.startswith('output'):
                 if message.channel.id in self.channels:
