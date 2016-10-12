@@ -10,4 +10,11 @@
 ./stories/905.z5 : 9:05
 ./stories/FailSafe.z5 : FailSafe
 ./stories/weapon.z5 : The Weapon
-./stories/hhgg.z5 : The Hitchhiker's Guide to the Galaxy
+./stories/hhgg.z3 : The Hitchhiker's Guide to the Galaxy
+./stories/zork1.z5 : Zork I
+./stories/AllRoads.z5 : All Roads
+./stories/slouch.z5 : Slouching Towards Bethlehem
+./stories/Balances.z5 : Balances
+./stories/across.z8 : Across The Stars: The Ralckor Incident
+./stories/69105keys.z5 : 69,105 Keys
+./stories/planetfall.z3 : Planetfall
