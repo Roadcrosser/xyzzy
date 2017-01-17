@@ -1,7 +1,12 @@
+@font-face {
+          font-family: Whitney Book;
+          src: url(https://discordapp.com/assets/e8acd7d9bf6207f99350ca9f9e23b168.woff) format('woff');
+        }
 body {
-    background: #222;
-    color: #BBB;
-    font-family: sans;
+    background: #36393E;
+    color: #FFF;
+    padding: 2em;
+    font-family: Whitney Book,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
 }
 
 header {
@@ -11,16 +16,21 @@ header {
 
 code {
     display: inline-block;
-    background: #444;
-    border: 1px solid #333;
+    background: #2E3136;
     border-radius: 3px;
     color: #DDD;
+    font-family: Consolas,Liberation Mono,Menlo,Courier,monospace;
     padding: 2px 4px;
 }
 code.block {
     display: block;
     padding: 0.65em;
+    border: 1px solid #282B30;
 
+}
+
+.xyzzy-command {
+  font-family: Consolas,Liberation Mono,Menlo,Courier,monospace;
 }
 .options {
     font-style: italic;
