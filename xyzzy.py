@@ -261,6 +261,14 @@ class XYZZYbot(discord.Client):
                         )
                     return
 
+                # don't play games in DM, kids.
+                if message.channel.is_private:
+                    yield from self.send_message(
+                        message.author,
+                        '```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```'
+                        )
+                    return
+
                 # extract story name from message
                 storyname = cmd[len(self.invoker) + 4:]
                 print('Searching for', storyname)
