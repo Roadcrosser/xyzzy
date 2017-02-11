@@ -374,12 +374,15 @@ class XYZZYbot(discord.Client):
                 if message.author.id not in self.owner_ids:
                     yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
                     return
-                if cmd.startswith('debug await '.format(self.invoker * 2)):
-                    response = yield from eval(cmd.split(None, 2)[2])
-                    yield from self.send_message(message.channel, response)
-                    return
+                try:
+                    if cmd.startswith('debug await '.format(self.invoker * 2)):
+                        response = yield from eval(cmd.split(None, 2)[2])
+                    else:
+                        response = eval(cmd.split(None, 1)[1])
+                except Exception as e:
+                    response = "```\n{}\n```".format(e)
 
-                yield from self.send_message(message.channel, eval(cmd.split(None, 1)[1]))
+                yield from self.send_message(message.channel, response)
                 return
 
             if cmd.startswith('announce '):
