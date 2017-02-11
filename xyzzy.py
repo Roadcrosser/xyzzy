@@ -5,9 +5,12 @@ if sys.platform == 'win32':
 
 import os # for checking if files exist.
 import asyncio # for asyncio's subprocess capabilities
+import aiohttp # for posting stats to APIs
+import json # for encoding stats for posting to API(s)
 import traceback # for printing tracebacks
 
 import json # for reading and writing to cfgs
+import datetime # to track uptime and whatever.
 
 from subprocess import PIPE
 # Because asyncio.subprocess uses regular subprocess's constants too.
@@ -32,6 +35,8 @@ class XYZZYbot(discord.Client):
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
         self.config = {}
+
+        self.timestamp = 0
 
         # read config file
         print('Reading "options.cfg", the configuration file...')
@@ -73,6 +78,14 @@ class XYZZYbot(discord.Client):
         if 'owner_ids' in self.config:
             for x in self.config['owner_ids'].split(','):
                 self.owner_ids.append(x.strip())
+
+        self.carbon_key = None
+        if 'carbon_key' in self.config:
+                self.carbon_key = self.config["carbon_key"]
+
+        self.dbots_key = None
+        if 'dbots_key' in self.config:
+                self.dbots_key = self.config["dbots_key"]
 
         print('Reading story database...')
 
@@ -158,6 +171,34 @@ class XYZZYbot(discord.Client):
                 )
             )
         self.home_channel = self.get_channel(self.home_channel_id)
+        if not self.timestamp:
+            self.timestamp = datetime.datetime.utcnow().timestamp()
+            while True:
+                server_count = len(self.servers)
+                session = aiohttp.ClientSession()
+                if self.carbon_key:
+                    carbon_url = "https://www.carbonitex.net/discord/data/botdata.php"
+                    carbon_data = {"key" : self.carbon_key, "servercount" : server_count}
+                    print("\nPosting to Carbotinex...")
+                    resp = yield from session.post(carbon_url, data=carbon_data)
+                    status = resp.status
+                    text = yield from resp.text()
+                    print("[{}] {}".format(status, text))
+                    yield from resp.release()
+
+                if self.dbots_key:
+                    dbots_url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
+                    dbots_data = json.dumps({"server_count" : server_count})
+                    dbots_headers = {"Authorization" : self.dbots_key, "content-type":"application/json"}
+                    print("\nPosting to Discord Bots...")
+                    resp = yield from session.post(dbots_url, data=dbots_data, headers=dbots_headers)
+                    status = resp.status
+                    text = yield from resp.text()
+                    print("[{}] {}".format(status, text))
+                    yield from resp.release()
+
+                yield from session.close()
+                yield from asyncio.sleep(3600)
 
     @asyncio.coroutine
     def on_server_join(self, server):
