@@ -223,8 +223,8 @@ class XYZZYbot(discord.Client):
             #     )
             return
 
-        # Disallow bot accounts from submitting commands.
-        if message.author.bot:
+        # Disallow bot accounts or channels the bot is blocked in from submitting commands.
+        if message.author.bot or (not message.channel.is_private and not message.channel.permissions_for(message.server.me).send_messages):
             return
 
         # Disallow blocked users from submitting commands.
