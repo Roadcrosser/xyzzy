@@ -474,7 +474,7 @@ class XYZZYbot(discord.Client):
                     json.dump(self.blocked_users, x)
 
             if cmd.startswith('backticks '):
-                if cmd.endswith('on') or cmd.endswith('off'):
+                if cmd.endswith(('on', 'off')):
                     if cmd.endswith('on'):
                         if message.author.id in self.user_preferences['backticks']:
                             self.user_preferences['backticks'].remove(message.author.id)
