@@ -242,8 +242,10 @@ class XYZZYbot(discord.Client):
 
             if not message.content.startswith('`'):
                 cmd = message.content.lower()[len(self.invoker * 2):]
+                cmdmsg = message.content[len(self.invoker * 2):]
             else:
                 cmd = message.content.lower()[len(self.invoker * 2) + 1: -1]
+                cmdmsg = message.content[len(self.invoker * 2) + 1: -1]
 
             # load new game
             if cmd.startswith('play '):
@@ -384,9 +386,9 @@ class XYZZYbot(discord.Client):
                     return
                 try:
                     if cmd.startswith('debug await '.format(self.invoker * 2)):
-                        response = yield from eval(cmd.split(None, 2)[2])
+                        response = yield from eval(cmdmsg.split(None, 2)[2])
                     else:
-                        response = eval(cmd.split(None, 1)[1])
+                        response = eval(cmdmsg.split(None, 1)[1])
                 except Exception as e:
                     response = "```\n{}\n```".format(e)
 
@@ -397,7 +399,7 @@ class XYZZYbot(discord.Client):
                 if message.author.id not in self.owner_ids:
                     yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
                     return
-                announcement = cmd.split(None, 1)[1]
+                announcement = cmdmsg.split(None, 1)[1]
                 for x in self.channels:
                     yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
 
