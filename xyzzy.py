@@ -6,10 +6,10 @@ if sys.platform == 'win32':
 import os # for checking if files exist.
 import asyncio # for asyncio's subprocess capabilities
 import aiohttp # for posting stats to APIs
-import json # for encoding stats for posting to API(s)
 import traceback # for printing tracebacks
 
-import json # for reading and writing to cfgs
+import json # for reading and writing to cfgs and POSTing to APIs
+import configparser # for reading the configs
 import datetime # to track uptime and whatever.
 
 from subprocess import PIPE
@@ -41,19 +41,11 @@ class XYZZYbot(discord.Client):
         # read config file
         print('Reading "options.cfg", the configuration file...')
 
-        with open('options.cfg') as configdata:
-            for line in configdata:
-                if not line.startswith('#'):
-                    # Like Python, our comments start with #.
-                    if '=' not in line:
-                        if line.strip() != '':
-                            raise Exception('I found a line that didn\'t have an equals sign in it. You should start comments with a number sign (#) so I know not to read them like configuration commands.')
-                    else:
-                        # Split the line where the first = occurs and save it as
-                        # key/string pairs in the dictionary.
-                        x = line.split('=', 1)
+        parser = configparser.ConfigParser()
 
-                        self.config[x[0].strip()] = x[1].strip()
+        with open('options.cfg') as configdata: # well that was easy
+            parser.read_string(configdata.read())
+            self.config = dict(parser._sections["Config"])
 
         if 'invoker' not in self.config:
             raise Exception('One of the lines in your configuration file must define an invoker. Make sure one of your lines is "invoker = >" or something similar.')
