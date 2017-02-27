@@ -153,6 +153,14 @@ class XYZZYbot(discord.Client):
         # run any initialization discord.py needs to do for this class.
         super().__init__()
 
+    def get_top_colour(self, member):
+        colour = discord.Colour.default()
+        roles = [(r.position, r.colour) for r in member.roles if r.colour != colour]
+        roles = [r[1] for r in sorted(roles, key=lambda x: x[0], reverse=True)]
+        if roles:
+            colour = roles[0]
+        return colour
+
     @asyncio.coroutine
     def on_ready(self):
         print(
@@ -363,7 +371,7 @@ class XYZZYbot(discord.Client):
                                 if len(msg + line[self.channels[message.channel.id]['indent']:] + '\n') < 2000:
                                     msg += line[self.channels[message.channel.id]['indent']:] + '\n'
                                 else:
-                                    yield from self.send_message(message.channel, msg)
+                                    yield from self.send_message(message.channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(message.server.me)))
                                     msg = line[self.channels[message.channel.id]['indent']:]
 
                             msg = msg.strip()
@@ -371,7 +379,7 @@ class XYZZYbot(discord.Client):
                             if self.channels[message.channel.id]['output']:
                                 print(msg)
 
-                            yield from self.send_message(message.channel, msg)
+                            yield from self.send_message(message.channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(message.server.me)))
 
                             obuffer = b''
 
