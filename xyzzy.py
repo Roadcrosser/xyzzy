@@ -160,6 +160,13 @@ class XYZZYbot(discord.Client):
         if roles:
             colour = roles[0]
         return colour
+    
+    def output_story(self, channel, msg):
+        if channel.permissions_for(channel.server.me).embed_links:
+            yield from self.send_message(channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(channel.server.me)))
+        else:
+            yield from self.send_message(channel, msg)
+
 
     @asyncio.coroutine
     def on_ready(self):
@@ -371,7 +378,7 @@ class XYZZYbot(discord.Client):
                                 if len(msg + line[self.channels[message.channel.id]['indent']:] + '\n') < 2000:
                                     msg += line[self.channels[message.channel.id]['indent']:] + '\n'
                                 else:
-                                    yield from self.send_message(message.channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(message.server.me)))
+                                    yield from self.output_story(message.channel, msg)
                                     msg = line[self.channels[message.channel.id]['indent']:]
 
                             msg = msg.strip()
@@ -379,7 +386,7 @@ class XYZZYbot(discord.Client):
                             if self.channels[message.channel.id]['output']:
                                 print(msg)
 
-                            yield from self.send_message(message.channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(message.server.me)))
+                            yield from self.output_story(message.channel, msg)
 
                             obuffer = b''
 
