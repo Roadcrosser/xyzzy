@@ -125,7 +125,7 @@ class XYZZYbot(discord.Client):
         #     load json file for each server
 
         self.helpdesk = {
-            'backticks' : '>>backticks [ on | off ]\nEnables or disables the requirement for Xyzzy to require backticks before and after each command. This is on by default.\nUsing this command only changes the setting for you.',
+            'backticks' : '>>backticks [ on | off ]\nEnables or disables the requirement for Xyzzy to require backticks before and after each command. This is off by default.\nUsing this command only changes the setting for you.',
             'play' : '>>play [ Game name ]\nTells xyzzy to start playing the game specified in [Game name] in the current channel. If no game is found with that name, xyzzy will show you all games with the text of [Game name] in their name. If only one game is found with that text in it\'s name, it will start that game.',
             'indent' : '>>indent [ indent level ]\nWill make xyzzy scrap the first [indent level] characters for each line in his output. If you\'re noticing random spaces after each line break, use this command.\n[Indent level] must be an integer between 0 and the total console width. (Usually 80.)',
             'forcequit': '>>forcequit or >>mortim\nAfter confirmation, terminates the process running the xyzzy game you are playing. [It is recommended to try to exit the game using an in-game method before using this command.] >quit usually works.\nThis command has an alias in >>mortim',
@@ -225,7 +225,7 @@ class XYZZYbot(discord.Client):
         # Don't even start if the message doesn't fit our invokation syntax.
         # This is the most disgusting conditional I have ever written.
         if not (message.content.startswith('`{}'.format(self.invoker)) and message.content.endswith('`')) and \
-         not (message.content.startswith('{}'.format(self.invoker)) and message.author.id in self.user_preferences['backticks']):
+         not (message.content.startswith('{}'.format(self.invoker)) and not message.author.id in self.user_preferences['backticks']):
             # If you need to debug, pop this big-ass print statement open.
             # print(
             #     message.content.startswith('`{}'.format(self.invoker)),
@@ -247,12 +247,8 @@ class XYZZYbot(discord.Client):
             yield from self.send_message(message.author, '```diff\n!An administrator has disabled your ability to submit commands in "{}".```'.format(message.server.name))
             return
 
-        if message.content.startswith(
-            '`{}'.format(self.invoker * 2)
-            ) or (message.content.startswith(
-                '{}'.format(self.invoker * 2)
-                ) and message.author.id in self.user_preferences['backticks']
-            ):
+        if (message.content.startswith('`{}'.format(self.invoker * 2))
+            or (message.content.startswith('{}'.format(self.invoker * 2)))):
             # define bot commands here
 
             if not message.content.startswith('`'):
@@ -490,17 +486,17 @@ class XYZZYbot(discord.Client):
 
             if cmd.startswith('backticks '):
                 if cmd.endswith(('on', 'off')):
-                    if cmd.endswith('on'):
-                        if message.author.id in self.user_preferences['backticks']:
-                            self.user_preferences['backticks'].remove(message.author.id)
+                    if cmd.endswith('on'):      
+                        if message.author.id not in self.user_preferences['backticks']:
+                            self.user_preferences['backticks'].append(message.author.id)
                             yield from self.send_message(message.channel, '```diff\n+Commands from you now require backticks. (They should look `{}like this`)```'.format(self.invoker))
                         else:
                             yield from self.send_message(message.channel, '```diff\n!Your preferences are already set to require backticks for commands.```')
                             return
                     else:
-                        if message.author.id not in self.user_preferences['backticks']:
-                            self.user_preferences['backticks'].append(message.author.id)
-                            yield from self.send_message(message.channel, '```diff\n+Commands from you no longer require backticks. (They should look {}like this)\n+XYZZY will still accept backticked commands in case you forget you set this option.```'.format(self.invoker, self.invoker*2))
+                        if message.author.id in self.user_preferences['backticks']:
+                            self.user_preferences['backticks'].remove(message.author.id)
+                            yield from self.send_message(message.channel, '```diff\n+Commands from you no longer require backticks. (They should look {}like this)\n+XYZZY will still accept backticked commands.```'.format(self.invoker, self.invoker*2))
                         else:
                             yield from self.send_message(message.channel, '```diff\n!Your preferences are already set such that backticks are not required for commands.```')
                             return
@@ -564,10 +560,10 @@ class XYZZYbot(discord.Client):
             return
 
         if message.channel.id in self.channels:
-            if message.author.id in self.user_preferences['backticks']:
+            if not message.content.startswith('`'):
                 cmd = message.content[len(self.invoker):] + '\n'
             else:
-                cmd = message.content[len(self.invoker) + 1:-1] + '\n'
+                cmd = message.content[len(self.invoker) + 1: -1] + '\n'
             self.channels[message.channel.id]['process'].stdin.write(cmd.encode('utf-8'))
 
     @asyncio.coroutine
