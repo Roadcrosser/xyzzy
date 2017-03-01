@@ -35,7 +35,7 @@
 ./stories/FragileShells.z8 : Fragile Shells
 ./stories/Galatea.z8 : Galatea
 ./stories/Glass.z5 : Glass
-./stories/hollywowod.z5 : Hollywood Hijinx
+./stories/hollywood.z5 : Hollywood Hijinx
 ./stories/infidel.z5 : Infidel
 ./stories/LostPig.z8 : Lost Pig
 ./stories/MakeItGood.z8 : Make It Good
