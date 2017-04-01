@@ -87,6 +87,8 @@ class XYZZYbot(discord.Client):
         if 'gist_id' in self.config:
             self.gist_id = self.config["gist_id"]
 
+        self.gist_data_cache = None
+        
         print('Reading story database...')
 
         self.stories = {}
@@ -221,12 +223,16 @@ class XYZZYbot(discord.Client):
                     gist_data = json.dumps({"server_count" : server_count, "session_count" : session_count, "token" : gist_token})
                     gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": gist_data}}})
                     gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
-                    print("\nPosting to Github...")
-                    resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
-                    status = resp.status
-                    text = yield from resp.text()
-                    print("[{}]".format(status))
-                    yield from resp.release()
+                    if self.gist_data_cache != gist_data:
+                        print("\nPosting to Github...")
+                        resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                        status = resp.status
+                        text = yield from resp.text()
+                        print("[{}]".format(status))
+                        yield from resp.release()
+                        self.gist_data_cache = gist_data
+                    else:
+                        print("\nGithub posting skipped.")
 
                 yield from session.close()
                 yield from asyncio.sleep(3600)
