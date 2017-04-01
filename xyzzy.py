@@ -73,11 +73,19 @@ class XYZZYbot(discord.Client):
 
         self.carbon_key = None
         if 'carbon_key' in self.config:
-                self.carbon_key = self.config["carbon_key"]
+            self.carbon_key = self.config["carbon_key"]
 
         self.dbots_key = None
         if 'dbots_key' in self.config:
-                self.dbots_key = self.config["dbots_key"]
+            self.dbots_key = self.config["dbots_key"]
+
+        self.gist_key = None
+        if 'gist_key' in self.config:
+            self.gist_key = self.config["gist_key"]
+
+        self.gist_id = None
+        if 'gist_id' in self.config:
+            self.gist_id = self.config["gist_id"]
 
         print('Reading story database...')
 
@@ -181,7 +189,10 @@ class XYZZYbot(discord.Client):
         if not self.timestamp:
             self.timestamp = datetime.datetime.utcnow().timestamp()
             while True:
+
                 server_count = len(self.servers)
+                session_count = len(self.channels)
+
                 session = aiohttp.ClientSession()
                 if self.carbon_key:
                     carbon_url = "https://www.carbonitex.net/discord/data/botdata.php"
@@ -202,6 +213,19 @@ class XYZZYbot(discord.Client):
                     status = resp.status
                     text = yield from resp.text()
                     print("[{}] {}".format(status, text))
+                    yield from resp.release()
+                
+                if self.gist_key and self.gist_id:
+                    gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
+                    gist_token = "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
+                    gist_data = json.dumps({"server_count" : server_count, "session_count" : session_count, "token" : gist_token})
+                    gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": gist_data}}})
+                    gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
+                    print("\nPosting to Github...")
+                    resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                    status = resp.status
+                    text = yield from resp.text()
+                    print("[{}]".format(status))
                     yield from resp.release()
 
                 yield from session.close()
