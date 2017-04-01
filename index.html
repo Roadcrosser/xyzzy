@@ -32,6 +32,7 @@
           <div class='command'>>x xyzzy</div>
           <div class='response'>
             <p>The construct appears to you as an ancient computer, one from the Old Age, a cream-colored CRT Monitor with a cream-colored keyboard in front of it. The tower sits next to the monitor, whirring away. You sense a magical aura connecting this construct to Discord's servers.</p>
+            <p>Hidden near the back, you spy a device labelled "Stats Display".</p>
             <p>A single line is displayed on the monitor, which reads <span class='green'>AWAITING INPUT</span>.</p>
           </div>
           <div class='command'>>press key</div>
@@ -58,9 +59,15 @@
       <div class="parallax__layer--base">
         <div class="colored">
           <div class='command'>>about</div>
-          <div class='response'>xyzzy is a Discord Bot designed to bridge the gap between shell-based Interactive Fiction interpreters and Discord chat rooms, allowing people to enjoy these wonderful stories with friends. While the bot is currently in development, you can track our progress and join our private server to see xyzzy in action.</div>
+          <div class='response'>xyzzy is a Discord Bot designed to bridge the gap between shell-based Interactive Fiction interpreters and Discord chat rooms, allowing people to enjoy these wonderful stories with friends. While the bot is currently in development, you can track our progress and join our server to see xyzzy in action.</div>
+          <div class='command'>>x stats display</div>
+          <div class='response'>
+            <p>A display sits in the back, almost out of view, consisting of boards with printed text and nixie tubes. The whole thing reads:</p>
+            <p class="display">xyzzy is on <span class="green" id="server_count">0000</span> servers with <span class="green" id="session_count">0000</span> currently active sessions.</p>
+            <p>You spot a sticky note in the corner reading "data updated hourly".</p>
+          </div>
           <div id='buttons'>
-            <a href="https://discord.gg/0yNyC2AVoVk5krWV" class="button">Join Server</a><a href="https://trello.com/b/JLBcT10o/xyzzy-discord-bot" class="button">View Trello</a><a href="http://xyzzy.roadcrosser.xyz/invite" class="button">Invite Bot</a>
+            <a href="https://discord.gg/0yNyC2AVoVk5krWV" class="button">Join Server</a><a href="http://xyzzy.roadcrosser.xyz/invite" class="button">Invite Bot</a><a href="http://xyzzy.roadcrosser.xyz/help" class="button">View Bot Help</a>
             <!-- Due to a dumb thing where browsers will interpret the whitespace between inline elements as text, you have to smoosh these As together to avoid a space character being generated between them. -->
           </div>
           <div id='bottom'>
@@ -75,5 +82,18 @@
       </div>
     </div>
   </div>
+<script>
+  var http_req = new XMLHttpRequest();
+  var url = ""
+  http_req.open("GET", url, false);
+  http_req.send(null);
+
+  var json_data = JSON.parse(http_req.responseText);
+
+  var server_count = document.getElementById("server_count");
+  var session_count = document.getElementById("session_count");
+  server_count.innerHTML = json_data.server_count;
+  session_count.innerHTML = json_data.session_count;
+</script>
 </body>
 </html>

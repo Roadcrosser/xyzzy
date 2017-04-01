@@ -148,6 +148,10 @@ span.green{
   font-weight: bold;
 }
 
+.display{
+  font-size: 150%;
+}
+
 #buttons {
   text-align: center;
 }
