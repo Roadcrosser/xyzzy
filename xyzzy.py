@@ -397,7 +397,7 @@ class XYZZYbot(discord.Client):
                         obuffer += output
                     except asyncio.TimeoutError:
                         if obuffer != b'':
-                            out = obuffer.decode('utf-8')
+                            out = obuffer.decode("utf-8", "replace")
                             msg = ''
                             for i, line in enumerate(out.splitlines()):
                                 line = line.replace('*','\*').replace('__','\_\_').replace('~~','\~\~')
@@ -598,7 +598,7 @@ class XYZZYbot(discord.Client):
                 cmd = message.content[len(self.invoker):] + '\n'
             else:
                 cmd = message.content[len(self.invoker) + 1: -1] + '\n'
-            self.channels[message.channel.id]['process'].stdin.write(cmd.encode('utf-8'))
+            self.channels[message.channel.id]['process'].stdin.write(cmd.encode("utf-8", "replace"))
 
     @asyncio.coroutine
     def on_error(self, e, *args):
