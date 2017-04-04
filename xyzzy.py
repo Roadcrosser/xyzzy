@@ -484,7 +484,11 @@ class XYZZYbot(discord.Client):
                      x == '`{}y`'.format(self.invoker * 2) or\
                      x == '{}yes'.format(self.invoker * 2) or\
                      x == '{}y'.format(self.invoker * 2):
-                        self.channels[message.channel.id]['process'].terminate()
+                        try:
+                            self.channels[message.channel.id]['process'].terminate()
+                        except ProcessLookupError:
+                            yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
+                            self.channels.pop(message.channel.id) # just pop the whole thing if the process fails to terminate
 
             if cmd.startswith('plugh ') or cmd.startswith('block '):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
