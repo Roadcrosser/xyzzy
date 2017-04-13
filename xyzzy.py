@@ -506,6 +506,12 @@ class XYZZYbot(discord.Client):
                         return
                     yield from self.send_message(message.channel, '```inform7\n"{}"```\nMore information: http://xyzzy.roadcrosser.xyz/help/#{}'.format(self.helpdesk[splot[1]], splot[1]))
                 return
+            
+            if cmd.startswith('about'):
+                yield from self.send_message(message.channel, 'Information about xyzzy can be found here: http://roadcrosser.xyz/zy')
+            
+            if cmd.startswith('invite') or cmd.startswith('join'):
+                yield from self.send_message(message.channel, 'This bot can be invited through the following URL: http://xyzzy.roadcrosser.xyz/invite')
 
             if cmd.startswith('forcequit') or cmd.startswith('mortim'):
                 if message.channel.id in self.channels:
