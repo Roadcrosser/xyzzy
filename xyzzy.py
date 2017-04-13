@@ -419,6 +419,8 @@ class XYZZYbot(discord.Client):
                 # create subprocesses
                 self.channels[message.channel.id]['process'] = yield from asyncio.create_subprocess_shell(self.interpreter + ' ' + self.channels[message.channel.id]['file'], stdout=PIPE, stdin=PIPE)
 
+                yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
+
                 # The rest of the on_message event will iterate forever, reading
                 # output from the program and posting any info produced
                 obuffer = b''
@@ -449,6 +451,7 @@ class XYZZYbot(discord.Client):
 
                 yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
                 self.channels.pop(message.channel.id)
+                yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
 
                 return
 
@@ -529,6 +532,7 @@ class XYZZYbot(discord.Client):
                         except ProcessLookupError:
                             yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
                             self.channels.pop(message.channel.id) # just pop the whole thing if the process fails to terminate
+                    yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
 
             if cmd.startswith('plugh ') or cmd.startswith('block '):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
