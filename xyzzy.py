@@ -88,6 +88,8 @@ class XYZZYbot(discord.Client):
             self.gist_id = self.config["gist_id"]
 
         self.gist_data_cache = None
+
+        self.gist_story_cache = None
         
         print('Reading story database...')
 
@@ -199,10 +201,21 @@ class XYZZYbot(discord.Client):
                 text = yield from resp.text()
                 text = json.loads(text)
                 status = resp.status
-                gist_data_cache = json.loads(text["files"]["xyzzy_data.json"]["content"])
+                self.gist_data_cache = json.loads(text["files"]["xyzzy_data.json"]["content"])
+                self.gist_story_cache = json.loads(text["files"]["xyzzy_stories.json"]["content"])
                 print("[{}]".format(status))
                 yield from resp.release()
+
+                gist_story = sorted([i for i in self.stories])
+                if self.gist_story_cache != gist_story:
+                    gist_story = json.dumps({"files" : {"xyzzy_stories.json" : {"content": json.dumps(gist_story)}}})
+                    resp = yield from session.patch(gist_url, data=gist_story, headers=gist_headers)
+                    status = resp.status
+                    print("[{}]".format(status))
+                    yield from resp.release()
+
                 yield from session.close()
+                
             while True:
 
                 server_count = len(self.servers)
@@ -459,7 +472,7 @@ class XYZZYbot(discord.Client):
                         yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
                     except:
                         pass
-                        
+
             if cmd.startswith('indent '):
                 if message.channel.id in self.channels:
                     try:
