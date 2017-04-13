@@ -220,17 +220,17 @@ class XYZZYbot(discord.Client):
                 if self.gist_key and self.gist_id:
                     gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
                     gist_token = "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
-                    gist_data = json.dumps({"server_count" : server_count, "session_count" : session_count, "token" : gist_token})
-                    gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": gist_data}}})
-                    gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
+                    gist_data = {"server_count" : server_count, "session_count" : session_count, "token" : gist_token}
                     if self.gist_data_cache != gist_data:
-                        print("\nPosting to Github...")
-                        resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
-                        status = resp.status
-                        text = yield from resp.text()
-                        print("[{}]".format(status))
-                        yield from resp.release()
                         self.gist_data_cache = gist_data
+                        gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": json.dumps(gist_data)}}})
+                        gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
+                            print("\nPosting to Github...")
+                            resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                            status = resp.status
+                            text = yield from resp.text()
+                            print("[{}]".format(status))
+                            yield from resp.release()
                     else:
                         print("\nGithub posting skipped.")
 
