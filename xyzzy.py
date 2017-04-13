@@ -455,8 +455,11 @@ class XYZZYbot(discord.Client):
                     return
                 announcement = cmdmsg.split(None, 1)[1]
                 for x in self.channels:
-                    yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
-
+                    try:
+                        yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
+                    except:
+                        pass
+                        
             if cmd.startswith('indent '):
                 if message.channel.id in self.channels:
                     try:
