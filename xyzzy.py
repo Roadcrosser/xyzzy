@@ -215,7 +215,7 @@ class XYZZYbot(discord.Client):
                     yield from resp.release()
 
                 yield from session.close()
-                
+
             while True:
 
                 server_count = len(self.servers)
@@ -314,6 +314,11 @@ class XYZZYbot(discord.Client):
                 cmd = message.content.lower()[len(self.invoker * 2) + 1: -1]
                 cmdmsg = message.content[len(self.invoker * 2) + 1: -1]
 
+            if cmd == "play":
+                yield from self.send_message(
+                    message.channel,
+                    '```diff\n-No story was specified with this command.```'
+                    )
             # load new game
             if cmd.startswith('play '):
 
