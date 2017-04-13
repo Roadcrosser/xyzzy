@@ -1,0 +1,20 @@
+@font-face {
+          font-family: Whitney Book;
+          src: url(https://discordapp.com/assets/e8acd7d9bf6207f99350ca9f9e23b168.woff) format('woff');
+        }
+body {
+    background: #36393E;
+    color: #FFF;
+    margin-left: 20%;
+    margin-right: 20%;
+    font-family: Whitney Book,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
+}
+
+header {
+    font-size: 4em;
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+}
