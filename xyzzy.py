@@ -630,6 +630,9 @@ class XYZZYbot(discord.Client):
                     yield from self.send_message(message.channel, '```md\n# Invalid response. #```')
 
             if cmd.startswith('nowplaying'):
+                if message.author.id not in self.owner_ids:
+                    yield from self.send_message(message.channel, '```diff\n!You are not in Owner ID list, therefore you cannot use this command.```')
+                    return
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
                     msg += '[{}]({}) {}\n'.format(self.channels[x]['channel'].server.name,self.channels[x]['channel'].name,self.channels[x]['game'])
