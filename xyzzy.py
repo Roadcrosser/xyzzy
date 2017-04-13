@@ -407,6 +407,7 @@ class XYZZYbot(discord.Client):
 
                 self.channels[message.channel.id]['indent'] = 0
                 self.channels[message.channel.id]['output'] = False
+                self.channels[message.channel.id]['last'] = message.timestamp
                 self.channels[message.channel.id]['owner'] = message.author
                 # "owner", for lack of a better word, and that's my best excuse.
 
@@ -638,6 +639,7 @@ class XYZZYbot(discord.Client):
             return
 
         if message.channel.id in self.channels:
+            self.channels[message.channel.id]['last'] = message.timestamp
             if not message.content.startswith('`'):
                 cmd = message.content[len(self.invoker):] + '\n'
             else:
