@@ -190,6 +190,19 @@ class XYZZYbot(discord.Client):
         self.home_channel = self.get_channel(self.home_channel_id)
         if not self.timestamp:
             self.timestamp = datetime.datetime.utcnow().timestamp()
+            if self.gist_key and self.gist_id:
+                session = aiohttp.ClientSession()
+                gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
+                gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
+                print("\nFetching cached Github data...")
+                resp = yield from session.get(gist_url, headers=gist_headers)
+                text = yield from resp.text()
+                text = json.loads(text)
+                status = resp.status
+                gist_data_cache = json.loads(text["files"]["xyzzy_data.json"]["content"])
+                print("[{}]".format(status))
+                yield from resp.release()
+                yield from session.close()
             while True:
 
                 server_count = len(self.servers)
@@ -225,12 +238,12 @@ class XYZZYbot(discord.Client):
                         self.gist_data_cache = gist_data
                         gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": json.dumps(gist_data)}}})
                         gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
-                            print("\nPosting to Github...")
-                            resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
-                            status = resp.status
-                            text = yield from resp.text()
-                            print("[{}]".format(status))
-                            yield from resp.release()
+                        print("\nPosting to Github...")
+                        resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                        status = resp.status
+                        text = yield from resp.text()
+                        print("[{}]".format(status))
+                        yield from resp.release()
                     else:
                         print("\nGithub posting skipped.")
 
