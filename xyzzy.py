@@ -635,7 +635,12 @@ class XYZZYbot(discord.Client):
                     return
                 msg = '```md\n## Currently playing games: ##\n'
                 for x in self.channels:
-                    msg += '[{}]({}) {}\n'.format(self.channels[x]['channel'].server.name,self.channels[x]['channel'].name,self.channels[x]['game'])
+                    msg += '[{}]({}) {} {{{} minutes ago}}\n'.format(
+                        self.channels[x]['channel'].server.name,
+                        self.channels[x]['channel'].name,
+                        self.channels[x]['game'],
+                        int( ( ( message.timestamp - self.channels[x]["last"] ).total_seconds() )/60 )
+                        )
                 msg += '```'
                 yield from self.send_message(message.author, msg)
 
