@@ -200,6 +200,7 @@ class XYZZYbot(discord.Client):
         self.home_channel = self.get_channel(self.home_channel_id)
         if not self.timestamp:
             self.timestamp = datetime.datetime.utcnow().timestamp()
+            yield from self.update_status()
             if self.gist_key and self.gist_id:
                 session = aiohttp.ClientSession()
                 gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
@@ -428,7 +429,7 @@ class XYZZYbot(discord.Client):
                 # create subprocesses
                 self.channels[message.channel.id]['process'] = yield from asyncio.create_subprocess_shell(self.interpreter + ' ' + self.channels[message.channel.id]['file'], stdout=PIPE, stdin=PIPE)
 
-                yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
+                yield from self.update_status()
 
                 # The rest of the on_message event will iterate forever, reading
                 # output from the program and posting any info produced
@@ -460,7 +461,7 @@ class XYZZYbot(discord.Client):
 
                 yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
                 self.channels.pop(message.channel.id)
-                yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
+                yield from self.update_status()
 
                 return
 
@@ -541,7 +542,7 @@ class XYZZYbot(discord.Client):
                         except ProcessLookupError:
                             yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
                             self.channels.pop(message.channel.id) # just pop the whole thing if the process fails to terminate
-                    yield from self.change_presence(game=discord.Game(name="{} game{}.".format(len(self.channels), "s" if len(self.channels) != 1 else "")))
+                    yield from self.update_status()
 
             if cmd.startswith('plugh ') or cmd.startswith('block '):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
