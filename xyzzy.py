@@ -490,6 +490,7 @@ class XYZZYbot(discord.Client):
                         yield from self.send_message(self.channels[x]['channel'], '```{}```'.format(announcement))
                     except:
                         pass
+                return
 
             if cmd.startswith('indent '):
                 if message.channel.id in self.channels:
@@ -498,6 +499,7 @@ class XYZZYbot(discord.Client):
                     except ValueError:
                         yield from self.send_message(message.channel, '```basic\n"Indent Level" is now {}.```'.format(self.channels[message.channel.id]['indent']))
                         yield from self.send_message(message.channel, '```diff\n!ERROR: {} is not a number.```'.format(message.content.split(None, 1)[1][:-1]))
+                return
 
             if cmd.startswith('output'):
                 if message.channel.id in self.channels:
@@ -522,9 +524,11 @@ class XYZZYbot(discord.Client):
             
             if cmd.startswith('about'):
                 yield from self.send_message(message.channel, 'Information about xyzzy can be found here: http://roadcrosser.xyz/zy')
-            
+                return
+
             if cmd.startswith('invite') or cmd.startswith('join'):
                 yield from self.send_message(message.channel, 'This bot can be invited through the following URL: http://xyzzy.roadcrosser.xyz/invite')
+                return
 
             if cmd.startswith('forcequit') or cmd.startswith('mortim'):
                 if message.channel.id in self.channels:
@@ -543,6 +547,7 @@ class XYZZYbot(discord.Client):
                             yield from self.send_message(message.channel, '```diff\n-The game has ended.```')
                             self.channels.pop(message.channel.id) # just pop the whole thing if the process fails to terminate
                     yield from self.update_status()
+                return
 
             if cmd.startswith('plugh ') or cmd.startswith('block '):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
@@ -558,6 +563,7 @@ class XYZZYbot(discord.Client):
 
                 with open('./bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
+                return
 
             if cmd.startswith('unblock '):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
@@ -571,6 +577,7 @@ class XYZZYbot(discord.Client):
 
                 with open('./bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
+                return
 
             if cmd.startswith('backticks '):
                 if cmd.endswith(('on', 'off')):
@@ -592,6 +599,7 @@ class XYZZYbot(discord.Client):
                         json.dump(self.user_preferences, x)
                 else:
                     yield from self.send_message(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.```')
+                return
 
             if cmd.startswith('list'):
                 msg = '```md\n# Here are all of the games I have available: #\n{}```'.format('\n'.join(self.stories))
@@ -599,6 +607,7 @@ class XYZZYbot(discord.Client):
                     yield from self.send_message(message.channel, msg)
                     return
                 yield from self.send_message(message.author, msg)
+                return
 
             if cmd.startswith('shutdown'):
                 if message.author.id not in self.owner_ids:
@@ -637,6 +646,7 @@ class XYZZYbot(discord.Client):
                          return
 
                     yield from self.send_message(message.channel, '```md\n# Invalid response. #```')
+                return
 
             if cmd.startswith('nowplaying'):
                 if message.author.id not in self.owner_ids:
@@ -652,15 +662,17 @@ class XYZZYbot(discord.Client):
                         )
                 msg += '```'
                 yield from self.send_message(message.author, msg)
-            
+                return
+
             # Insert easter eggs here
 
             if cmd == 'get ye flask':
                 yield from self.send_message(message.channel, 'You can\'t get ye flask!')
+                return
 
             if re.match("((can|does|is) this bot (play )?(cah|cards against humanity|pretend you'?re xyzzy))", cmd):
                 yield from self.send_message(message.channel, 'no.')
-            
+                return
             return
 
         if message.channel.id in self.channels:
