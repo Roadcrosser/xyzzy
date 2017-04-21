@@ -11,6 +11,7 @@ import traceback # for printing tracebacks
 import json # for reading and writing to cfgs and POSTing to APIs
 import configparser # for reading the configs
 import datetime # to track uptime and whatever.
+import re # for that one easter egg
 
 from subprocess import PIPE
 # Because asyncio.subprocess uses regular subprocess's constants too.
@@ -173,6 +174,13 @@ class XYZZYbot(discord.Client):
             colour = roles[0]
         return colour
     
+    def update_status(self):
+        status = "nothing yet!"
+        if len(self.channels) > 0:
+            status = "{} game{}.".format(len(self.channels), "s" if len(self.channels) > 1 else "")
+
+        yield from self.change_presence(game=discord.Game(name=status))
+
     def output_story(self, channel, msg):
         if channel.permissions_for(channel.server.me).embed_links:
             yield from self.send_message(channel, embed=discord.Embed(description=msg, colour=self.get_top_colour(channel.server.me)))
@@ -643,7 +651,15 @@ class XYZZYbot(discord.Client):
                         )
                 msg += '```'
                 yield from self.send_message(message.author, msg)
+            
+            # Insert easter eggs here
 
+            if cmd == 'get ye flask':
+                yield from self.send_message(message.channel, 'You can\'t get ye flask!')
+
+            if re.match("((can|does|is) this bot (play )?(cah|cards against humanity|pretend you'?re xyzzy))", cmd):
+                yield from self.send_message(message.channel, 'no.')
+            
             return
 
         if message.channel.id in self.channels:
