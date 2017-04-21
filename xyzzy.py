@@ -526,11 +526,11 @@ class XYZZYbot(discord.Client):
                 yield from self.send_message(message.channel, 'Information about xyzzy can be found here: http://roadcrosser.xyz/zy')
                 return
 
-            if cmd.startswith('invite') or cmd.startswith('join'):
+            if cmd.startswith(('invite', 'join')):
                 yield from self.send_message(message.channel, 'This bot can be invited through the following URL: http://xyzzy.roadcrosser.xyz/invite')
                 return
 
-            if cmd.startswith('forcequit') or cmd.startswith('mortim'):
+            if cmd.startswith(('forcequit', 'mortim')):
                 if message.channel.id in self.channels:
                     yield from self.send_message(message.channel, '```diff\nAre you sure you want to quit?\n-Say Y or Yes to close the program.\n!You will lose all unsaved progress!\n+Send any other message to continue playing.```')
                     x = yield from self.wait_for_message(author=message.author, channel=message.channel)
@@ -549,7 +549,7 @@ class XYZZYbot(discord.Client):
                     yield from self.update_status()
                 return
 
-            if cmd.startswith('plugh ') or cmd.startswith('block '):
+            if cmd.startswith(('plugh ', 'block ')):
                 if not message.channel.permissions_for(message.author).kick_members or message.author.id not in self.owner_ids:
                     yield from self.send_message(message.channel, '```diff\n!Only users with the permission to kick other users can use this command.```')
                     return
