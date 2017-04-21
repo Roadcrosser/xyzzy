@@ -602,7 +602,7 @@ class XYZZYbot(discord.Client):
                 return
 
             if cmd.startswith('list'):
-                msg = '```md\n# Here are all of the games I have available: #\n{}```'.format('\n'.join(self.stories))
+                msg = '```md\n# Here are all of the games I have available: #\n{}```\nAlternatively, an up-to-date list can also be found here: http://xyzzy.roadcrosser.xyz/list'.format('\n'.join(self.stories))
                 if cmd.startswith('list here'):
                     yield from self.send_message(message.channel, msg)
                     return
@@ -670,7 +670,7 @@ class XYZZYbot(discord.Client):
                 yield from self.send_message(message.channel, 'You can\'t get ye flask!')
                 return
 
-            if re.match("((can|does|is) this bot (play )?(cah|cards against humanity|pretend you'?re xyzzy))", cmd):
+            if re.match("((can|does|is) this bot (play )?(cah|cards against humanity|pretend you'?re xyzzy)\??)", cmd):
                 yield from self.send_message(message.channel, 'no.')
                 return
             return
