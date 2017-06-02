@@ -606,7 +606,10 @@ class XYZZYbot(discord.Client):
                 if cmd.startswith('list here'):
                     yield from self.send_message(message.channel, msg)
                     return
-                yield from self.send_message(message.author, msg)
+                try:
+                    yield from self.send_message(message.author, msg)
+                except:
+                    yield from self.send_message(message.author, "I cannot PM you as your private messages have been disabled. However, an up-to-date list can also be found here: http://xyzzy.roadcrosser.xyz/list")
                 return
 
             if cmd.startswith('shutdown'):
