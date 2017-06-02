@@ -201,8 +201,8 @@ class XYZZYbot(discord.Client):
         if not self.timestamp:
             self.timestamp = datetime.datetime.utcnow().timestamp()
             yield from self.update_status()
+            session = aiohttp.ClientSession()
             if self.gist_key and self.gist_id:
-                session = aiohttp.ClientSession()
                 gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
                 gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
                 print("\nFetching cached Github data...")
@@ -223,53 +223,52 @@ class XYZZYbot(discord.Client):
                     print("[{}]".format(status))
                     yield from resp.release()
 
-                yield from session.close()
-
             while True:
 
-                server_count = len(self.servers)
-                session_count = len(self.channels)
+                try:
+                    server_count = len(self.servers)
+                    session_count = len(self.channels)
 
-                session = aiohttp.ClientSession()
-                if self.carbon_key:
-                    carbon_url = "https://www.carbonitex.net/discord/data/botdata.php"
-                    carbon_data = {"key" : self.carbon_key, "servercount" : server_count}
-                    print("\nPosting to Carbotinex...")
-                    resp = yield from session.post(carbon_url, data=carbon_data)
-                    status = resp.status
-                    text = yield from resp.text()
-                    print("[{}] {}".format(status, text))
-                    yield from resp.release()
-
-                if self.dbots_key:
-                    dbots_url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
-                    dbots_data = json.dumps({"server_count" : server_count})
-                    dbots_headers = {"Authorization" : self.dbots_key, "content-type":"application/json"}
-                    print("\nPosting to Discord Bots...")
-                    resp = yield from session.post(dbots_url, data=dbots_data, headers=dbots_headers)
-                    status = resp.status
-                    text = yield from resp.text()
-                    print("[{}] {}".format(status, text))
-                    yield from resp.release()
-                
-                if self.gist_key and self.gist_id:
-                    gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
-                    gist_token = "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
-                    gist_data = {"server_count" : server_count, "session_count" : session_count, "token" : gist_token}
-                    if self.gist_data_cache != gist_data:
-                        self.gist_data_cache = gist_data
-                        gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": json.dumps(gist_data)}}})
-                        gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
-                        print("\nPosting to Github...")
-                        resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                    if self.carbon_key:
+                        carbon_url = "https://www.carbonitex.net/discord/data/botdata.php"
+                        carbon_data = {"key" : self.carbon_key, "servercount" : server_count}
+                        print("\nPosting to Carbotinex...")
+                        resp = yield from session.post(carbon_url, data=carbon_data)
                         status = resp.status
                         text = yield from resp.text()
-                        print("[{}]".format(status))
+                        print("[{}] {}".format(status, text))
                         yield from resp.release()
-                    else:
-                        print("\nGithub posting skipped.")
 
-                yield from session.close()
+                    if self.dbots_key:
+                        dbots_url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
+                        dbots_data = json.dumps({"server_count" : server_count})
+                        dbots_headers = {"Authorization" : self.dbots_key, "content-type":"application/json"}
+                        print("\nPosting to Discord Bots...")
+                        resp = yield from session.post(dbots_url, data=dbots_data, headers=dbots_headers)
+                        status = resp.status
+                        text = yield from resp.text()
+                        print("[{}] {}".format(status, text))
+                        yield from resp.release()
+                    
+                    if self.gist_key and self.gist_id:
+                        gist_url = "https://api.github.com/gists/{}".format(self.gist_id)
+                        gist_token = "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
+                        gist_data = {"server_count" : server_count, "session_count" : session_count, "token" : gist_token}
+                        if self.gist_data_cache != gist_data:
+                            self.gist_data_cache = gist_data
+                            gist_data = json.dumps({"files" : {"xyzzy_data.json" : {"content": json.dumps(gist_data)}}})
+                            gist_headers = {"Accept" : "application/vnd.github.v3+json", "Authorization" : "token {}".format(self.gist_key)}
+                            print("\nPosting to Github...")
+                            resp = yield from session.patch(gist_url, data=gist_data, headers=gist_headers)
+                            status = resp.status
+                            text = yield from resp.text()
+                            print("[{}]".format(status))
+                            yield from resp.release()
+                        else:
+                            print("\nGithub posting skipped.")
+                except:
+                    pass
+
                 yield from asyncio.sleep(3600)
 
     @asyncio.coroutine
