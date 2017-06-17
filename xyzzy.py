@@ -311,7 +311,10 @@ class XYZZYbot(discord.Client):
             return
 
         # Disallow blocked users from submitting commands.
-        if not message.channel.is_private and message.server.id in self.blocked_users and message.author.id in self.blocked_users[message.server.id]:
+        if not message.channel.is_private and ((message.server.id in self.blocked_users and
+        message.author.id in self.blocked_users[message.server.id]) or
+        ("global" in self.blocked_users and
+        message.author.id in self.blocked_users["global"])):
             yield from self.send_message(message.author, '```diff\n!An administrator has disabled your ability to submit commands in "{}".```'.format(message.server.name))
             return
 
