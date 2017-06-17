@@ -33,7 +33,11 @@ class XYZZYbot(discord.Client):
     def __init__(self):
         print(bcolours.HEADER + 'Welcome to Xyzzy.' + bcolours.ENDC)
 
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        if not os.path.exists('./saves/'):
+            print('I couldn\'t find a folder to save data in, so I\'m going to make one really quick. The file will be "./saves/".')
+            os.makedirs('./saves/')
+
+        os.chdir(os.path.dirname(os.path.realpath(__file__)) + '/saves')
 
         self.config = {}
 
@@ -44,7 +48,7 @@ class XYZZYbot(discord.Client):
 
         parser = configparser.ConfigParser()
 
-        with open('options.cfg') as configdata: # well that was easy
+        with open('../options.cfg') as configdata: # well that was easy
             parser.read_string(configdata.read())
             self.config = dict(parser._sections["Config"])
 
@@ -96,7 +100,7 @@ class XYZZYbot(discord.Client):
 
         self.stories = {}
 
-        with open('stories.txt') as storydata:
+        with open('../stories.txt') as storydata:
             for line in storydata:
                 if not line.startswith('#'):
                     # Unlike the options file, the stories file requires a colon
@@ -107,29 +111,29 @@ class XYZZYbot(discord.Client):
                     else:
                         x = line.split(' : ', 1)
 
-                        self.stories[x[1].strip()] = x[0].strip()
+                        self.stories[x[1].strip()] = "." + x[0].strip()
 
-        if not os.path.exists('./bot-data/'):
+        if not os.path.exists('../bot-data/'):
             print('I couldn\'t find a folder to store runtime data in, so I\'m going to make one really quick. The file will be "./bot-data/". I\'ll use it to store stuff like user preferences and server settings.')
             os.makedirs('./bot-data/')
 
         try:
             print('Loading user preferences...')
-            with open('./bot-data/userprefs.json') as x:
+            with open('../bot-data/userprefs.json') as x:
                 self.user_preferences = json.load(x)
         except FileNotFoundError:
             print(bcolours.WARNING + 'User preferences not found. Creating new User Preferences file...' + bcolours.ENDC)
-            with open('./bot-data/userprefs.json', 'w') as x:
+            with open('../bot-data/userprefs.json', 'w') as x:
                 x.write('{ "version" : 1, "backticks" : [] }')
                 self.user_preferences = { 'version' : 1, 'backticks' : [] }
 
         try:
             print('Loading blocked user list...')
-            with open('./bot-data/blocked_users.json') as x:
+            with open('../bot-data/blocked_users.json') as x:
                 self.blocked_users = json.load(x)
         except FileNotFoundError:
             print(bcolours.WARNING + 'Blocked user list not found. Creating new blocked user list...' + bcolours.ENDC)
-            with open('./bot-data/blocked_users.json', 'w') as x:
+            with open('../bot-data/blocked_users.json', 'w') as x:
                 x.write('{}')
                 self.blocked_users = {}
 
@@ -560,7 +564,7 @@ class XYZZYbot(discord.Client):
                     self.blocked_users[message.server.id].append(x.id)
                     yield from self.send_message(message.channel, '```diff\n- "{}" has been restricted from entering commands in this server.```'.format(x.display_name))
 
-                with open('./bot-data/blocked_users.json', 'w') as x:
+                with open('../bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
                 return
 
@@ -574,7 +578,7 @@ class XYZZYbot(discord.Client):
                         self.blocked_users[message.server.id].remove(x.id)
                         yield from self.send_message(message.channel, '```diff\n+ "{}" is now allowed to submit commands.```'.format(x.display_name))
 
-                with open('./bot-data/blocked_users.json', 'w') as x:
+                with open('../bot-data/blocked_users.json', 'w') as x:
                     json.dump(self.blocked_users, x)
                 return
 
@@ -594,7 +598,7 @@ class XYZZYbot(discord.Client):
                         else:
                             yield from self.send_message(message.channel, '```diff\n!Your preferences are already set such that backticks are not required for commands.```')
                             return
-                    with open('./bot-data/userprefs.json', 'w') as x:
+                    with open('../bot-data/userprefs.json', 'w') as x:
                         json.dump(self.user_preferences, x)
                 else:
                     yield from self.send_message(message.channel, '```diff\n!You must provide whether you want to turn your backtick preferences ON or OFF.```')
