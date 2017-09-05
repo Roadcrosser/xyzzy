@@ -1,0 +1,7 @@
+[
+    {
+        "name": "Name of the game to display.",
+        "path": "/path/to/story.ext",
+        "url": "Url to display."
+    }
+]
