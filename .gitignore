@@ -2,3 +2,5 @@
 options.cfg
 bot-data/
 stories.json
+stories/
+__pycache__/

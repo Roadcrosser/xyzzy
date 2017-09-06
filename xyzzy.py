@@ -3,12 +3,17 @@ import sys # Checking if host platform is Windows
 if sys.platform == 'win32':
     raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
 
+from command_sys import Context, Holder
 from datetime import datetime
+from glob import glob
+from random import randint
 from configparser import ConfigParser
+
 import os
 import json
 import re
 import asyncio
+import traceback
 import aiohttp
 import discord
 
@@ -17,6 +22,8 @@ REQUIRED_CONFIG_OPTIONS = {
     'invoker': '"invoker" option required in configuration.\nMake sure there is a line that is something like "invoker = >".',
     'token': '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".'
 }
+
+CAH_REGEX = re.compile(r"(?:can|does|is) this bot (?:play |do )?(?:cah|cards against humanity|pretend you'?re xyzzy)\??")
 
 class ConsoleColours:
     HEADER = '\033[95m'
@@ -105,8 +112,10 @@ class Xyzzy(discord.Client):
         self.thread = None
         self.queue = None
         self.channels = {}
+
         self.content_regex = re.compile(r'`{}.+`'.format(self.invoker))
         self.session = aiohttp.ClientSession()
+        self.commands = Holder(self)
 
         print(ConsoleColours.OKGREEN + 'Initialisation complete! Connecting to Discord...' + ConsoleColours.END)
 
@@ -120,6 +129,23 @@ class Xyzzy(discord.Client):
 
         await self.change_presence(game=discord.Game(name=game))
 
+    async def handle_error(self, ctx, exc):
+        trace = ''.join(traceback.format_tb(exc.__traceback__))
+        err = 'Traceback (most recent call last):\n{}{}: {}'.format(trace, type(exc).__name__, exc)
+
+        print('\n' + ConsoleColours.FAIL + 'An error has occured!')
+        print(err + ConsoleColours.END)
+
+        if ctx.is_dm():
+            print('This was caused by a DM with "{}".\n'.format(ctx.msg.author.name))
+        else:
+            print('This was caused by a message.\nServer: "{}"\nChannel: #{}'.format(ctx.msg.guild.name, ctx.msg.channel.name))
+
+        if self.home_channel:
+            await self.home_channel.send('User: `{}`\nInput: `{}`\n```py\n{}\n```'.format(ctx.msg.author.name, ctx.clean, err))
+
+        await ctx.send('```py\nError at memory location {}\n  {} {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+
     async def on_ready(self):
         print('======================\n'
               '{0.user.name} is online.\n'
@@ -127,6 +153,14 @@ class Xyzzy(discord.Client):
               'Accepting commands with the syntax `{0.invoker}command`'.format(self))
 
         self.home_channel = self.get_channel(self.home_channel_id)
+
+        for mod in glob('commands/*.py'):
+            mod = mod.replace('/', '.').replace('\\', '.')[:-3]
+
+            try:
+                self.commands.load_module(mod)
+            except Exception as e:
+                print(ConsoleColours.FAIL + 'Error loading module "{}"\n{}'.format(mod, e) + ConsoleColours.END)
 
         if not self.timestamp:
             self.timestamp = datetime.utcnow().timestamp()
@@ -244,8 +278,8 @@ class Xyzzy(discord.Client):
         # Hopefully a not so fucky version of the old conditional here.
         # Makes sure that the content actually matches something we like.
         if (not self.content_regex.match(msg.content) and msg.author.id in self.user_preferences['backticks']) or \
-                (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith('`'))) and 
-                msg.author.id not in self.user_preferences['backticks']):
+           (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith('`'))) and 
+           msg.author.id not in self.user_preferences['backticks']):
             # Explanation of how the above works
             # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
             # - Second & third line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
@@ -262,6 +296,22 @@ class Xyzzy(discord.Client):
 
         if clean == self.invoker * 2 + 'get ye flask':
             return await msg.channel.send("You can't get ye flask!")
+
+        if clean.startswith(self.invoker * 2) and CAH_REGEX.match(clean[2:]):
+            return await msg.channel.send('no')
+
+        if not self.commands.get_command(clean[2:].split(' ')[0]):
+            return
+
+        try:
+            ctx = Context(msg, self)
+        except ValueError:
+            return await msg.channel.send('Shlex error.')
+
+        try:
+            await self.commands.run(ctx)
+        except Exception as e:
+            await self.handle_error(ctx, e)
 
 if __name__ == '__main__':
     # Only start the bot if it is being run directly
