@@ -1,6 +1,6 @@
 import sys # Checking if host platform is Windows
 
-if sys.platform == 'win32':
+if sys.platform == "win32":
     raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
 
 from command_sys import Context, Holder
@@ -17,42 +17,42 @@ import traceback
 import aiohttp
 import discord
 
-OPTIONAL_CONFIG_OPTIONS = ('home_channel_id', 'owner_ids', 'carbon_key', 'dbots_key', 'gist_key', 'gist_id')
+OPTIONAL_CONFIG_OPTIONS = ("home_channel_id", "owner_ids", "carbon_key", "dbots_key", "gist_key", "gist_id")
 REQUIRED_CONFIG_OPTIONS = {
-    'invoker': '"invoker" option required in configuration.\nMake sure there is a line that is something like "invoker = >".',
-    'token': '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".'
+    "invoker": '"invoker" option required in configuration.\nMake sure there is a line that is something like "invoker = >".',
+    "token": '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".'
 }
 
 CAH_REGEX = re.compile(r"(?:can|does|is) this bot (?:play |do )?(?:cah|cards against humanity|pretend you'?re xyzzy)\??")
 
 class ConsoleColours:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    END = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    END = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 class Xyzzy(discord.Client):
     def __init__(self):
-        print(ConsoleColours.HEADER + 'Welcome to Xyzzy, v2.0.' + ConsoleColours.END)
+        print(ConsoleColours.HEADER + "Welcome to Xyzzy, v2.0." + ConsoleColours.END)
 
-        if not os.path.exists('./saves/'):
+        if not os.path.exists("./saves/"):
             print('Creating saves directory at "./saves/"')
-            os.makedirs('./saves/')
+            os.makedirs("./saves/")
 
         self.config = {}
         self.timestamp = 0
 
-        print('Reading "options.cfg".')
+        print("Reading "options.cfg".")
 
         parser = ConfigParser()
 
-        with open('./options.cfg') as cfg_data:
+        with open("./options.cfg") as cfg_data:
             parser.read_string(cfg_data.read())
-            self.config = dict(parser._sections['Config'])
+            self.config = dict(parser._sections["Config"])
 
         for opt, msg in REQUIRED_CONFIG_OPTIONS.items():
             if opt not in self.config:
@@ -66,45 +66,45 @@ class Xyzzy(discord.Client):
             else:
                 self.__setattr__(opt, None)
 
-        self.owner_ids = [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(',')]
+        self.owner_ids = [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
         self.home_channel = None
         self.gist_data_cache = None
         self.gist_story_cache = None
 
-        print('Reading story database...')
+        print("Reading story database...")
 
-        with open('./stories.json') as stories:
+        with open("./stories.json") as stories:
             self.stories = json.load(stories)
 
-        if not os.path.exists('./bot-data/'):
+        if not os.path.exists("./bot-data/"):
             print('Creating bot data directory at "./bot-data/"')
-            os.makedirs('./bot-data/')
+            os.makedirs("./bot-data/")
 
         try:
-            print('Loading user preferences...')
+            print("Loading user preferences...")
 
-            with open('./bot-data/userprefs.json') as pref:
+            with open("./bot-data/userprefs.json") as pref:
                 self.user_preferences = json.load(pref)
         except FileNotFoundError:
-            print(ConsoleColours.WARNING + 'User preferences not found. Creating new user preferences file...' + ConsoleColours.END)
+            print(ConsoleColours.WARNING + "User preferences not found. Creating new user preferences file..." + ConsoleColours.END)
 
-            with open('./bot-data/userprefs.json', 'w') as pref:
+            with open("./bot-data/userprefs.json", "w") as pref:
                 pref.write('{"version": 1, "backticks": []}')
                 self.user_preferences = {
-                    'version': 1,
-                    'backticks': []
+                    "version": 1,
+                    "backticks": []
                 }
 
         try:
-            print('Loading blocked user list...')
+            print("Loading blocked user list...")
 
-            with open('./bot-data/blocked_users.json') as blk:
+            with open("./bot-data/blocked_users.json") as blk:
                 self.blocked_users = json.load(blk)
         except FileNotFoundError:
-            print(ConsoleColours.WARNING + 'Blocked user list not found. Creating new blocked user list...' + ConsoleColours.END)
+            print(ConsoleColours.WARNING + "Blocked user list not found. Creating new blocked user list..." + ConsoleColours.END)
 
-            with open('./bot-data/blocked_users.json', 'w') as blk:
-                blk.write('{}')
+            with open("./bot-data/blocked_users.json", "w") as blk:
+                blk.write("{}")
                 self.blocked_users = {}
 
         self.game = None
@@ -113,27 +113,27 @@ class Xyzzy(discord.Client):
         self.queue = None
         self.channels = {}
 
-        self.content_regex = re.compile(r'`{}.+`'.format(self.invoker))
+        self.content_regex = re.compile(r"`{}.+`".format(self.invoker))
         self.session = aiohttp.ClientSession()
         self.commands = Holder(self)
 
-        print(ConsoleColours.OKGREEN + 'Initialisation complete! Connecting to Discord...' + ConsoleColours.END)
+        print(ConsoleColours.OKGREEN + "Initialisation complete! Connecting to Discord..." + ConsoleColours.END)
 
         super().__init__()
 
     async def update_game(self):
-        game = 'nothing yet!'
+        game = "nothing yet!"
 
         if self.channels:
-            game = '{} game{}.'.format(len(self.channels), 's' if len(self.channels) > 1 else '')
+            game = "{} game{}.".format(len(self.channels), "s" if len(self.channels) > 1 else "")
 
         await self.change_presence(game=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):
-        trace = ''.join(traceback.format_tb(exc.__traceback__))
-        err = 'Traceback (most recent call last):\n{}{}: {}'.format(trace, type(exc).__name__, exc)
+        trace = "".join(traceback.format_tb(exc.__traceback__))
+        err = "Traceback (most recent call last):\n{}{}: {}".format(trace, type(exc).__name__, exc)
 
-        print('\n' + ConsoleColours.FAIL + 'An error has occured!')
+        print("\n" + ConsoleColours.FAIL + "An error has occured!")
         print(err + ConsoleColours.END)
 
         if ctx.is_dm():
@@ -142,20 +142,20 @@ class Xyzzy(discord.Client):
             print('This was caused by a message.\nServer: "{}"\nChannel: #{}'.format(ctx.msg.guild.name, ctx.msg.channel.name))
 
         if self.home_channel:
-            await self.home_channel.send('User: `{}`\nInput: `{}`\n```py\n{}\n```'.format(ctx.msg.author.name, ctx.clean, err))
+            await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
 
         await ctx.send('```py\nError at memory location {}\n  {} {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
 
     async def on_ready(self):
-        print('======================\n'
-              '{0.user.name} is online.\n'
-              'Connected with ID {0.user.id}\n'
-              'Accepting commands with the syntax `{0.invoker}command`'.format(self))
+        print("======================\n"
+              "{0.user.name} is online.\n"
+              "Connected with ID {0.user.id}\n"
+              "Accepting commands with the syntax `{0.invoker}command`".format(self))
 
         self.home_channel = self.get_channel(self.home_channel_id)
 
-        for mod in glob('commands/*.py'):
-            mod = mod.replace('/', '.').replace('\\', '.')[:-3]
+        for mod in glob("commands/*.py"):
+            mod = mod.replace("/", ".").replace("\\", ".")[:-3]
 
             try:
                 self.commands.load_module(mod)
@@ -166,96 +166,96 @@ class Xyzzy(discord.Client):
             self.timestamp = datetime.utcnow().timestamp()
 
             if self.gist_key and self.gist_id:
-                url = 'https://api.github.com/gists/' + self.gist_id
+                url = "https://api.github.com/gists/" + self.gist_id
                 headers = {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Authorization': 'token ' + self.gist_key
+                    "Accept": "application/vnd.github.v3+json",
+                    "Authorization": "token " + self.gist_key
                 }
 
-                print('\nFetching cached GitHub data...')
+                print("\nFetching cached GitHub data...")
 
                 async with self.session.get(url, headers=headers) as r:
                     res = await r.json()
 
-                print('[{}]'.format(r.status))
+                print("[{}]".format(r.status))
 
-                self.gist_data_cache = json.loads(res['files']['xyzzy_data.json']['content'])
-                self.gist_story_cache = json.loads(res['files']['xyzzy_stories.json']['content'])
+                self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
+                self.gist_story_cache = json.loads(res["files"]["xyzzy_stories.json"]["content"])
                 gist_story = sorted([i for i in self.stories])
 
                 if self.gist_story_cache != gist_story:
                     gist_story = json.dumps({
-                        'files': {
-                            'xyzzy_stories.json': {
-                                'content': json.dumps(gist_story)
+                        "files": {
+                            "xyzzy_stories.json": {
+                                "content": json.dumps(gist_story)
                             }
                         }
                     })
 
                     async with self.session.patch(url, data=gist_story, headers=headers) as r:
-                        print('[{}]'.format(r.status))
+                        print("[{}]".format(r.status))
 
             while True:
                 guilds = len(self.guilds)
                 sessions = len(self.channels)
 
                 if self.carbon_key:
-                    url = 'https://www.carbonitex.net/discord/data/botdata.php' # PHP SUCKS
+                    url = "https://www.carbonitex.net/discord/data/botdata.php" # PHP SUCKS
                     data = {
-                        'key': self.carbon_key,
-                        'servercount': guilds
+                        "key": self.carbon_key,
+                        "servercount": guilds
                     }
 
-                    print('\nPosting to Carbonitex...')
+                    print("\nPosting to Carbonitex...")
 
                     async with self.session.post(url, data=data) as r:
                         text = await r.text()
 
-                    print('[{}] {}'.format(r.status, text))
+                    print("[{}] {}".format(r.status, text))
 
                 if self.dbots_key:
-                    url = 'https://bots.discord.pw/api/bots/{}/stats'.format(self.user.id)
-                    data = json.dumps({'server_count': guilds})
+                    url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
+                    data = json.dumps({"server_count": guilds})
                     headers = {
-                        'Authorization': self.dbots_key,
-                        'content-type': 'application/json'
+                        "Authorization": self.dbots_key,
+                        "content-type": "application/json"
                     }
 
-                    print('\nPosting to Discord Bots...')
+                    print("\nPosting to Discord Bots...")
 
                     async with self.session.post(url, data=data, headers=headers) as r:
                         text = await r.text()
 
-                    print('[{}] {}'.format(r.status, text))
+                    print("[{}] {}".format(r.status, text))
 
                 if self.gist_key and self.gist_id:
-                    url = 'https://api.github.com/gists/' + self.gist_id
+                    url = "https://api.github.com/gists/" + self.gist_id
                     data = {
-                        'server_count': guilds,
-                        'session_count': sessions,
-                        'token': 'MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn'
+                        "server_count": guilds,
+                        "session_count": sessions,
+                        "token": "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
                     }
 
                     if self.gist_data_cache != data:
                         self.gist_data_cache = data
                         data = json.dumps({
-                            'files': {
-                                'xyzzy_data.json': {
-                                    'content': json.dumps(data)
+                            "files": {
+                                "xyzzy_data.json": {
+                                    "content": json.dumps(data)
                                 }
                             }
                         })
                         headers = {
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Authorization': 'token ' + self.gist_key
+                            "Accept": "application/vnd.github.v3+json",
+                            "Authorization": "token " + self.gist_key
                         }
 
-                        print('\nPosting to GitHub...')
+                        print("\nPosting to GitHub...")
 
                         async with self.session.patch(url, data=data, headers=headers) as r:
-                            print('[{}]'.format(r.status))
+                            print("[{}]".format(r.status))
                     else:
-                        print('\nGitHub posting skipped.')
+                        print("\nGitHub posting skipped.")
 
                 await asyncio.sleep(3600) # Post stuff every hour
 
@@ -277,9 +277,9 @@ class Xyzzy(discord.Client):
 
         # Hopefully a not so fucky version of the old conditional here.
         # Makes sure that the content actually matches something we like.
-        if (not self.content_regex.match(msg.content) and msg.author.id in self.user_preferences['backticks']) or \
-           (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith('`'))) and 
-           msg.author.id not in self.user_preferences['backticks']):
+        if (not self.content_regex.match(msg.content) and msg.author.id in self.user_preferences["backticks"]) or \
+           (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and 
+           msg.author.id not in self.user_preferences["backticks"]):
             # Explanation of how the above works
             # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
             # - Second & third line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
@@ -287,33 +287,33 @@ class Xyzzy(discord.Client):
 
         if not isinstance(msg.channel, discord.DMChannel) and \
                 ((str(msg.guild.id) in self.blocked_users and str(msg.author.id) in self.blocked_users[str(msg.guild.id)]) or
-                ('global' in self.blocked_users and str(msg.author.id) in self.blocked_users['global'])):
-            return await msg.author.send('```diff\n'
+                ("global" in self.blocked_users and str(msg.author.id) in self.blocked_users["global"])):
+            return await msg.author.send("```diff\n"
                                          '!An administrator has disabled your ability to submit commands in "{}"\n'
-                                         '```'.format(msg.guild.name))
+                                         "```".format(msg.guild.name))
 
         clean = msg.content[1:-1] if self.content_regex.match(msg.content) else msg.content
 
-        if clean == self.invoker * 2 + 'get ye flask':
+        if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
 
         if clean.startswith(self.invoker * 2) and CAH_REGEX.match(clean[2:]):
-            return await msg.channel.send('no')
+            return await msg.channel.send("no")
 
-        if not self.commands.get_command(clean[2:].split(' ')[0]):
+        if not self.commands.get_command(clean[2:].split(" ")[0]):
             return
 
         try:
             ctx = Context(msg, self)
         except ValueError:
-            return await msg.channel.send('Shlex error.')
+            return await msg.channel.send("Shlex error.")
 
         try:
             await self.commands.run(ctx)
         except Exception as e:
             await self.handle_error(ctx, e)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Only start the bot if it is being run directly
     bot = Xyzzy()
     bot.run(bot.token)
