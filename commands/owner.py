@@ -14,7 +14,7 @@ class Owner:
         env = {
             "xyzzy": self.xyzzy,
             "ctx": ctx,
-            'message": ctx.msg
+            "message": ctx.msg
         }
 
         out = eval(ctx.clean.split(' ', 1)[1], env)

@@ -46,7 +46,7 @@ class Xyzzy(discord.Client):
         self.config = {}
         self.timestamp = 0
 
-        print("Reading "options.cfg".")
+        print('Reading "options.cfg".')
 
         parser = ConfigParser()
 
