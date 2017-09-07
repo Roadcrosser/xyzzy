@@ -144,7 +144,7 @@ class Xyzzy(discord.Client):
         if self.home_channel:
             await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
 
-        await ctx.send('```py\nError at memory location {}\n  {} {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+        await ctx.send('```py\nError at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
 
     async def on_ready(self):
         print("======================\n"
@@ -277,12 +277,11 @@ class Xyzzy(discord.Client):
 
         # Hopefully a not so fucky version of the old conditional here.
         # Makes sure that the content actually matches something we like.
-        if (not self.content_regex.match(msg.content) and msg.author.id in self.user_preferences["backticks"]) or \
-           (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and 
-           msg.author.id not in self.user_preferences["backticks"]):
+        if (not self.content_regex.match(msg.content) and str(msg.author.id) in self.user_preferences["backticks"]) or \
+         (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and str(msg.author.id) not in self.user_preferences["backticks"]):
             # Explanation of how the above works
             # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
-            # - Second & third line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
+            # - Second line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
             return
 
         if not isinstance(msg.channel, discord.DMChannel) and \
