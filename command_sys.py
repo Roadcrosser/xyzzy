@@ -86,7 +86,7 @@ class Command:
 
     async def run(self, ctx: Context) -> None:
         if self.owner and str(ctx.msg.author.id) not in ctx.client.owner_ids:
-            return
+            await ctx.send("```ERROR at memory location {}\n  Access denied.```".format(hex(randint(2 ** 4, 2 ** 32))))
         else:
             await self.func(self.cls, ctx)
 

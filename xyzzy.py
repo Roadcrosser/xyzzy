@@ -144,7 +144,7 @@ class Xyzzy(discord.Client):
         if self.home_channel:
             await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
 
-        await ctx.send('```py\nError at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+        await ctx.send('```py\ERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
 
     async def on_ready(self):
         print("======================\n"
@@ -292,6 +292,10 @@ class Xyzzy(discord.Client):
                                          "```".format(msg.guild.name))
 
         clean = msg.content[1:-1] if self.content_regex.match(msg.content) else msg.content
+
+        # Send game input if a game is running.
+        if clean[0] == self.invoker and clean[1] != self.invoker and msg.channel.id in self.channels and self.channels[msg.channel.id].playing:
+            return self.channels[msg.channel.id].send_input(clean[1:])
 
         if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
