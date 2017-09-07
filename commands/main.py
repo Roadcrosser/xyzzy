@@ -1,4 +1,5 @@
 from command_sys import command
+import json
 
 class Main:
     def __init__(self, xyzzy):
@@ -48,13 +49,34 @@ class Main:
 ```
 Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(x["name"] for x in self.xyzzy.stories))
 
-        if ctx.args[0] == "here":
+        if ctx.args and ctx.args[0] == "here":
             await ctx.send(msg)
         else:
             try:
                 await ctx.send(msg, dest="author")
             except:
                 await ctx.send("I cannot PM you, as you seem to have private messages disabled. However, an up-to-date list is available at: http://xyzzy.roadcrosser.xyz/list")
+
+    @command(usage="[ on|off ]")
+    async def backticks(self, ctx):
+        if not ctx.args or ctx.args[0] not in ("on", "off"):
+            return await ctx.send("```diff\nYou must provide whether you want to turn your backtick preferences ON or OFF.\n```")
+
+        if ctx.args[0] == "on":
+            if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["backticks"]:
+                self.xyzzy.user_preferences["backticks"].append(str(ctx.msg.author.id))
+                await ctx.send("```diff\n+Commands from you now require backticks. (They should look `{}like this`)\n```".format(self.xyzzy.invoker))
+            else:
+                return await ctx.send("```diff\n!Your preferences are already set to require backticks for commands.\n```")
+        else:
+            if str(ctx.msg.author.id) in self.xyzzy.user_preferences["backticks"]:
+                self.xyzzy.user_preferences["backticks"].remove(str(ctx.msg.author.id))
+                await ctx.send("```diff\n+Commands from you no longer require backticks. (They should look {}like this)\n+XYZZY will still accept backticked commands.\n```".format(self.xyzzy.invoker))
+            else:
+                return await ctx.send("```diff\n!Your preferences are already set such that backticks are not required for commands\n```")
+
+        with open('./bot-data/userprefs.json', 'w') as x:
+            json.dump(self.xyzzy.user_preferences, x)
 
 def setup(xyzzy):
     return Main(xyzzy)
