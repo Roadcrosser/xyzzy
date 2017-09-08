@@ -144,7 +144,7 @@ class Xyzzy(discord.Client):
         if self.home_channel:
             await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
 
-        await ctx.send('```py\ERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+        await ctx.send('```py\nERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
 
     async def on_ready(self):
         print("======================\n"

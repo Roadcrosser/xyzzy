@@ -46,7 +46,7 @@ class Main:
 # Here are all of the games I have available: #
 {}
 ```
-Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(x["name"] for x in self.xyzzy.stories))
+Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(x["name"] for x in self.xyzzy.stories)))
 
         if ctx.args and ctx.args[0] == "here":
             await ctx.send(msg)
@@ -94,21 +94,21 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.channel.id in self.xyzzy.channels:
             return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the story has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
 
-        print("Searching for " + ctx.clean)
+        print("Searching for " + ctx.raw)
 
-        stories = [x for x in self.xyzzy.stories if ctx.clean.lower() in x["name"].lower()]
+        stories = [x for x in self.xyzzy.stories if ctx.raw.lower() in x["name"].lower()]
 
         if not stories:
-            return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.clean))
+            return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
         elif len(stories) > 1:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n```'
                                   '"{}"\n'
-                                  "```".format(ctx.clean, len(stories), "\n".join(sorted(x["name"] for x in stories))))
+                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(x["name"] for x in stories))))
 
         print("Now loading {} for #{} (Server: {})".format(stories[0]["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
-        chan = GuildChannel(ctx.msg, stories[0])
+        chan = GameChannel(ctx.msg, stories[0])
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
         await ctx.send('```py\nLoaded "{}"\n```'.format(chan.game))

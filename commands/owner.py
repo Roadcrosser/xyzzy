@@ -19,7 +19,7 @@ class Owner:
             "message": ctx.msg
         }
 
-        out = eval(ctx.clean.split(' ', 1)[1], env)
+        out = eval(ctx.raw, env)
 
         if inspect.isawaitable(out):
             out = await out
@@ -66,7 +66,7 @@ class Owner:
 
         for _, chan in self.xyzzy.channels:
             try:
-                await chan.channel.send("```{}```".format(ctx.clean))
+                await chan.channel.send("```{}```".format(ctx.raw))
             except:
                 pass
 
@@ -82,6 +82,24 @@ class Owner:
 
         self.xyzzy.commands.reload_module('commands.' + ctx.args[0].lower())
         await ctx.send('```diff\n+Reloaded module "{}".\n```'.format(ctx.args[0].lower()))
+
+    @command(owner=True)
+    async def nowplaying(self, ctx):
+        """
+        Sends you a direct message containing all currently running xyzzy instances across Discord.
+        [This command may only be used by trusted individuals.]
+        """
+        if not self.xyzzy.channels:
+            return await ctx.send("```md\n## Nothing is currently being played. ##\n```", dest="author")
+
+        msg = "```md\n## Currently playing games: ##\n"
+
+        for _, game in self.xyzzy.channels.items():
+            msg += "[{0.guild.name}]({0.name}) {0.game} {{{1} minutes ago}}\n".format(chan, (ctx.msg.created_at - chan.last).total_seconds() // 60)
+
+        msg += '```'
+
+        await ctx.send(msg, dest="author")
 
 def setup(xyzzy):
     return Owner(xyzzy)
