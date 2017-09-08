@@ -51,7 +51,7 @@ class GameChannel:
 
         while self.process.returncode is None:
             try:
-                output = await asyncio.wait_for(self.process.stdout.read(1), 0.5)
+                output = await asyncio.wait_for(self.process.stdout.read(-1), 0.5)
                 buffer += output
             except asyncio.TimeoutError:
                 if buffer != b"":
