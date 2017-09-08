@@ -25,7 +25,7 @@ class Context:
         self.cmd = self.clean.split(" ")[0]
         self.args = shlex.split(self.clean.replace(r'\"', "\u009E").replace("'", "\u009F")) # Shlex doesn't obey escaped quotes, so lets do it ourselves.
         self.args = [x.replace("\u009E", '"').replace("\u009F", "'") for x in self.args][1:]
-        self.raw = self.clean.split(" ", 1)[1]
+        self.raw = self.clean.split(" ", 1)[1] if len(self.clean.split(" ")) > 1 else ""
 
     async def _send(self, content, dest, *, embed=None, file=None, files=None):
         """Internal send function, not actually ment to be used by anyone."""
