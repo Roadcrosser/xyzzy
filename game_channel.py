@@ -53,7 +53,7 @@ class GameChannel:
             try:
                 output = await asyncio.wait_for(self.process.stdout.read(1), 0.5)
                 buffer += output
-            except asynio.TimeoutError:
+            except asyncio.TimeoutError:
                 if buffer != b"":
                     out = buffer.decode("utf-8", "replace")
                     msg = ""
