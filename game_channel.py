@@ -35,7 +35,7 @@ class GameChannel:
     def send_input(self, input):
         self.process.stdin.write((input + '\n').encode('utf-8', 'replace'))
 
-    async def force_kill(self):
+    async def force_quit(self):
         """Forces the channel's game process to end."""
         self.process.terminate()
         self.process = None
