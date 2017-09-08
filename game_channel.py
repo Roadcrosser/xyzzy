@@ -59,7 +59,7 @@ class GameChannel:
                     msg = ""
 
                     for i, line in enumerate(out.splitlines()):
-                        line = line.replace("*" "\*").replace("__", "\_\_").replace("~~", "\~\~")
+                        line = line.replace("*", "\*").replace("__", "\_\_").replace("~~", "\~\~")
 
                         if len(msg + line[self.indent:] + "\n") < 2000:
                             msg += line[self.indent:] + "\n"
