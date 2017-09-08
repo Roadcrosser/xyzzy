@@ -295,6 +295,7 @@ class Xyzzy(discord.Client):
 
         # Send game input if a game is running.
         if clean[0] == self.invoker and clean[1] != self.invoker and msg.channel.id in self.channels and self.channels[msg.channel.id].playing:
+            self.channels[msg.channel.id].last = msg.created_at
             return self.channels[msg.channel.id].send_input(clean[1:])
 
         if clean == self.invoker * 2 + "get ye flask":
