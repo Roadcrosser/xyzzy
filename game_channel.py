@@ -27,6 +27,9 @@ class GameChannel:
 
     async def send_story(self, msg):
         """Sends the story to the game's channel, handling permissions."""
+        if self.output:
+            print(msg)
+
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
             await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour))
         else:
@@ -69,9 +72,6 @@ class GameChannel:
                             msg = line[self.indent:]
 
                         msg = msg.strip()
-
-                        if self.output:
-                            print(msg)
 
                         await self.send_story(msg)
 
