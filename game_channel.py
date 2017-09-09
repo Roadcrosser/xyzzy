@@ -71,11 +71,11 @@ class GameChannel:
 
                             msg = line[self.indent:]
 
-                        msg = msg.strip()
+                    msg = msg.strip()
 
-                        await self.send_story(msg)
+                    await self.send_story(msg)
 
-                        buffer = b""
+                    buffer = b""
 
         self.playing = False
         await self.channel.send("```diff\n-The game has ended.\n```")
