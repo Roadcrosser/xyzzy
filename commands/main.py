@@ -102,7 +102,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
         elif len(stories) > 1:
             return await ctx.send("```accesslog\n"
-                                  'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n```'
+                                  'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
                                   '"{}"\n'
                                   "```".format(ctx.raw, len(stories), "\n".join(sorted(x["name"] for x in stories))))
 
