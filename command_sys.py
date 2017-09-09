@@ -109,7 +109,7 @@ class Holder:
     def load_module(self, module_name: str) -> None:
         """Loads a module by name, and registers all its commands."""
         if module_name in self.modules:
-            raise Exception(f"Module `{module_name}` is already loaded.")
+            raise Exception("Module `{}` is already loaded.".format(module_name))
 
         module = importlib.import_module(module_name)
 
@@ -164,7 +164,7 @@ class Holder:
     def unload_module(self, module_name: str) -> None:
         """Unloads a module by name, and unregisters all its commands."""
         if module_name not in self.modules:
-            raise Exception(f"Module `{module_name}` is not loaded.")
+            raise Exception("Module `{}` is not loaded.".format(module_name))
 
         # Walk through the commands and remove them from the command and aliases dicts
         for cmd in self.modules[module_name]:
