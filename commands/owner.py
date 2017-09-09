@@ -94,7 +94,7 @@ class Owner:
 
         msg = "```md\n## Currently playing games: ##\n"
 
-        for _, game in self.xyzzy.channels.items():
+        for _, chan in self.xyzzy.channels.items():
             msg += "[{0.guild.name}]({0.name}) {0.game} {{{1} minutes ago}}\n".format(chan, (ctx.msg.created_at - chan.last).total_seconds() // 60)
 
         msg += '```'

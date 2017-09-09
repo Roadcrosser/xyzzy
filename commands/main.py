@@ -125,6 +125,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         await self.xyzzy.update_game()
         await chan.game_loop()
         await self.xyzzy.update_game()
+        del self.xyzzy.channels[ctx.msg.channel.id]
 
     @command()
     async def output(self, ctx):

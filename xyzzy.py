@@ -298,6 +298,10 @@ class Xyzzy(discord.Client):
 
         clean = msg.content[1:-1] if self.content_regex.match(msg.content) else msg.content
 
+        # Without this, an error is thrown below due to only one character.
+        if len(clean) == 1:
+            return
+
         # Send game input if a game is running.
         if clean[0] == self.invoker and clean[1] != self.invoker and msg.channel.id in self.channels and self.channels[msg.channel.id].playing:
             self.channels[msg.channel.id].last = msg.created_at
