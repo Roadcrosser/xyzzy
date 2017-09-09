@@ -97,18 +97,27 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         print("Searching for " + ctx.raw)
 
         stories = [x for x in self.xyzzy.stories if ctx.raw.lower() in x["name"].lower()]
+        perfect_match = None
+
+        if stories:
+            perfect_match = [x for x in stories if ctx.raw.lower() == x["name"].lower()]
 
         if not stories:
             return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
-        elif len(stories) > 1:
+        elif len(stories) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
                                   '"{}"\n'
                                   "```".format(ctx.raw, len(stories), "\n".join(sorted(x["name"] for x in stories))))
 
-        print("Now loading {} for #{} (Server: {})".format(stories[0]["name"], ctx.msg.channel.name, ctx.msg.guild.name))
+        if perfect_match:
+            game = perfect_match[0]
+        else:
+            game = stories[0]
 
-        chan = GameChannel(ctx.msg, stories[0])
+        print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
+
+        chan = GameChannel(ctx.msg, game)
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
         await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
