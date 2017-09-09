@@ -188,7 +188,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             msg = await self.xyzzy.wait_for("message", check=check, timeout=30)
 
             if re.match(r"^`?({})?y(es)?`?$", msg.content.lower()):
-                self.xyzzy.channels[ctx.msg.channel.id].force_quit()
+                await self.xyzzy.channels[ctx.msg.channel.id].force_quit()
                 del self.xyzzy.channels[ctx.msg.channel.id]
             else:
                 await ctx.send("```diff\n+Continuing game.\n```")
