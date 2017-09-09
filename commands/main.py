@@ -111,7 +111,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         chan = GameChannel(ctx.msg, stories[0])
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
-        await ctx.send('```py\nLoaded "{}"\n```'.format(chan.game))
+        await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
