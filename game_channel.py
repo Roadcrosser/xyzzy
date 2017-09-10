@@ -57,7 +57,7 @@ class GameChannel:
     def check_saves(self):
         """Checks if the user saved the game."""
         files = glob("{}*[!screc]".format(self.save_path)) # Filter out script and recording files.
-        files = [discord.File("{}/{}".format(x)) for x in files][:10] # Convert paths to Discord files, and limit to 10.
+        files = [discord.File(x) for x in files][:10] # Convert paths to Discord files, and limit to 10.
 
         return files or None
 
