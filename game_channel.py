@@ -65,7 +65,7 @@ class GameChannel:
             mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
 
             if mod_time > latest[0]:
-                latest = [modtime, file]
+                latest = [mod_time, file]
 
         if latest[1]:
             return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
