@@ -1,10 +1,12 @@
 from subprocess import PIPE
-from glob import glob
 
+import re
 import shutil
 import os
 import asyncio
 import discord
+
+SCRIPT_OR_RECORD = re.compile(r"(?i).*(?:\.rec|\.scr)$")
 
 class GameChannel:
     """Represents a channel that is prepped for playing a game through Xyzzy."""
@@ -56,8 +58,8 @@ class GameChannel:
 
     def check_saves(self):
         """Checks if the user saved the game."""
-        files = glob("{}*[!screc]".format(self.save_path)) # Filter out script and recording files.
-        files = [discord.File(x) for x in files][:10] # Convert paths to Discord files, and limit to 10.
+        files = [x for x in os.listdir(self.save_path) if not SCRIPT_OR_RECORD.match(x)]
+        files = [discord.File("{}/{}".format(self.save_path, x)) for x in files]
 
         return files or None
 
@@ -96,6 +98,9 @@ class GameChannel:
                     saves = self.check_saves()
 
                     await self.send_story(msg, saves)
+
+                    for file in os.listdir(self.save_path):
+                        os.unlink("{}/{}".format(self.save_path, file))
 
                     buffer = b""
 
