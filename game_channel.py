@@ -34,15 +34,15 @@ class GameChannel:
 
         self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
 
-    async def send_story(self, msg, saves=None):
+    async def send_story(self, msg, save=None):
         """Sends the story to the game's channel, handling permissions."""
         if self.output:
             print(msg)
 
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
-            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), files=saves)
+            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), file=save)
         else:
-            await self.channel.send(msg, files=saves)
+            await self.channel.send("```{}```".format(msg), file=save)
 
     def send_input(self, input):
         """"""
@@ -59,9 +59,18 @@ class GameChannel:
     def check_saves(self):
         """Checks if the user saved the game."""
         files = [x for x in os.listdir(self.save_path) if not SCRIPT_OR_RECORD.match(x)]
-        files = [discord.File("{}/{}".format(self.save_path, x)) for x in files]
+        latest = [0, None]
 
-        return files or None
+        for file in files:
+            mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
+
+            if mod_time > latest[0]:
+                latest = [modtime, file]
+
+        if latest[1]:
+            return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
+        else:
+            return None
 
     def cleanup(self):
         """Cleans up after the game."""
@@ -99,16 +108,24 @@ class GameChannel:
 
                     await self.send_story(msg, saves)
 
+                    files = os.listdir(self.save_path)
+                    latest = 0
+
                     for file in os.listdir(self.save_path):
-                        os.unlink("{}/{}".format(self.save_path, file))
+                        mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
+
+                        if mod_time < latest or SCRIPT_OR_RECORD.match(file):
+                            os.unlink("{}/{}".format(self.save_path, file))
+                        elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
+                            latest = mod_time
 
                     buffer = b""
 
         self.playing = False
-        last_saves = self.check_saves()
+        last_save = self.check_saves()
 
         if last_saves:
-            await self.channel.send("```diff\n-The game has ended.\n+Here are your saves from the game.\n```", files=last_saves)
+            await self.channel.send("```diff\n-The game has ended.\n+Here is your most recent save from the game.\n```", file=last_save)
         else:
             await self.channel.send("```diff\n-The game has ended.\n```")
 
