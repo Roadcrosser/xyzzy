@@ -31,6 +31,11 @@ class GameChannel:
         # Make directory for saving
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
+        else:
+            # Clear out existing directory if it exists.
+            # This could happen due to a reboot or something.
+            shutil.rmtree(self.save_path)
+            os.makedirs(self.save_path)
 
         self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
 
