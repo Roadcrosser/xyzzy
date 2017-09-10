@@ -1,6 +1,8 @@
-from typing import Union
 from subprocess import PIPE
+from glob import glob
 
+import shutil
+import os
 import asyncio
 import discord
 
@@ -17,35 +19,54 @@ class GameChannel:
         self.url = game.get("url", None)
         self.process = None
         self.playing = False
+        self.save_path = "./saves/" + str(self.channel.id)
 
     async def init_process(self):
         """Sets up the channel's game process."""
         if self.process:
             raise Exception("Game already has a process.")
 
-        self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 " + self.file, stdout=PIPE, stdin=PIPE)
+        # Make directory for saving
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
 
-    async def send_story(self, msg):
+        self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
+
+    async def send_story(self, msg, saves=None):
         """Sends the story to the game's channel, handling permissions."""
         if self.output:
             print(msg)
 
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
-            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour))
+            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), files=saves)
         else:
-            await self.channel.send(msg)
+            await self.channel.send(msg, files=saves)
 
     def send_input(self, input):
-        self.process.stdin.write((input + '\n').encode('utf-8', 'replace'))
+        """"""
+        if not self.process:
+            raise Exception("Channel does not have an attached process.")
+
+        self.process.stdin.write((input + "\n").encode("utf-8", "replace"))
 
     async def force_quit(self):
         """Forces the channel's game process to end."""
         self.process.terminate()
-        self.process = None
         self.playing = False
 
+    def check_saves(self):
+        """Checks if the user saved the game."""
+        files = glob("*[!screc]") # Filter out script and recording files.
+        files = [discord.File("{}/{}".format(self.save_path, x), x) for x in files][:10] # Convert paths to Discord files, and limit to 10.
+
+        return files or None
+
+    def cleanup(self):
+        """Cleans up after the game."""
+        shutil.rmtree(self.save_path)
+
     async def game_loop(self):
-        """Enters into the channel's game process' loop."""
+        """Enters into the channel's game process loop."""
         if not self.process:
             await self.init_process()
 
@@ -72,10 +93,18 @@ class GameChannel:
                             msg = line[self.indent:]
 
                     msg = msg.strip()
+                    saves = self.check_saves()
 
-                    await self.send_story(msg)
+                    await self.send_story(msg, saves)
 
                     buffer = b""
 
         self.playing = False
-        await self.channel.send("```diff\n-The game has ended.\n```")
+        last_saves = self.check_saves()
+
+        if last_saves:
+            await self.channel.send("```diff\n-The game has ended.\n+Here are your saves from the game.\n```", files=last_saves)
+        else:
+            await self.channel.send("```diff\n-The game has ended.\n```")
+
+        self.cleanup()

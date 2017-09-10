@@ -188,14 +188,25 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             msg = await self.xyzzy.wait_for("message", check=check, timeout=30)
 
             if re.match(r"^`?({})?y(es)?`?$", msg.content.lower()):
-                await self.xyzzy.channels[ctx.msg.channel.id].force_quit()
+                chan = self.xyzzy.channels[ctx.msg.channel.id]
+
+                await chan.force_quit()
+                chan.cleanup()
                 del self.xyzzy.channels[ctx.msg.channel.id]
             else:
                 await ctx.send("```diff\n+Continuing game.\n```")
         except asyncio.TimeoutError:
             await ctx.send("```diff\n+Message timeout expired. Continuing game.\n```")
         except ProcessLookupError:
-            await ctx.send("```diff\n-The game has ended.\n```")
+            chan = self.xyzzy.channels[ctx.msg.channel.id]
+            saves = chan.check_saves()
+
+            if saves:
+                await self.channel.send("```diff\n-The game has ended.\n+Here are your saves from the game.\n```", files=saves)
+            else:
+                await ctx.send("```diff\n-The game has ended.\n```")
+
+            chan.cleanup()
             del self.xyzzy.channels[ctx.msg.channel.id]
 
 def setup(xyzzy):
