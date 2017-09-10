@@ -22,6 +22,7 @@ class GameChannel:
         self.process = None
         self.playing = False
         self.save_path = "./saves/" + str(self.channel.id)
+        self.last_save = None
 
     async def init_process(self):
         """Sets up the channel's game process."""
@@ -72,7 +73,7 @@ class GameChannel:
             if mod_time > latest[0]:
                 latest = [mod_time, file]
 
-        if latest[1]:
+        if latest[1] and latest[1] != self.last_save:
             return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
         else:
             return None
@@ -123,13 +124,14 @@ class GameChannel:
                             os.unlink("{}/{}".format(self.save_path, file))
                         elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                             latest = mod_time
+                            last_save = file
 
                     buffer = b""
 
         self.playing = False
         last_save = self.check_saves()
 
-        if last_saves:
+        if last_save:
             await self.channel.send("```diff\n-The game has ended.\n+Here is your most recent save from the game.\n```", file=last_save)
         else:
             await self.channel.send("```diff\n-The game has ended.\n```")
