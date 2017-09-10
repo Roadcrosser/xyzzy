@@ -129,10 +129,10 @@ class GameChannel:
                     buffer = b""
 
         self.playing = False
-        last_save = self.check_saves()
 
-        if last_save:
-            await self.channel.send("```diff\n-The game has ended.\n+Here is your most recent save from the game.\n```", file=last_save)
+        if self.last_save:
+            file = discord.File("{}/{}".format(self.save_path, self.last_save), self.last_save)
+            await self.channel.send("```diff\n-The game has ended.\n+Here is your most recent save from the game.\n```", file=file)
         else:
             await self.channel.send("```diff\n-The game has ended.\n```")
 
