@@ -74,6 +74,7 @@ class GameChannel:
                 latest = [mod_time, file]
 
         if latest[1] and latest[1] != self.last_save:
+            self.last_save = latest[1]
             return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
         else:
             return None
@@ -124,7 +125,6 @@ class GameChannel:
                             os.unlink("{}/{}".format(self.save_path, file))
                         elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                             latest = mod_time
-                            last_save = file
 
                     buffer = b""
 
