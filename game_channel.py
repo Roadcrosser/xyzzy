@@ -97,7 +97,7 @@ class GameChannel:
                 buffer += output
             except asyncio.TimeoutError:
                 if buffer != b"":
-                    out = buffer.decode("utf-8", "replace")
+                    out = buffer.decode("latin-1", "replace")
                     msg = ""
 
                     for i, line in enumerate(out.splitlines()):
