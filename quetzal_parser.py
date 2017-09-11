@@ -6,13 +6,22 @@ Loosely based off of the code here: https://github.com/sussman/zvm/blob/master/z
 Quetzal file format standard: http://inform-fiction.org/zmachine/standards/quetzal/index.html
 """
 
-from typing import List
+from typing import List, Union
 from chunk import Chunk
-from collections import namedtuple
 
 import os
 
-HeaderData = namedtuple("HeaderData", ["release", "serial", "checksum"])
+class HeaderData:
+    def __init__(self, release, serial, checksum):
+        self.release = release
+        self.serial = serial
+        self.checksum = checksum
+
+    def __str__(self):
+        return "HeaderData(release={}, serial={}, checksum={})".format(self.release, self.serial, self.checksum)
+
+    def __repr__(self):
+        return self.__str__()
 
 def read_word(address: int, mem: List[int]) -> int:
     """Read's a 16-bit value at the specified address."""
@@ -81,21 +90,24 @@ def parse_zcode(path: str) -> HeaderData:
 
     return HeaderData(release, serial, checksum)
 
-def compare_quetzal(quetzal_path: str, game_path: str) -> bool:
+def compare_quetzal(quetzal: Union[str, HeaderData], game: Union[str, HeaderData]) -> bool:
     """Reads a Quetzal file and a game file, and determines if they match."""
-    if type(quetzal_path) != str:
-        raise Exception("quetzal_path is not a string.")
-    elif type(game_path) != str:
-        raise Exception("game_path is not a string.")
+    if not isinstance(quetzal, (HeaderData, str)):
+        raise Exception("`quetzal` is not a HeaderData instance, or a string.")
+    elif not isinstance(game, (HeaderData, str)):
+        raise Exception("game_path is not a HeaderData instance, or a string.")
 
-    qzl_data = parse_quetzal(quetzal_path)
-    zcode_data = parse_zcode(game_path)
+    if type(quetzal) == str:
+        quetzal = parse_quetzal(quetzal)
 
-    if qzl_data.release != zcode_data.release:
+    if type(game) == str:
+        game = parse_zcode(game)
+
+    if quetzal.release != game.release:
         return False
-    elif qzl_data.serial != zcode_data.serial:
+    elif quetzal.serial != game.serial:
         return False
-    elif zcode_data.checksum != 0 and qzl_data.checksum != zcode_data.checksum:
+    elif game.checksum != 0 and quetzal.checksum != game.checksum:
         return False
 
     return True
