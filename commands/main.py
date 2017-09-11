@@ -96,11 +96,11 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         print("Searching for " + ctx.raw)
 
-        stories = [x for x in self.xyzzy.stories if ctx.raw.lower() in x["name"].lower()]
+        stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower()}
         perfect_match = None
 
         if stories:
-            perfect_match = [x for x in stories if ctx.raw.lower() == x["name"].lower()]
+            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower()}
 
         if not stories:
             return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
@@ -108,7 +108,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
                                   '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(x["name"] for x in stories))))
+                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
 
         if perfect_match:
             game = perfect_match[0]

@@ -186,7 +186,7 @@ class Xyzzy(discord.Client):
 
                 self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
                 self.gist_story_cache = json.loads(res["files"]["xyzzy_stories.json"]["content"])
-                gist_story = sorted([i for i in self.stories])
+                gist_story = sorted([[i, v["url"] or None] for k, v in self.stories.items()] key=lambda x: x[0])
 
                 if self.gist_story_cache != gist_story:
                     gist_story = json.dumps({
