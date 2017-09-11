@@ -111,10 +111,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                                   "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
 
         if perfect_match:
-            game = list(perfect_match.items())
+            game = list(perfect_match.items())[0]
             game = {"name": game[0], **game[1]}
         else:
-            game = list(stories[0].items())
+            game = list(stories[0].items())[0]
             game = {"name": game[0], **game[1]}
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
