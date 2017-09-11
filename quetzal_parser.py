@@ -56,7 +56,7 @@ def parse_quetzal(path: str) -> HeaderData:
 
         # Bitwise magic to get data.
         release = (ord(data[0]) << 8) + ord(data[1])
-        serial = data[2:8]
+        serial = int(data[2:8])
         checksum = (ord(data[8]) << 8) + ord(data[9])
         # pc = (ord(data[10]) << 16) + (ord(data[11]) << 8) + ord(data[12]) # This isn't needed rn, but it's commented just in case.
 
@@ -76,7 +76,7 @@ def parse_zcode(path: str) -> HeaderData:
 
         # Byte magic
         release = read_word(2, mem)
-        serial = mem[0x12:0x18]
+        serial = int(''.join(chr(x) for x in mem[0x12:0x18]))
         checksum = read_word(0x1C, mem)
 
     return HeaderData(release, serial, checksum)
@@ -93,7 +93,7 @@ def compare_quetzal(quetzal_path: str, game_path: str) -> bool:
 
     if qzl_data.release != zcode_data.release:
         return False
-    elif [ord(x) for x in qzl_data.serial] != zcode_data.serial:
+    elif qzl_data.serial != zcode_data.serial:
         return False
     elif zcode_data.checksum != 0 and qzl_data.checksum != zcode_data.checksum:
         return False
