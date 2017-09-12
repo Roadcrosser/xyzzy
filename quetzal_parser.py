@@ -58,7 +58,7 @@ def parse_quetzal(fp) -> HeaderData:
     chunk = Chunk(qzl)
     name = chunk.getname()
     size = chunk.getsize()
-    data = chunk.read(size).decode("ansi")
+    data = chunk.read(size).decode("latin-1")
 
     # Make sure first chunk is IFhd.
     if name != b"IFhd":
