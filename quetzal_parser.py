@@ -82,7 +82,7 @@ def parse_zcode(path: str) -> HeaderData:
     if not os.path.isfile(path):
         raise Exception("File provided isn't a file, or doesn't exist.")
 
-    with open(path, encoding='ansi') as zcode:
+    with open(path, encoding='latin-1') as zcode:
         mem = zcode.read()
         mem = [ord(x) for x in mem]
 
