@@ -127,7 +127,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             if attch.width or attch.height:
                 return await ctx.send("```diff\n-Images are not save files.\n```")
 
-            async with self.xyzzy.session.get(attach.url) as r:
+            async with self.xyzzy.session.get(attch.url) as r:
                 res = await r.read()
 
             qzl_bytes = BytesIO(res)
