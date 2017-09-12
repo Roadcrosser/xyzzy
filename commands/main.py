@@ -1,9 +1,12 @@
 from command_sys import command
 from game_channel import GameChannel
+from io import BytesIO
 
+import os
 import re
 import json
 import asyncio
+import quetzal_parser as qzl
 
 class Main:
     def __init__(self, xyzzy):
@@ -94,28 +97,58 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.channel.id in self.xyzzy.channels:
             return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the story has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
 
-        print("Searching for " + ctx.raw)
+        if not ctx.msg.attachments:
+            print("Searching for " + ctx.raw)
 
-        stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower()}
-        perfect_match = None
+            stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower()}
+            perfect_match = None
 
-        if stories:
-            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower()}
+            if stories:
+                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower()}
 
-        if not stories:
-            return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
-        elif len(stories) > 1 and not perfect_match:
-            return await ctx.send("```accesslog\n"
-                                  'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
-                                  '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
+            if not stories:
+                return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
+            elif len(stories) > 1 and not perfect_match:
+                return await ctx.send("```accesslog\n"
+                                    'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
+                                    '"{}"\n'
+                                    "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
 
-        if perfect_match:
-            game = list(perfect_match.items())[0]
-            game = {"name": game[0], **game[1]}
+            if perfect_match:
+                game = list(perfect_match.items())[0]
+                game = {"name": game[0], **game[1]}
+            else:
+                game = list(stories[0].items())[0]
+                game = {"name": game[0], **game[1]}
         else:
-            game = list(stories[0].items())[0]
-            game = {"name": game[0], **game[1]}
+            # Attempt to load a game from a possible save file.
+            attch = ctx.msg.attachments[0]
+
+            if attch.width or attch.height:
+                return await ctx.send("```diff\n-Images are not save files.\n```")
+
+            async with self.xyzzy.session.get(attach.url) as r:
+                res = await r.read()
+
+            qzl_bytes = BytesIO(res)
+
+            try:
+                qzl_headers = qzl.parse_quetzal(qzl_bytes)
+            except Exception as e:
+                if str(e) == "Invalid file format.":
+                    return await ctx.send("```diff\n-Invalid file format.\n```")
+                else:
+                    return await ctx.send("```diff\n-Malformed save file.\n```")
+
+            for name, stuff in self.xyzzy.stories.items():
+                res = qzl.compare_quetzal(qzl_headers, stuff["path"])
+
+                if res:
+                    game = {"name": name, **stuff}
+                    break
+
+            if not res:
+                return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
