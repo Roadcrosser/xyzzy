@@ -127,28 +127,29 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             if attch.width or attch.height:
                 return await ctx.send("```diff\n-Images are not save files.\n```")
 
-            async with self.xyzzy.session.get(attch.url) as r:
-                res = await r.read()
+            async with ctx.typing():
+                async with self.xyzzy.session.get(attch.url) as r:
+                    res = await r.read()
 
-            qzl_bytes = BytesIO(res)
+                qzl_bytes = BytesIO(res)
 
-            try:
-                qzl_headers = qzl.parse_quetzal(qzl_bytes)
-            except Exception as e:
-                if str(e) == "Invalid file format.":
-                    return await ctx.send("```diff\n-Invalid file format.\n```")
-                else:
-                    return await ctx.send("```diff\n-Malformed save file.\n```")
+                try:
+                    qzl_headers = qzl.parse_quetzal(qzl_bytes)
+                except Exception as e:
+                    if str(e) == "Invalid file format.":
+                        return await ctx.send("```diff\n-Invalid file format.\n```")
+                    else:
+                        return await ctx.send("```diff\n-{}\n```".format(str(e)))
 
-            for name, stuff in self.xyzzy.stories.items():
-                res = qzl.compare_quetzal(qzl_headers, stuff["path"])
+                for name, stuff in self.xyzzy.stories.items():
+                    res = qzl.compare_quetzal(qzl_headers, stuff["path"])
 
-                if res:
-                    game = {"name": name, **stuff}
-                    break
+                    if res:
+                        game = {"name": name, **stuff}
+                        break
 
-            if not res:
-                return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
+                if not res:
+                    return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
