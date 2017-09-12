@@ -131,10 +131,8 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 async with self.xyzzy.session.get(attch.url) as r:
                     res = await r.read()
 
-                qzl_bytes = BytesIO(res)
-
                 try:
-                    qzl_headers = qzl.parse_quetzal(qzl_bytes)
+                    qzl_headers = qzl.parse_quetzal(BytesIO(res))
                 except Exception as e:
                     if str(e) == "Invalid file format.":
                         return await ctx.send("```diff\n-Invalid file format.\n```")
