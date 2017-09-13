@@ -157,7 +157,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         chan = GameChannel(ctx.msg, game)
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
-        if ctx.attachments:
+        if ctx.msg.attachments:
             chan.save = "./save-data/{}.qzl".format(ctx.msg.channel.id)
 
         await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
