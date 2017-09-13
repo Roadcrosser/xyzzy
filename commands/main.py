@@ -2,6 +2,7 @@ from command_sys import command
 from game_channel import GameChannel
 from io import BytesIO
 
+import random
 import os
 import re
 import json
@@ -11,6 +12,24 @@ import quetzal_parser as qzl
 class Main:
     def __init__(self, xyzzy):
         self.xyzzy = xyzzy
+        self.phrases = ("^ . ^\n\___/", "– obligatory easter egg –", "*** You have died ***", "(arirang norae)", "(Is that an ornithopter I spy?)",
+                          "(Itadakimasu!)", "(Meep!)", "(No Garden of Unearthly Delights, alas.)", "(Twinkle, twinkle, little...never mind.)",
+                          "(What did you expect, Stormbringer?)", "(You should know better than this.)", "(It's said the 'x' is really a 'chi', so tt's pronounced 'cheesy'.)\n\n[Insert humorous comment here]", "[A hollow voice says, 'K3WL!]", '[dootsrednu ton saw "yzzyx" drow eht]',
+                          "As in the water face answers to face,\nSo the mind of a man\nReflects the man.\n\n-- Pr. 27:19", "[Note to self: insert witty answer here.]",
+                          "[Oh yeah? Well, plugh on you then!]", "[Sigh.]", "/usr/local/games/advent: Connection timed out.", "A cardboard cut-out of Graham Nelson appears and waves a cardboard arm. The cardboard cut-out then vanishes in a puff of Inform.",
+                          'A deep voice booms out "Cretino."', 'A disembodied voice informs you, "The solution isn\'t magic, but it\'s not rocket science, either."\n\nThe voice pauses, as if in thought, and queries, "S\'matter? Are you chicken?"',
+                          'A disembodied voice speaks. "This magic word is down for repairs, necessitated by its overuse. Please try another."',
+                          'A finely-dressed man appears in a flash of blinding pink light. "You know, with an important Presidential election coming up in the United States very soon, I think it\'s time to talk to you about a very important subject: Spork safety.\n\nThe man vanishes.',
+                          'A foolish voice says, "Hallo."', 'A HOLLOW VOICE SAYS, "FOOL!"', 'A hollow cow says, "Moo."', "A hollow voice announces that the XYZZY Forum on the Virtua WorldNet is closed right now. How typical.",
+                          "A hollow voice bleats.", 'A hollow voice booms, "Do you see your shadow?"', "A hollow voice ignores you.",
+                          "A hollow voice inside your head mocks your social skills.", 'A hollow voice inside your head says, "Wrong genre."',
+                          "A hollow voice rings out - no wait, that's my stomach.", 'A hollow voice says, "A hollow voice says, \'Plugh\'."',
+                          'A hollow voice says, "Is this thing on?"', 'A hollow voice says, "Klmml."', 'A hollow voice says, "Plugh."',
+                          'A hollow voice says, "Testing, one, two."', 'A hollow voice says, "That\'s not a bug, it\'s a feature!"',
+                          'A hollow voice says, "This is a test of the emergency hollow voice system."', 'A hollow voice says, "Any sufficiently advanced technology is indistinguishable from magic. And vice-versa."',
+                          'A hollow voice says, "Ba-cock!"', "An anvil falls on your head, then vanishes.", 'A hollow voice says, "Beam me up, Scotty."',
+                          'A hollow voice says, "Cretin."', "A hollow voice says 'Cretin'.\n(Probably your boss)", 'A hollow voice says, "Did you really think I\'d take the time to implement that?"', "You regret dropping out of Magic 101 at college.", 'You murmer "Xyzzy", but nothing happens.',
+                          'You hear a hollow voice proclaim “Gummi Bears -- they hibernate in your colon!”', "Nothing happens.")
 
     @command(usage="[ command ]", has_site_help=False)
     async def help(self, ctx):
@@ -248,6 +267,11 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
             chan.cleanup()
             del self.xyzzy.channels[ctx.msg.channel.id]
+
+    @command(name="xyzzy", aliases=["magic", "spell"], has_site_help=False)
+    async def zyzz(self, ctx):
+        """Nothing happens."""
+        await ctx.send("```{}```".format(random.choice(self.phrases)))
 
 def setup(xyzzy):
     return Main(xyzzy)

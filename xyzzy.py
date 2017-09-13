@@ -126,7 +126,7 @@ class Xyzzy(discord.Client):
         self.session = aiohttp.ClientSession()
         self.commands = Holder(self)
 
-        print(ConsoleColours.OKGREEN + "Initialisation complete! Connecting to Discord..." + ConsoleColours.END)
+        print(ConsoleColours.OK_GREEN + "Initialisation complete! Connecting to Discord..." + ConsoleColours.END)
 
         super().__init__()
 
