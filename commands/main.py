@@ -149,7 +149,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 if not res:
                     return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
-                with open("./save-data/{}.qzl".format(ctx.msg.channel.id), "w") as save:
+                if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
+                    os.mkdirs("./saves/{}".format(ctx.msg.channel.id))
+
+                with open("./saves/{}.qzl".format(ctx.msg.channel.id), "w") as save:
                     save.write(res)
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
@@ -158,7 +161,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
         if ctx.msg.attachments:
-            chan.save = "./save-data/{}.qzl".format(ctx.msg.channel.id)
+            chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
         await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
         await chan.init_process()

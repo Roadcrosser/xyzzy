@@ -36,8 +36,9 @@ class GameChannel:
         else:
             # Clear out existing directory if it exists.
             # This could happen due to a reboot or something.
-            shutil.rmtree(self.save_path)
-            os.makedirs(self.save_path)
+            for f in os.listdir(self.save_path):
+                if f !== "__UPLOADED__.qzl":
+                    os.remove("{}/{}".format(self.save_path, f))
 
         if self.save:
             self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} -L {} {}".format(self.save_path, self.save, self.file), stdout=PIPE, stdin=PIPE)
