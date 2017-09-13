@@ -37,7 +37,7 @@ class GameChannel:
             # Clear out existing directory if it exists.
             # This could happen due to a reboot or something.
             for f in os.listdir(self.save_path):
-                if f !== "__UPLOADED__.qzl":
+                if f != "__UPLOADED__.qzl":
                     os.remove("{}/{}".format(self.save_path, f))
 
         if self.save:
