@@ -5,3 +5,4 @@ stories.json
 stories/
 __pycache__/
 saves/
+save-cache/

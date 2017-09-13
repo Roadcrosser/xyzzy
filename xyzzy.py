@@ -32,8 +32,8 @@ CAH_REGEX = re.compile(r"(?:can|does|is) this bot (?:play |do )?(?:cah|cards aga
 
 class ConsoleColours:
     HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKGREEN = "\033[92m"
+    OK_BLUE = "\033[94m"
+    OK_GREEN = "\033[92m"
     WARNING = "\033[93m"
     FAIL = "\033[91m"
     END = "\033[0m"
@@ -84,6 +84,10 @@ class Xyzzy(discord.Client):
         if not os.path.exists("./bot-data/"):
             print('Creating bot data directory at "./bot-data/"')
             os.makedirs("./bot-data/")
+
+        if not os.path.exists("./save-cache/"):
+            print('Creating save cache directory at "./save-cache/"')
+            os.makedirs("./save-cache/")
 
         try:
             print("Loading user preferences...")

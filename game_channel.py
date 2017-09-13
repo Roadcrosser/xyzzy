@@ -23,6 +23,7 @@ class GameChannel:
         self.playing = False
         self.save_path = "./saves/" + str(self.channel.id)
         self.last_save = None
+        self.save = None
 
     async def init_process(self):
         """Sets up the channel's game process."""
@@ -38,7 +39,10 @@ class GameChannel:
             shutil.rmtree(self.save_path)
             os.makedirs(self.save_path)
 
-        self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
+        if self.save:
+            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} -L {} {}".format(self.save_path, self.save, self.file), stdout=PIPE, stdin=PIPE)
+        else:
+            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
 
     async def send_story(self, msg, save=None):
         """Sends the story to the game's channel, handling permissions."""

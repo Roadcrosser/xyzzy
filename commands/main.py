@@ -100,11 +100,11 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not ctx.msg.attachments:
             print("Searching for " + ctx.raw)
 
-            stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower()}
+            stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if "aliases" in y and ctx.raw.lower() in z.lower()]}
             perfect_match = None
 
             if stories:
-                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower()}
+                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y["aliases"] if "aliases" in y and ctx.raw.lower() == z.lower()]}
 
             if not stories:
                 return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
@@ -149,10 +149,16 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 if not res:
                     return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
+                with open("./save-data/{}.qzl".format(ctx.msg.channel.id), "w") as save:
+                    save.write(res)
+
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
         chan = GameChannel(ctx.msg, game)
         self.xyzzy.channels[ctx.msg.channel.id] = chan
+
+        if ctx.attachments:
+            chan.save = "./save-data/{}.qzl".format(ctx.msg.channel.id)
 
         await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
         await chan.init_process()
