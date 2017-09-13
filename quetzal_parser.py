@@ -58,7 +58,7 @@ def parse_quetzal(fp) -> HeaderData:
     chunk = Chunk(qzl)
     name = chunk.getname()
     size = chunk.getsize()
-    data = chunk.read(size).decode("utf8")
+    data = chunk.read(size).decode("latin_1")
 
     # Make sure first chunk is IFhd.
     if name != b"IFhd":
@@ -82,7 +82,7 @@ def parse_zcode(path: str) -> HeaderData:
     if not os.path.isfile(path):
         raise Exception("File provided isn't a file, or doesn't exist.")
 
-    with open(path, encoding='utf8') as zcode:
+    with open(path, encoding="latin_1") as zcode:
         mem = zcode.read()
         mem = [ord(x) for x in mem]
 
