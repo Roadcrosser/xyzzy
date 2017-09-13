@@ -150,7 +150,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                     return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
                 if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
-                    os.mkdirs("./saves/{}".format(ctx.msg.channel.id))
+                    os.makedirs("./saves/{}".format(ctx.msg.channel.id))
 
                 with open("./saves/{}.qzl".format(ctx.msg.channel.id), "w", encoding="latin_1") as save:
                     save.write(res)
