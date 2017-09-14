@@ -126,6 +126,12 @@ class Xyzzy(discord.Client):
         self.session = aiohttp.ClientSession()
         self.commands = Holder(self)
 
+        if os.listdir("./saves"):
+            print("Cleaning out saves directory after reboot.")
+
+            for s in os.listdir("./saves"):
+                shutil.rmtree("./saves/" + s)
+
         print(ConsoleColours.OK_GREEN + "Initialisation complete! Connecting to Discord..." + ConsoleColours.END)
 
         super().__init__()

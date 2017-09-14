@@ -152,7 +152,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
                     os.makedirs("./saves/{}".format(ctx.msg.channel.id))
 
-                with open("./saves/{}.qzl".format(ctx.msg.channel.id), "w") as save:
+                with open("./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id), "w") as save:
                     save.write(res)
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
