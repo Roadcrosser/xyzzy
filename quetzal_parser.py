@@ -41,6 +41,8 @@ def parse_quetzal(fp) -> HeaderData:
     else:
         qzl = fp
 
+    print(qzl.getvalue())
+
     header = qzl.read(4)
 
     # Header checking yay.
