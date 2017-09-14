@@ -23,7 +23,7 @@ class Main:
                                   "http://xyzzy.roadcrosser.xyz/help/".format(self.xyzzy.invoker * 2))
         elif self.xyzzy.commands.get_command(ctx.args[0].lower()):
             cmd = self.xyzzy.commands.get_command(ctx.args[0].lower())
-            msg = '```inform7"{}{}{}{}"```'.format(self.xyzzy.invoker * 2, cmd.name, " " + cmd.usage if cmd.usage else "", cmd.description)
+            msg = '```inform7\n"{}{}{}{}"\n```'.format(self.xyzzy.invoker * 2, cmd.name, " " + cmd.usage + " " if cmd.usage else "", cmd.description)
 
             if cmd.has_site_help:
                 msg += "\nMore information: http://xyzzy.roadcrosser.xyz/help/#{}".format(cmd.name)

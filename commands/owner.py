@@ -1,6 +1,8 @@
 from command_sys import command
+import traceback as tb
 import inspect
 import asyncio
+import discord
 import re
 
 class Owner:
@@ -100,6 +102,76 @@ class Owner:
         msg += '```'
 
         await ctx.send(msg, dest="author")
+
+    @command(owner=True, has_site_help=False)
+    async def repl(self, ctx):
+        """Repl in Discord. Because debugging using eval is a PiTA."""
+        check = lambda m: m.content.startswith("`") and m.author == ctx.msg.author and m.channel == ctx.msg.channel
+        locals = {}
+        globals = {
+            "discord": discord,
+            "xyzzy": self.xyzzy,
+            "ctx": ctx,
+            "last": None
+        }
+
+        await ctx.send("```You sit down at the terminal and press a key.\nA message appears.```"
+                       "```\n"
+                       "      **** XYZZY PYTHON V3.5 REPL ****\n"
+                       " 4GB RAM SYSTEM   A LOT OF PYTHON BYTES FREE\n\n"
+                       "READY.\n"
+                       "```")
+
+        while True:
+            resp = await self.xyzzy.wait_for("message", check=check)
+            clean = resp.content.strip("` \n")
+
+            if clean.lower() in ("quit", "exit", "exit()", "quit()"):
+                return await ctx.send("```You stand up from the terminal.```")
+
+            runner = exec
+
+            if clean.count("\n") == 0:
+                try:
+                    res =  compile(clean, "<repl>", "eval")
+                    runner = eval
+                except SyntaxError:
+                    pass
+
+            if runner is exec:
+                try:
+                    res = compile(clean, "<repl>", "exec")
+                except SyntaxError as e:
+                    if e.text is None:
+                        await ctx.send("```py\n{0.__class__.__name__}: {0}\n```".format(e))
+                    else:
+                        await ctx.send("```py\n{0.text}{1:>{0.offset}}\n{0.__class__.__name__}: {0}\n```".format(e, "^"))
+
+                    continue
+
+            globals["last"] = resp
+            fmt = None
+
+            try:
+                res = runner(res, globals, locals)
+
+                if inspect.isawaitable(res):
+                    res = await res
+
+                if res:
+                    msg = "```py\n{}\n```".format(res)
+                else:
+                    msg = "```Nothing happens.```"
+            except Exception as e:
+                msg = "```py\n{}\n```".format(tb.format_exc())
+
+            if msg:
+                try:
+                    await ctx.send(msg)
+                except discord.Forbidden:
+                    pass
+                except discord.HTTPException as e:
+                    await ctx.send("Unexpected error: `{}`".format(e))
 
 def setup(xyzzy):
     return Owner(xyzzy)
