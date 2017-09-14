@@ -140,13 +140,13 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                         return await ctx.send("```diff\n-{}\n```".format(str(e)))
 
                 for name, stuff in self.xyzzy.stories.items():
-                    res = qzl.compare_quetzal(qzl_headers, stuff["path"])
+                    comp_res = qzl.compare_quetzal(qzl_headers, stuff["path"])
 
-                    if res:
+                    if comp_res:
                         game = {"name": name, **stuff}
                         break
 
-                if not res:
+                if not comp_res:
                     return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
                 if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
