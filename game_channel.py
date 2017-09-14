@@ -63,7 +63,7 @@ class GameChannel:
 
     def check_saves(self):
         """Checks if the user saved the game."""
-        files = [x for x in os.listdir(self.save_path) if not SCRIPT_OR_RECORD.match(x)]
+        files = [x for x in os.listdir(self.save_path) if not SCRIPT_OR_RECORD.match(x) and x != "__UPLOADED__.qzl"]
         latest = [0, None]
 
         for file in files:
@@ -120,7 +120,7 @@ class GameChannel:
                     for file in os.listdir(self.save_path):
                         mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
 
-                        if mod_time < latest or SCRIPT_OR_RECORD.match(file):
+                        if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
                             os.unlink("{}/{}".format(self.save_path, file))
                         elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                             latest = mod_time
