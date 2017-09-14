@@ -154,7 +154,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
                 with open("./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id), "w") as save:
                     print(res)
-                    save.write(res.decode("utf-8"))
+                    save.write(res.decode("latin_1"))
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
