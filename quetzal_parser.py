@@ -66,11 +66,18 @@ def parse_quetzal(fp) -> HeaderData:
     elif size != 13:
         raise Exception("Invalid size for IFhd chunk: " + str(size))
 
-    # Bitwise magic to get data.
-    release = (ord(data[0]) << 8) + ord(data[1])
-    serial = int(data[2:8])
-    checksum = (ord(data[8]) << 8) + ord(data[9])
-    # pc = (ord(data[10]) << 16) + (ord(data[11]) << 8) + ord(data[12]) # This isn't needed rn, but it's commented just in case.
+    try:
+        # Bitwise magic to get data.
+        release = (ord(data[0]) << 8) + ord(data[1])
+        serial = int(data[2:8])
+        checksum = (ord(data[8]) << 8) + ord(data[9])
+        # pc = (ord(data[10]) << 16) + (ord(data[11]) << 8) + ord(data[12]) # This isn't needed rn, but it's commented just in case.
+    except ValueError as e:
+        print(data)
+        print(release)
+        print(data[2:8])
+        print((ord(data[8]) << 8) + ord(data[9]))
+        raise e
 
     return HeaderData(release, serial, checksum)
 
