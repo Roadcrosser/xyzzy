@@ -71,6 +71,9 @@ class Xyzzy(discord.Client):
             else:
                 self.__setattr__(opt, None)
 
+        if self.home_channel_id:
+            self.home_channel_id = int(self.home_channel_id)
+
         self.owner_ids = [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
         self.home_channel = None
         self.gist_data_cache = None
