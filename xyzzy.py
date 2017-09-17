@@ -278,10 +278,10 @@ class Xyzzy(discord.Client):
                 await asyncio.sleep(3600) # Post stuff every hour
 
     async def on_guild_join(self, guild):
-        print('I have been invited to tell stories in "{}".'.format(guild.name))
+        print('I have been added to "{}".'.format(guild.name))
 
         if self.home_channel:
-            await self.home_channel.send('I have been invited to tell stories in "{0.name}" (ID: {0.id}).'.format(guild))
+            await self.home_channel.send('I have been added to "{0.name}" (ID: {0.id}).'.format(guild))
 
     async def on_guild_remove(self, guild):
         print('I have been removed from "{}".'.format(guild.name))
