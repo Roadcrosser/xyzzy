@@ -50,7 +50,7 @@ class GameChannel:
             await self.channel.send("```{}```".format(msg), file=save)
 
     def send_input(self, input):
-        """"""
+        """Send's text input to the game process."""
         if not self.process:
             raise Exception("Channel does not have an attached process.")
 
@@ -88,6 +88,7 @@ class GameChannel:
             await self.init_process()
 
         buffer = b""
+        first_time = True
         self.playing = True
 
         while self.process.returncode is None:
@@ -111,6 +112,10 @@ class GameChannel:
 
                     msg = msg.strip()
                     saves = self.check_saves()
+
+                    if first_time:
+                        saves = None
+                        first_time = False
 
                     await self.send_story(msg, saves)
 
