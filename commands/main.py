@@ -122,13 +122,13 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 game = {"name": game[0], **game[1]}
         else:
             # Attempt to load a game from a possible save file.
-            attch = ctx.msg.attachments[0]
+            attach = ctx.msg.attachments[0]
 
-            if attch.width or attch.height:
+            if attach.width or attach.height:
                 return await ctx.send("```diff\n-Images are not save files.\n```")
 
             async with ctx.typing():
-                async with self.xyzzy.session.get(attch.url) as r:
+                async with self.xyzzy.session.get(attach.url) as r:
                     res = await r.read()
 
                 try:
@@ -251,6 +251,41 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
             chan.cleanup()
             del self.xyzzy.channels[ctx.msg.channel.id]
+
+    @command(aliases=["upload"], usage="[ Save as Attachment ]")
+    async def uploadsave(self, ctx):
+        """Uploads a save to be played from during a game."""
+        if not ctx.msg.attachments:
+            return await ctx.send("Please send a save file as an attachment.")
+
+        attach = ctx.msg.attachments[0]
+
+        if attach.height or attach.width:
+            return await ctx.send("```diff\n-Images are not save files.\n```")
+
+        async with ctx.typing():
+            async with self.xyzzy.session.get(attach.url) as r:
+                res = await r.read()
+
+            try:
+                qzl_headers = qzl.parse_quetzal(BytesIO(res))
+            except Exception as e:
+                if str(e) == "Invalid file format.":
+                    return await ctx.send("```diff\n-Invalid file format.\n```")
+                else:
+                    return await ctx.send("```diff\n-{}\n```".format(str(e)))
+
+            if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
+                os.makedirs("./saves/{}".format(ctx.msg.channel.id))
+
+            with open("./saves/{}/{}.qzl".format(ctx.msg.channel.id, attach.filename.rsplit(".")[0]), "wb") as save:
+                save.write(res)
+
+        await ctx.send("```diff\n"
+                       "+Saved file as '{}.qzl'.\n"
+                       "+You can load it by playing the relevant game and using the RESTORE command.\n"
+                       "-Note that this will get removed during the next game played if it is not loaded, or after the next reboot.\n"
+                       "```".format(attach.filename.split(".")[0]))
 
 def setup(xyzzy):
     return Main(xyzzy)
