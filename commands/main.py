@@ -89,6 +89,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         Tells xyzzy to start playing the [game] in the current channel.
         If no game is found with that name, xyzzy will show you all games with the [game] in their name.
         If only one game is found with that text in it's name, it will start that game.
+        If you run the command with a save file attached, xyzzy will try to load a game from it.
         """
         # Don't do DMs kids.
         if ctx.is_dm():
