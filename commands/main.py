@@ -161,7 +161,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         if str(ctx.msg.guild.id) in self.xyzzy.server_settings:
             if game["name"] in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
-                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```')
+                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```'.format(game["name"]))
 
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
