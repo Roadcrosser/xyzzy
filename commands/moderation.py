@@ -102,7 +102,7 @@ class Moderation:
             else:
                 return await ctx.send('```diff\n- "{}" has already been blocked on this server.\n```'.format(game))
 
-        await ctx.send('```diff\n+ "{}" has been blocked and will no longer be able to be played on this server.\n```')
+        await ctx.send('```diff\n+ "{}" has been blocked and will no longer be able to be played on this server.\n```'.format(game))
 
         with open("./bot-data/server_settings.json", "w") as srv:
             json.dump(self.xyzzy.server_settings, srv)
@@ -147,7 +147,7 @@ class Moderation:
         else:
             return await ctx.send('```diff\n- "{}" has not been blocked on this server.\n```'.format(game))
 
-        await ctx.send('```diff\n+ "{}" has been unblocked and can be played again on this server.\n```')
+        await ctx.send('```diff\n+ "{}" has been unblocked and can be played again on this server.\n```'.format(game))
 
         with open("./bot-data/server_settings.json", "w") as srv:
             json.dump(self.xyzzy.server_settings, srv)
