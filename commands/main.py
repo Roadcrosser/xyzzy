@@ -156,6 +156,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 with open("./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id), "wb") as save:
                     save.write(res)
 
+        if str(ctx.msg.guild.id) in self.xyzzy.server_settings:
+            if game["name"] in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
+                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```')
+
         print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
 
         chan = GameChannel(ctx.msg, game)

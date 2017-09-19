@@ -119,6 +119,18 @@ class Xyzzy(discord.Client):
                 blk.write("{}")
                 self.blocked_users = {}
 
+        try:
+            print("Loading server settings...")
+
+            with open("./bot-data/server_settings.json") as srv:
+                self.server_settings = json.load(srv)
+        except FileNotFoundError:
+            print(ConsoleColours.WARNING + "Server settings not found. Creating new server settings file.." + ConsoleColours.END)
+
+            with open("./bot-data/server_settings.json") as srv:
+                srv.write("{}")
+                self.server_settings = {}
+
         self.game = None
         self.process = None
         self.thread = None
