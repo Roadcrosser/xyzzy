@@ -99,6 +99,9 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the story has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
 
         if not ctx.msg.attachments:
+            if not ctx.args:
+                return await ctx.send("```diff\n-Please provide a game to play.\n```")
+
             print("Searching for " + ctx.raw)
 
             stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}

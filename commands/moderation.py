@@ -59,10 +59,10 @@ class Moderation:
         """
         Stops the game specified in [game name] being played on the server.
         If "list" is specified as the game name, then a list of all the currently blocked games will be shown.
-        [A user may only use this command if they have permission to kick other users.]
+        [A user may only use this command if they can manage the server.]
         """
-        if not ctx.has_permission("kick_members", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids:
-            return await ctx.send("```diff\n!Only users with the permission to kick other users can use this command.\n```")
+        if not ctx.has_permission("manage_guild", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids:
+            return await ctx.send("```diff\n!Only users who can manage the server can use this command.\n```")
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please specify a game to block for the server.\n```")
@@ -111,10 +111,10 @@ class Moderation:
     async def unblockgame(self, ctx):
         """
         Re-allows a previously blocked game to be played again.
-        [A user may only use this command if they have permission to kick other users.]
+        [A user may only use this command if can manage the server.]
         """
-        if not ctx.has_permission("kick_members", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids:
-            return await ctx.send("```diff\n!Only users with the permission to kick other users can use this command.\n```")
+        if not ctx.has_permission("manage_guild", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids:
+            return await ctx.send("```diff\n!Only users who can manage the server can use this command.\n```")
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please specify a game to unblock.\n```")
