@@ -127,7 +127,7 @@ class Xyzzy(discord.Client):
         except FileNotFoundError:
             print(ConsoleColours.WARNING + "Server settings not found. Creating new server settings file.." + ConsoleColours.END)
 
-            with open("./bot-data/server_settings.json") as srv:
+            with open("./bot-data/server_settings.json", "w") as srv:
                 srv.write("{}")
                 self.server_settings = {}
 
