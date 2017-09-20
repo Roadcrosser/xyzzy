@@ -1,6 +1,7 @@
 from command_sys import command
 from game_channel import GameChannel
 from io import BytesIO
+from math import floor
 
 import os
 import re
@@ -31,6 +32,12 @@ class Main:
             return await ctx.send(msg)
         else:
             return await ctx.send('```diff\n-No information found on "{}".\n```'.format(ctx.args[0].lower()))
+
+    @command(has_site_help=False)
+    async def ping(self, ctx):
+        msg = await ctx.send("Pong!")
+
+        await msg.edit(content="Pong! `{}ms`".format(floor(msg.created_at.timestamp() * 1000 - ctx.msg.created_at.timestamp() * 1000)))
 
     @command(has_site_help=False)
     async def about(self, ctx):
