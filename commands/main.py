@@ -129,7 +129,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 game = list(perfect_match.items())[0]
                 game = {"name": game[0], **game[1]}
             else:
-                game = list(stories[0].items())[0]
+                game = list(stories.items())[0]
                 game = {"name": game[0], **game[1]}
         else:
             # Attempt to load a game from a possible save file.
@@ -178,7 +178,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.attachments:
             chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
-        await ctx.send('```py\nLoaded "{}"\n```\n{}'.format(chan.game, chan.url or ''))
+        await ctx.send('```py\nLoaded "{}"{}\n```\n{}'.format(chan.game, " by " + game["author"] if "author" in game else "", "<" + chan.url + ">" or ""))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
