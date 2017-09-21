@@ -340,7 +340,7 @@ class Xyzzy(discord.Client):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
-            channel.send_input(msg.content)
+            channel.send_input(clean)
         elif not clean.startswith(self.invoker):
             return
 
