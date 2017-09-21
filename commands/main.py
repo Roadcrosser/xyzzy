@@ -155,7 +155,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 return await ctx.send("```accesslog\n"
                                     'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
                                     '"{}"\n'
-                                    "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
+                                    "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(x for x in stories))))
 
             if perfect_match:
                 game = list(perfect_match.items())[0]
@@ -210,7 +210,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.attachments:
             chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
-        await ctx.send('```py\nLoaded "{}"{}\n```\n{}'.format(chan.game, " by " + game["author"] if "author" in game else "", "<" + chan.url + ">" or ""))
+        await ctx.send('```py\nLoaded "{}"{}\n```'.format(chan.game, " by " + game["author"] if "author" in game else ""))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
