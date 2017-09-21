@@ -67,7 +67,7 @@ class Moderation:
         if not ctx.args:
             return await ctx.send("```diff\n-Please specify a game to block for the server.\n```")
 
-        if ctx.args[0] == "list":
+        if ctx.args[0].lower() == "list":
             if str(ctx.msg.guild.id) not in self.xyzzy.server_settings or not self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
                 return await ctx.send("```diff\n+No blocked games.\n```")
             else:
@@ -75,7 +75,7 @@ class Moderation:
 
                 return await ctx.send("```asciidoc\n.Blocked Games.\n{}\n```".format("\n".join("* '{}'".format(x) for x in sorted(games))))
 
-        stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
+        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
         perfect_match = None
 
         if stories:
@@ -119,7 +119,7 @@ class Moderation:
         if not ctx.args:
             return await ctx.send("```diff\n-Please specify a game to unblock.\n```")
 
-        stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
+        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
         perfect_match = None
 
         if stories:

@@ -56,7 +56,7 @@ class Main:
 # Here are all of the games I have available: #
 {}
 ```
-Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(x["name"] for x in self.xyzzy.stories)))
+Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(x["name"] for x in self.xyzzy.games)))
 
         if ctx.args and ctx.args[0] == "here":
             await ctx.send(msg)
@@ -68,15 +68,19 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
     @command(usage="[ on|off ]")
     async def backticks(self, ctx):
-        if not ctx.args or ctx.args[0] not in ("on", "off"):
-            return await ctx.send("```diff\nYou must provide whether you want to turn your backtick preferences ON or OFF.\n```")
+        """
+        Enables or disables the requirement for Xyzzy to require backticks before and after each command. This is off by default.
+        Using this command only changes the setting for you.
+        """
+        if not ctx.args or ctx.args[0].lower() not in ("on", "off"):
+            return await ctx.send("```diff\n-You must provide whether you want to turn your backtick preferences ON or OFF.\n```")
 
         if ctx.args[0] == "on":
             if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["backticks"]:
                 self.xyzzy.user_preferences["backticks"].append(str(ctx.msg.author.id))
                 await ctx.send("```diff\n+Commands from you now require backticks. (They should look `{}like this`)\n```".format(self.xyzzy.invoker))
             else:
-                return await ctx.send("```diff\n!Your preferences are already set to require backticks for commands.\n```")
+                return await ctx.send("```glsl\n#Your preferences are already set to require backticks for commands.\n```")
         else:
             if str(ctx.msg.author.id) in self.xyzzy.user_preferences["backticks"]:
                 self.xyzzy.user_preferences["backticks"].remove(str(ctx.msg.author.id))
@@ -89,6 +93,34 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         with open('./bot-data/userprefs.json', 'w') as x:
             json.dump(self.xyzzy.user_preferences, x)
+
+    @command(usage="[ on|off ]")
+    async def unprefixed(self, ctx):
+        """
+        Enables or disable the ability to send game input without a prefix.
+        With this mode enabled, you can get the bot to ignore you by prefixing your message with either "#" or "//"
+        If you run a command while this is active and a game is running, the game won't get it as input.
+        Using this command only changes the setting for you.
+        """
+        if not ctx.args or ctx.args[0].lower() not in ("on", "off"):
+            return await ctx.send("```diff\n-You must provide whether you want to turn unprefixed game input ON or OFF.\n```")
+
+        if ctx.args[0] == "on":
+            if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["unprefixed"]:
+                self.xyzzy.user_preferences["unprefixed"].append(str(ctx.msg.author.id))
+                await ctx.send("```diff\n+You can now run commands for games without needing a prefix.\n```")
+            else:
+                return await ctx.send("```glsl\n#You can already use game commands without a prefix.\n```")
+        else:
+            if str(ctx.msg.author.id) in self.xyzzy.user_preferences["unprefixed"]:
+                self.xyzzy.user_preferences["unprefixed"].remove(str(ctx.msg.author.id))
+                await ctx.send("```diff\n+You can no longer run commands for games without a prefix.\n```")
+            else:
+                return await ctx.send("```glsl\n#Your preferences are already set so that you cannot run game commands without a prefix.\n```")
+
+        with open('./bot-data/userprefs.json', 'w') as x:
+            json.dump(self.xyzzy.user_preferences, x)
+
 
     @command(usage="[ game ]")
     async def play(self, ctx):
@@ -111,7 +143,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
             print("Searching for " + ctx.raw)
 
-            stories = {x: y for x, y in self.xyzzy.stories.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
+            stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
             perfect_match = None
 
             if stories:
@@ -150,7 +182,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                     else:
                         return await ctx.send("```diff\n-{}\n```".format(str(e)))
 
-                for name, stuff in self.xyzzy.stories.items():
+                for name, stuff in self.xyzzy.games.items():
                     comp_res = qzl.compare_quetzal(qzl_headers, stuff["path"])
 
                     if comp_res:

@@ -82,7 +82,7 @@ class Xyzzy(discord.Client):
         print("Reading story database...")
 
         with open("./stories.json") as stories:
-            self.stories = json.load(stories)
+            self.games = json.load(stories)
 
         if not os.path.exists("./bot-data/"):
             print('Creating bot data directory at "./bot-data/"')
@@ -97,14 +97,22 @@ class Xyzzy(discord.Client):
 
             with open("./bot-data/userprefs.json") as pref:
                 self.user_preferences = json.load(pref)
+
+            if "unprefixed" not in self.user_preferences:
+                with open("./bot-data/userprefs.json", "w") as pref:
+                    print(ConsoleColours.OK_BLUE + 'Adding "unprefixed" array to user preferences file...' + ConsoleColours.END)
+                    json.dump({**self.user_preferences, "unprefixed": []}, pref)
+
+                    self.user_preferences["unprefixed"] = []
         except FileNotFoundError:
             print(ConsoleColours.WARNING + "User preferences not found. Creating new user preferences file..." + ConsoleColours.END)
 
             with open("./bot-data/userprefs.json", "w") as pref:
-                pref.write('{"version": 1, "backticks": []}')
+                pref.write('{"version": 1, "backticks": [], "unprefixed": []}')
                 self.user_preferences = {
                     "version": 1,
-                    "backticks": []
+                    "backticks": [],
+                    "unprefixed": []
                 }
 
         try:
@@ -131,7 +139,6 @@ class Xyzzy(discord.Client):
                 srv.write("{}")
                 self.server_settings = {}
 
-        self.game = None
         self.process = None
         self.thread = None
         self.queue = None
@@ -211,7 +218,7 @@ class Xyzzy(discord.Client):
 
                 self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
                 self.gist_story_cache = json.loads(res["files"]["xyzzy_stories.json"]["content"])
-                gist_story = sorted([[k, v["url"] or None] for k, v in self.stories.items()], key=lambda x: x[0])
+                gist_story = sorted([[k, v["url"] or None] for k, v in self.games.items()], key=lambda x: x[0])
 
                 if self.gist_story_cache != gist_story:
                     gist_story = json.dumps({
@@ -308,20 +315,34 @@ class Xyzzy(discord.Client):
         # Hopefully a not so fucky version of the old conditional here.
         # Makes sure that the content actually matches something we like.
         if (not self.content_regex.match(msg.content) and str(msg.author.id) in self.user_preferences["backticks"]) or \
-         (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and str(msg.author.id) not in self.user_preferences["backticks"]):
+         (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and
+         str(msg.author.id) not in self.user_preferences["backticks"]) and msg.channel.id not in self.channels:
             # Explanation of how the above works
             # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
             # - Second line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
             return
 
-        if not isinstance(msg.channel, discord.DMChannel) and \
-                ((str(msg.guild.id) in self.blocked_users and str(msg.author.id) in self.blocked_users[str(msg.guild.id)]) or
-                ("global" in self.blocked_users and str(msg.author.id) in self.blocked_users["global"])):
+        if not isinstance(msg.channel, discord.DMChannel) and ((str(msg.guild.id) in self.blocked_users and
+         str(msg.author.id) in self.blocked_users[str(msg.guild.id)]) or ("global" in self.blocked_users and
+         str(msg.author.id) in self.blocked_users["global"])):
             return await msg.author.send("```diff\n"
                                          '!An administrator has disabled your ability to submit commands in "{}"\n'
                                          "```".format(msg.guild.name))
 
-        clean = msg.content[1:-1] if self.content_regex.match(msg.content) else msg.content
+        clean = msg.content[1:-1] if re.match(r"^`.*`$", msg.content) else msg.content
+
+        # Allows people who have opted in to run commands without a prefix.
+        if not clean.startswith(self.invoker) and msg.channel.id in self.channels and self.channels[msg.channel.id].playing and\
+         str(msg.author.id) in self.user_preferences["unprefixed"]:
+            if msg.content.startswith(("#", "//")):
+                return
+
+            channel = self.channels[msg.channel.id]
+            channel.last = msg.created_at
+
+            channel.send_input(msg.content)
+        elif not clean.startswith(self.invoker):
+            return
 
         # Without this, an error is thrown below due to only one character.
         if len(clean) == 1:
@@ -332,12 +353,7 @@ class Xyzzy(discord.Client):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
-            if clean[1:] == "SPACE":
-                return channel.send_input(" ")
-            elif clean[1:] == "ENTER":
-                return channel.send_input("")
-            else:
-                return channel.send_input(clean[1:])
+            return channel.send_input(clean[1:])
 
         if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
