@@ -1,5 +1,5 @@
 from command_sys import command
-from game_channel import GameChannel
+from game_channel import GameChannel, InputMode
 from io import BytesIO
 from math import floor
 
@@ -333,6 +333,95 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                        "+You can load it by playing the relevant game and using the RESTORE command.\n"
                        "-Note that this will get removed during the next game played if it is not loaded, or after the next reboot.\n"
                        "```".format(attach.filename.split(".")[0]))
+
+    @command()
+    async def modes(self, ctx):
+        """
+        Shows a list of all the different game input modes currently supported by xyzzy.
+        """
+        await ctx.send("```asciidoc\n"
+                       ".Game Input Modes.\n"
+                       "A list of all the different input modes available for xyzzy.\n\n"
+                       "* Anarchy *default*\n"
+                       "  Anyone can run any command with no restrictions.\n\n"
+                       "* Democracy\n"
+                       "  Commands are voted on by players. After 10 seconds, the highest voted command is run.\n"
+                       "  More info: http://helixpedia.wikia.com/wiki/Democracy\n\n"
+                       "* Driver\n"
+                       "  Only one person can control the game at a time, but can transfer ownership at any time.\n"
+                       "```")
+
+    @command(usage="[ mode ] or list")
+    async def mode(self, ctx):
+        """
+        Changes the input mode for the currently running session to [mode].
+        If "list" is specified as the mode, a list of the supported input modes will be shown (this is also aliased to >>modes).
+        [Only users who can manage the server, or the "owner" of the current game can change the mode.]
+        """
+        if ctx.msg.channel.id not in self.xyzzy.channels:
+            return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
+
+        if not ctx.has_permission("manage_guild", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != self.xyzzy.channels[ctx.msg.channel.id].owner:
+            return await ctx.send('```diff\n-Only people who can manage the server, or the "owner" of the current game can change the mode.\n```')
+
+        if not ctx.args:
+            return await ctx.send("```diff\n-Please tell me a mode to switch to.\n```")
+
+        if ctx.args[0].lower() == "list":
+            return await self.modes.run(ctx)
+
+        if ctx.args[0].lower() not in ("democracy", "anarchy", "driver"):
+            return await ctx.send("```diff\n"
+                                  "Please select a valid mode.\n"
+                                  "You can run >>modes to view all the currently available modes.\n"
+                                  "```")
+
+        res = [x for x in InputMode if ctx.args[0].lower() == x.name.lower()][0]
+        channel = self.xyzzy.channels[ctx.msg.channel.id]
+
+        if res == channel.mode:
+            return await ctx.send('```diff\n-The current mode is already "{}".\n```'.format(ctx.args[0].lower()))
+
+        channel.mode = res
+
+        if res == InputMode.ANARCHY:
+            await ctx.send("```glsl\n"
+                           "#Anarchy mode is now on.\n"
+                           "Any player can now submit any command with no restriction.\n"
+                           "```")
+        elif res == InputMode.DEMOCRACY:
+            await ctx.send("```diff\n"
+                           "+Democracy mode is now on.\n"
+                           "Players will now vote on commands. After 10 seconds, the top voted command will be input.\n"
+                           "On ties, the command will be scrapped and no input will be sent.\n"
+                           "More info: http://helixpedia.wikia.com/wiki/Democracy\n"
+                           "```")
+        else:
+            await ctx.send("```diff\n"
+                           "-Driver mode is now on.\n"
+                           "Only {} will be able to submit commands.\n"
+                           'You can transfer the "wheel" with >>transfer [user]\n'
+                           "```".format(channel.owner))
+
+    @command(usage="[ @User Mentions#1234 ]")
+    async def transfer(self, ctx):
+        """
+        Passes the "wheel" to another user, letting them take control of the current game.
+        NOTE: this only works in driver mode.
+        [This command can only be used by the "owner" of the game.]
+        """
+        if ctx.msg.channel.id not in self.xyzzy.channels:
+            return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
+
+        if str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != self.xyzzy.channels[ctx.msg.channel.id].owner:
+            return await ctx.send("```diff\n-Only the current owner of the game can use this command.\n```")
+
+        if not ctx.msg.mentions:
+            return await ctx.send('```diff\n-Please give me a user to pass the "wheel" to.\n```')
+
+        self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
+
+        await ctx.send('```diff\n+Transferred the "wheel" to {}.\n```'.format(ctx.msg.mentions[0]))
 
 def setup(xyzzy):
     return Main(xyzzy)
