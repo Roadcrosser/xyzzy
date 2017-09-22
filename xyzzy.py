@@ -340,7 +340,7 @@ class Xyzzy(discord.Client):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
-            channel.handle_input(msg, clean)
+            return await channel.handle_input(msg, clean)
         elif not clean.startswith(self.invoker):
             return
 
@@ -353,7 +353,7 @@ class Xyzzy(discord.Client):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
-            return channel.handle_input(msg, clean[1:])
+            return await channel.handle_input(msg, clean[1:])
 
         if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
