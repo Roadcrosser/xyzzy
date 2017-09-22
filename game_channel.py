@@ -71,8 +71,6 @@ class GameChannel:
             vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
             highest = sorted(x for x in vote_sort if len(x[1]) == len(vote_sort[0][1]))
 
-            print(highest)
-
             # Discard draws
             if len(highest) > 1:
                 highest = [x[0] for x in highest]
@@ -169,6 +167,9 @@ class GameChannel:
         """Forces the channel's game process to end."""
         self.process.terminate()
         self.playing = False
+
+        if self.timer:
+            self.timer.cancel_task()
 
     async def handle_input(self, msg, input):
         """Easily handles the various input types for the game."""
