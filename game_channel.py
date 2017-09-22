@@ -70,10 +70,7 @@ class GameChannel:
 
         self.voting = False
         vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
-        highest = sorted(x for x in vote_sort if len(x[1]) == vote_sort[0][1])
-
-        print(vote_sort)
-        print(highest)
+        highest = sorted(x for x in vote_sort if len(x[1]) == len(vote_sort[0][1]))
 
         # Discard draws
         if len(highest) > 1:
