@@ -62,7 +62,9 @@ class GameChannel:
         self.voting = True
 
     async def _democracy_loop(self):
-        await asyncio.sleep(15)
+        await asyncio.sleep(5)
+        await self.channel.send("```py\n@ 5 seconds of voting remaining. @\n```")
+        await asyncio.sleep(5)
 
         self.voting = False
         vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
@@ -72,12 +74,12 @@ class GameChannel:
         if len(highest) > 1:
             draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
 
-            await self.msg.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
+            await self.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
         else:
             cmd = highest[0][0]
             amt = len(highest[0][1])
 
-            await ctx.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
+            await self.channel.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
             self._send_input(cmd)
 
         self.votes = {}
@@ -166,9 +168,12 @@ class GameChannel:
         if self.mode == InputMode.ANARCHY:
             # Default mode, anyone can send any command at any time.
             self._send_input(input)
-        elif self.mode == InputMode.DEMOCRACY and self.voting:
-            # Players vote on commands. After 5 seconds of input, the top command is picked.
+        elif self.mode == InputMode.DEMOCRACY:
+            # Players vote on commands. After 10 seconds of input, the top command is picked.
             # On ties, all commands are scrapped and we start again.
+            if not self.voting:
+                return
+
             voters = []
             [voters.extend(x) for x in self.votes.values()]
 
@@ -181,6 +186,8 @@ class GameChannel:
                 self.votes[action] += [msg.author.id]
             else:
                 self.votes[action] = [msg.author.id]
+
+            await self.channel.send("{} has voted for `{}`".format(msg.author.mention, action))
 
             if not self.timer:
                 self.timer = self.loop.create_task(self._democracy_loop())
