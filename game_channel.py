@@ -62,38 +62,36 @@ class GameChannel:
         self.voting = True
 
     async def _democracy_loop(self):
-        await asyncio.sleep(10)
-        await self.channel.send("```py\n@ 5 seconds of voting remaining. @\n```")
-        await asyncio.sleep(5)
+        try:
+            await asyncio.sleep(10)
+            await self.channel.send("```py\n@ 5 seconds of voting remaining. @\n```")
+            await asyncio.sleep(5)
 
-        print('voting done')
+            self.voting = False
+            vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
+            highest = sorted(x for x in vote_sort if len(x[1]) == len(vote_sort[0][1]))
 
-        self.voting = False
-        vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
-        highest = sorted(x for x in vote_sort if len(x[1]) == len(vote_sort[0][1]))
+            print(highest)
 
-        print(highest)
+            # Discard draws
+            if len(highest) > 1:
+                highest = [x[1] for x in highest]
+                draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
 
-        # Discard draws
-        if len(highest) > 1:
-            print('too many')
-            draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
+                await self.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
+            else:
+                cmd = highest[0][0]
+                amt = len(highest[0][1])
 
-            print(draw_join)
+                await self.channel.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
+                self._send_input(cmd)
 
-            await self.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
-        else:
-            cmd = highest[0][0]
-            amt = len(highest[0][1])
-
-            await self.channel.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
-            self._send_input(cmd)
-
-        print('boyo')
-
-        self.votes = {}
-        self.voting = True
-        self.timer = None
+            self.votes = {}
+            self.voting = True
+            self.timer = None
+        except Exception as e:
+            print(e)
+            raise e
 
     def _send_input(self, input):
         """Send's text input to the game process."""
