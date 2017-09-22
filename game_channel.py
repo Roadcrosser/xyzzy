@@ -75,7 +75,7 @@ class GameChannel:
 
             # Discard draws
             if len(highest) > 1:
-                highest = [x[1] for x in highest]
+                highest = [x[0] for x in highest]
                 draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
 
                 await self.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
