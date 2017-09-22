@@ -62,13 +62,18 @@ class GameChannel:
         self.voting = True
 
     async def _democracy_loop(self):
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
         await self.channel.send("```py\n@ 5 seconds of voting remaining. @\n```")
         await asyncio.sleep(5)
+
+        print('voting done')
 
         self.voting = False
         vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
         highest = sorted(x for x in vote_sort if len(x[1]) == vote_sort[0][1])
+
+        print(vote_sort)
+        print(highest)
 
         # Discard draws
         if len(highest) > 1:
@@ -83,6 +88,7 @@ class GameChannel:
             self._send_input(cmd)
 
         self.votes = {}
+        self.voting = True
         self.timer = None
 
     def _send_input(self, input):
