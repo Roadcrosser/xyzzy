@@ -266,6 +266,12 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.channel.id not in self.xyzzy.channels:
             return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
 
+        channel = self.xyzzy.channels[ctx.msg.channel.id]
+
+        if not ctx.has_permission("manage_guild", "author") and str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != channel.owner and\
+         (channel.mode == InputMode.DEMOCRACY or channel.mode == InputMode.DRIVER):
+            return await ctx.send('```diff\n-Only people who can manage the server, or the "owner" of the current game may force quit.\n```')
+
         await ctx.send("```diff\n"
                        "Are you sure you want to quit?\n"
                        "-Say Y or Yes to close the program.\n"
