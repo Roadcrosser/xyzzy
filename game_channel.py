@@ -76,7 +76,7 @@ class GameChannel:
                 highest = [x[0] for x in highest]
                 draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
 
-                await self.channel.send('```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```'.format(draw_join))
+                await self.channel.send("```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```".format(draw_join))
             else:
                 cmd = highest[0][0]
                 amt = len(highest[0][1])
@@ -101,7 +101,7 @@ class GameChannel:
         elif input == "SPACE":
             input = " "
 
-        self.process.stdin.write((input + "\n").encode("utf-8", "replace"))
+        self.process.stdin.write((input + "\n").encode("latin-1", "replace"))
 
     async def game_loop(self):
         """Enters into the channel's game process loop."""
