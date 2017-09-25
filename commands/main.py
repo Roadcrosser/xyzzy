@@ -413,11 +413,14 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
     async def transfer(self, ctx):
         """
         Passes the "wheel" to another user, letting them take control of the current game.
-        NOTE: this only works in driver mode.
+        NOTE: this only works in driver or democracy mode.
         [This command can only be used by the "owner" of the game.]
         """
         if ctx.msg.channel.id not in self.xyzzy.channels:
             return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
+
+        if self.xyzzy.channels[ctx.msg.channel.id].mode == InputMode.ANARCHY:
+            return await ctx.send("```diff\n->>transfer may only be used in driver or anarchy mode.\n```")
 
         if str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != self.xyzzy.channels[ctx.msg.channel.id].owner:
             return await ctx.send("```diff\n-Only the current owner of the game can use this command.\n```")
