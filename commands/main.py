@@ -210,7 +210,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.attachments:
             chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
-        await ctx.send('```py\nLoaded "{}"{}\n```'.format(chan.game, " by " + game["author"] if "author" in game else ""))
+        await ctx.send('```py\nLoaded "{}"{}\n```'.format(chan.game, " by " + game["author"] if "author" in game and game["author"] else ""))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
