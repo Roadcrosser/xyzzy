@@ -199,6 +199,8 @@ class Xyzzy(discord.Client):
             except Exception as e:
                 print(ConsoleColours.FAIL + 'Error loading module "{}"\n{}'.format(mod, e) + ConsoleColours.END)
 
+        await self.xyzzy.update_game()
+        
         if not self.timestamp:
             self.timestamp = datetime.utcnow().timestamp()
 
