@@ -38,7 +38,7 @@ class Owner:
             await ctx.send("```diff\n"
                            "!There are currently {} games running on my system.\n"
                            "-If you shut me down now, all unsaved data regarding these games could be lost!\n"
-                           "(Use `{}nowplaying` for a list of currently running games.)".format(len(self.xyzzy.channels), self.xyzzy.invoker * 2))
+                           "(Use `{}nowplaying` for a list of currently running games.)\n```".format(len(self.xyzzy.channels), self.xyzzy.invoker * 2))
 
         await ctx.send("```md\n## Are you sure you want to shut down the bot? ##\n[y/n]:\n```")
 
