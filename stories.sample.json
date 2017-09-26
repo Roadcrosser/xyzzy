@@ -1,0 +1,8 @@
+{
+    "Name of game": {
+        "path": "/path/to/story.ext",
+        "url": "Url to display.",
+        "aliases": ["alternate lookup names"],
+        "author": "Optional author"
+    }
+}

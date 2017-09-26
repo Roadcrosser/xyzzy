@@ -1,8 +1,0 @@
-# This is an example story file. The syntax for a story is this:
-#
-# path/to/story/file.ext : Name of Story
-#
-# This follows the usual Unix file selection conventions, which means that to
-# select a file relative to the current path, you would do "./folder/file.ext"
-# and to select a file relative to the root (an absolute file path), you would
-# do "/folder/file.ext"
