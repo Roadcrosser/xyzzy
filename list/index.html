@@ -21,8 +21,14 @@
 
   var json_data = JSON.parse(http_req.responseText);
   
-  var list = json_data.map(item=>"<li>"+item+"</li>").join("\n");
-  
+  const list=json_data.map(item=>{
+    if(item[1]!==null){
+      return `<li><a href="${item[1]}">${item[0]}</a></li>` 
+    } else {
+      return `<li>${item[0]}</li>` 
+    }
+  }).join("");
+
   var game_list = document.getElementById("game_list");
   game_list.innerHTML = list;
 </script>

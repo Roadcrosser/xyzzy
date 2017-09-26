@@ -18,3 +18,13 @@ header {
 ul {
     list-style-type: none;
 }
+
+a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #FFF;
+    text-decoration: underline;
+}
