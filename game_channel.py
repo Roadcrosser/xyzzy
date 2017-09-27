@@ -121,10 +121,12 @@ class GameChannel:
                     out = buffer.decode("latin-1", "replace")
                     msg = ""
 
+                    stripped_period = False
                     for i, line in enumerate(out.splitlines()):
-                        if line == ".":
+                        if line == "." and not stripped_period:
                             line = ""
-                            
+                            stripped_period = True
+
                         line = line.replace("*", "\*").replace("_", "\_").replace("~", "\~")
 
                         if len(msg + line[self.indent:] + "\n") < 2000:
