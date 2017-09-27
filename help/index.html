@@ -33,7 +33,7 @@
                 >>backticks <span class="options">[ on | off ]</span>
             </h3>
             <p>
-                Enables or disables the requirement for Xyzzy to require backticks before and after each command. This is <b>off</b> by default.
+                Enables or disables the requirement for xyzzy to require backticks before and after each command. This is <b>off</b> by default.
             </p>
             <p>
                 Using this command only changes the setting for you.
@@ -42,13 +42,31 @@
                 ><span class="options">input</span>
             </h3>
             <p>
-                Any command submitted with a single greater than sign will be submitted to the game running inside of xyzzy. I.E., if xyzzy was playing Zork and you wanted to pick up a lantern, you would do <code>>Get lantern.</code>
+                Any command submitted with a single greater than sign will be submitted to the game running inside of xyzzy. I.E., if xyzzy was playing Zork and you wanted to pick up a lantern, you would do <code>>get lantern</code>.
+            </p>
+            <h3 class="xyzzy-command" id="unprefixed">
+                >>unprefixed <span class="options">[ on | off ]</span>
+            </h3>
+            <p>
+                Enables or disables the requirement for game inputs to require a prefix. When enabled, this means that doing <code>get lantern</code> will work as well as <code>>get lantern</code>. If you wish to speak normally without triggering the game in this mode, you can start your message with <code>#</code> or <code>//</code> for it to be ignored. This is <b>off</b> by default.
+            </p>
+            <p>
+                Using this command only changes the setting for you.
             </p>
             <h3 class="xyzzy-command" id="play">
                 >>play <span class="options">[ Game name ]</span>
             </h3>
             <p>
-                Tells xyzzy to start playing the game specified in <i>[Game name]</i> in the current channel. If no game is found with that name, xyzzy will show you all games with the text of <i>[Game name]</i> in their name. If only one game is found with that text in it's name, it will start that game.
+                Tells xyzzy to start playing the game specified in <i>[Game name]</i> in the current channel. If no game is found with that name, xyzzy will show you any close matches it can find, and if there is only one, start that one.
+            </p>
+            <p>
+                Alternatively, you can also attach a save file from a game with this command, and it will attempt to match a game in its database to your save and load it.
+            </p>
+            <h3 class="xyzzy-command" id="upload">
+                >>upload
+            </h3>
+            <p>
+                Attaching a save file with this command will upload the save file to your channel instance, allowing you to use a <code>RESTORE</code> game command to load them.
             </p>
             <h3 class="xyzzy-command" id="indent">
                 >>indent <span class="options">[ indent level ]</span>
@@ -68,18 +86,30 @@
             <p>
                 This command has an alias in <code>>>mortim</code>
             </p>
+            <h3 class="xyzzy-command" id="modes">
+                >>modes
+            </h3>
+            <p>
+                Lists and describes all possiblle game input modes.
+            </p>
+            <h3 class="xyzzy-command" id="mode">
+                >>mode <span class="options">[ anarchy | democracy | driver ]</span>
+            </h3>
+            <p>
+                Sets a game input mode if a game is running on the current channel.
+            </p>
+            <h3 class="xyzzy-command" id="transfer">
+                >>trasfer <span class="options">@mention#1234</span>
+            </h3>
+            <p>
+                Transfers input rights to the mentioned user. Only usable in Driver mode.
+            </p>
         <h2>Bot Status and Health</h2>
             <h3 class="xyzzy-command" id="list">
                 >>list
             </h3>
             <p>
                 Sends you a direct message containing all stories in xyzzy's library.
-            </p>
-            <h3 class="xyzzy-command" id="nowplaying">
-                >>nowplaying
-            </h3>
-            <p>
-                Sends you a direct message containing all currently running xyzzy instances across Discord.
             </p>
         <h2>Moderation Commands</h3>
             <p>
@@ -115,6 +145,12 @@
             </h3>
             <p>
                 Executes arbitrary Python code.
+            </p>
+            <h3 class="xyzzy-command" id="nowplaying">
+                >>nowplaying
+            </h3>
+            <p>
+                Sends you a direct message containing all currently running xyzzy instances across Discord.
             </p>
             <h3 class="xyzzy-command" id="announce">
                 >>announce <span class="options">[ Announcement ]</span>
