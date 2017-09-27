@@ -16,7 +16,7 @@ class Owner:
         [This command may only be used by trusted individuals.]
         """
         env = {
-            "xyzzy": self.xyzzy,
+            "bot": self.xyzzy,
             "ctx": ctx,
             "message": ctx.msg
         }
