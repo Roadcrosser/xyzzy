@@ -215,7 +215,8 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         await self.xyzzy.update_game()
         await chan.game_loop()
         await self.xyzzy.update_game()
-        del self.xyzzy.channels[ctx.msg.channel.id]
+        if ctx.msg.channel.id in self.xyzzy.channels:
+            del self.xyzzy.channels[ctx.msg.channel.id]
 
     @command()
     async def output(self, ctx):
@@ -288,7 +289,8 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
                 await chan.force_quit()
                 chan.cleanup()
-                del self.xyzzy.channels[ctx.msg.channel.id]
+                if ctx.msg.channel.id in self.xyzzy.channels:
+                    del self.xyzzy.channels[ctx.msg.channel.id]
             else:
                 await ctx.send("```diff\n+Continuing game.\n```")
         except asyncio.TimeoutError:
@@ -303,7 +305,8 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 await ctx.send("```diff\n-The game has ended.\n```")
 
             chan.cleanup()
-            del self.xyzzy.channels[ctx.msg.channel.id]
+            if ctx.msg.channel.id in self.xyzzy.channels:
+                del self.xyzzy.channels[ctx.msg.channel.id]
 
     @command(aliases=["upload"], usage="[ Save as Attachment ]")
     async def uploadsave(self, ctx):
