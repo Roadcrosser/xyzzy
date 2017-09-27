@@ -83,6 +83,11 @@ class Xyzzy(discord.Client):
 
         with open("./stories.json") as stories:
             self.games = json.load(stories)
+        
+        for name, stuff in self.games.items():
+            if not os.path.exists(stuff["path"]):
+                print("Path for {} is invalid. Delisting.")
+                self.games.pop(name)
 
         if not os.path.exists("./bot-data/"):
             print('Creating bot data directory at "./bot-data/"')
