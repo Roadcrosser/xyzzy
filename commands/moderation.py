@@ -87,7 +87,7 @@ class Moderation:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
                                   '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(x for x in stories))))
+                                  "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(stories))))
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]
@@ -131,7 +131,7 @@ class Moderation:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
                                   '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(x for x in stories))))
+                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(stories))))
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]

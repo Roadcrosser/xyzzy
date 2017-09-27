@@ -56,7 +56,7 @@ class Main:
 # Here are all of the games I have available: #
 {}
 ```
-Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(x["name"] for x in self.xyzzy.games)))
+Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(self.xyzzy.games)))
 
         if ctx.args and ctx.args[0] == "here":
             await ctx.send(msg)
@@ -155,7 +155,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 return await ctx.send("```accesslog\n"
                                     'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
                                     '"{}"\n'
-                                    "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(x for x in stories))))
+                                    "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(stories))))
 
             if perfect_match:
                 game = list(perfect_match.items())[0]
