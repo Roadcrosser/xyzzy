@@ -160,7 +160,16 @@ a {
   /* override <a> defaults */
   text-decoration: none;
   color: #FFFFFF;
-  /* This will have to change (".quotes a, a.button") if we ever add more links but for now, this works. */
+}
+
+a:hover {
+  /* override <a> defaults */
+  text-decoration: underline;
+  color: #FFFFFF;
+}
+
+#quotes a:hover {
+  text-decoration: none;
 }
 
 a.button {
@@ -175,6 +184,7 @@ a.button {
   background-color: #2E3136;
   font-family: 'VT323';
   font-size: 125%;
+  text-decoration: none;
   box-shadow: 0 0 1px rgba(0,0,0,0);
 
   /* webkit hack to make transforms look good */
