@@ -354,7 +354,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                        "* Anarchy *default*\n"
                        "  Anyone can run any command with no restrictions.\n\n"
                        "* Democracy\n"
-                       "  Commands are voted on by players. After 10 seconds, the highest voted command is run.\n"
+                       "  Commands are voted on by players. After 15 seconds, the highest voted command is run.\n"
                        "  More info: http://helixpedia.wikia.com/wiki/Democracy\n\n"
                        "* Driver\n"
                        "  Only one person can control the game at a time, but can transfer ownership at any time.\n"
@@ -401,7 +401,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         elif res == InputMode.DEMOCRACY:
             await ctx.send("```diff\n"
                            "+Democracy mode is now on.\n"
-                           "Players will now vote on commands. After 10 seconds, the top voted command will be input.\n"
+                           "Players will now vote on commands. After 15 seconds, the top voted command will be input.\n"
                            "On ties, the command will be scrapped and no input will be sent.\n"
                            "More info: http://helixpedia.wikia.com/wiki/Democracy\n"
                            "```")

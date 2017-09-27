@@ -178,7 +178,7 @@ class GameChannel:
             # Default mode, anyone can send any command at any time.
             self._send_input(input)
         elif self.mode == InputMode.DEMOCRACY:
-            # Players vote on commands. After 10 seconds of input, the top command is picked.
+            # Players vote on commands. After 15 seconds of input, the top command is picked.
             # On ties, all commands are scrapped and we start again.
             if not self.voting:
                 return
