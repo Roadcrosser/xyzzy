@@ -253,5 +253,8 @@ class GameChannel:
 
     def cleanup(self):
         """Cleans up after the game."""
-        shutil.rmtree(self.save_path)
+
+        # Check if cleanup has already been done.
+        if os.path.isdir(self.save_path):
+            shutil.rmtree(self.save_path)
 
