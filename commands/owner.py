@@ -21,10 +21,13 @@ class Owner:
             "message": ctx.msg
         }
 
-        out = eval(ctx.raw, env)
+        try:
+            out = eval(ctx.raw, env)
 
-        if inspect.isawaitable(out):
-            out = await out
+            if inspect.isawaitable(out):
+                out = await out
+        except Exception as e:
+            out = str(e)
 
         await ctx.send("```py\n{}\n```".format(out))
 
