@@ -78,9 +78,9 @@ class Xyzzy(discord.Client):
         self.owner_ids = [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
         self.home_channel = None
         self.gist_data_cache = None
-        self.gist_story_cache = None
+        self.gist_game_cache = None
 
-        print("Reading story database...")
+        print("Reading game database...")
 
         with open("./games.json") as games:
             games = json.load(games)
@@ -227,19 +227,19 @@ class Xyzzy(discord.Client):
                 print("[{}]".format(r.status))
 
                 self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
-                self.gist_story_cache = json.loads(res["files"]["xyzzy_games.json"]["content"])
-                gist_story = sorted([[k, v.url] for k, v in self.games.items()], key=lambda x: x[0])
+                self.gist_game_cache = json.loads(res["files"]["xyzzy_games.json"]["content"])
+                gist_game = sorted([[k, v.url] for k, v in self.games.items()], key=lambda x: x[0])
 
-                if self.gist_story_cache != gist_story:
-                    gist_story = json.dumps({
+                if self.gist_game_cache != gist_game:
+                    gist_game = json.dumps({
                         "files": {
                             "xyzzy_games.json": {
-                                "content": json.dumps(gist_story)
+                                "content": json.dumps(gist_game)
                             }
                         }
                     })
 
-                    async with self.session.patch(url, data=gist_story, headers=headers) as r:
+                    async with self.session.patch(url, data=gist_game, headers=headers) as r:
                         print("[{}]".format(r.status))
 
             while True:

@@ -75,24 +75,24 @@ class Moderation:
 
                 return await ctx.send("```asciidoc\n.Blocked Games.\n{}\n```".format("\n".join("* '{}'".format(x) for x in sorted(games))))
 
-        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
+        games = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
         perfect_match = None
 
-        if stories:
-            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
+        if games:
+            perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
-        if not stories:
+        if not games:
             return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
-        elif len(stories) > 1 and not perfect_match:
+        elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
                                   '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(stories))))
+                                  "```".format(ctx.raw, len(games), '"\n"'.join(sorted(games))))
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]
         else:
-            game = list(stories[0].items())[0][0]
+            game = list(games[0].items())[0][0]
 
         if str(ctx.msg.guild.id) not in self.xyzzy.server_settings:
             self.xyzzy.server_settings[str(ctx.msg.guild.id)] = {"blocked_games": [game]}
@@ -119,24 +119,24 @@ class Moderation:
         if not ctx.args:
             return await ctx.send("```diff\n-Please specify a game to unblock.\n```")
 
-        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
+        games = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
         perfect_match = None
 
-        if stories:
-            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
+        if games:
+            perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
-        if not stories:
+        if not games:
             return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
-        elif len(stories) > 1 and not perfect_match:
+        elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
                                   'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
                                   '"{}"\n'
-                                  "```".format(ctx.raw, len(stories), "\n".join(sorted(stories))))
+                                  "```".format(ctx.raw, len(games), "\n".join(sorted(games))))
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]
         else:
-            game = list(stories[0].items())[0][0]
+            game = list(games[0].items())[0][0]
 
         if str(ctx.msg.guild.id) not in self.xyzzy.server_settings:
             self.xyzzy.server_settings[str(ctx.msg.guild.id)] = {"blocked_games": [game]}

@@ -51,7 +51,7 @@ class Main:
 
     @command(has_site_help=False)
     async def list(self, ctx):
-        """Sends you a direct message containing all stories in xyzzy's library."""
+        """Sends you a direct message containing all games in xyzzy's library."""
         msg = """```md
 # Here are all of the games I have available: #
 {}
@@ -135,7 +135,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
 
         if ctx.msg.channel.id in self.xyzzy.channels:
-            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the story has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
+            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
 
         if not ctx.msg.attachments:
             if not ctx.args:
@@ -143,24 +143,24 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
             print("Searching for " + ctx.raw)
 
-            stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
+            games = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
             perfect_match = None
 
-            if stories:
-                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
+            if games:
+                perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
-            if not stories:
-                return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
-            elif len(stories) > 1 and not perfect_match:
+            if not games:
+                return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
+            elif len(games) > 1 and not perfect_match:
                 return await ctx.send("```accesslog\n"
-                                    'I couldn\'t find any stories with that name, but I found "{}" in {} other stories. Did you mean one of these?\n'
+                                    'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
                                     '"{}"\n'
-                                    "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(stories))))
+                                    "```".format(ctx.raw, len(games), '"\n"'.join(sorted(games))))
 
             if perfect_match:
                 game = list(perfect_match.items())[0][1]
             else:
-                game = list(stories.items())[0][1]
+                game = list(games.items())[0][1]
         else:
             # Attempt to load a game from a possible save file.
             attach = ctx.msg.attachments[0]
@@ -220,7 +220,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
     @command()
     async def output(self, ctx):
         """
-        Toggles whether the text being sent to this channel from a currently playing story also should be printed to the terminal.
+        Toggles whether the text being sent to this channel from a currently playing game also should be printed to the terminal.
         This is functionally useless in most cases.
         """
         if ctx.msg.channel.id not in self.xyzzy.channels:

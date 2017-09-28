@@ -128,7 +128,7 @@ class GameChannel:
                         if len(msg + line[self.indent:] + "\n") < 2000:
                             msg += line[self.indent:] + "\n"
                         else:
-                            await self.send_story(msg)
+                            await self.send_game_input(msg)
 
                             msg = line[self.indent:]
 
@@ -139,7 +139,7 @@ class GameChannel:
                         saves = None
                         first_time = False
 
-                    await self.send_story(msg, saves)
+                    await self.send_game_input(msg, saves)
 
                     files = os.listdir(self.save_path)
                     latest = 0
@@ -223,8 +223,8 @@ class GameChannel:
         else:
             self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} {}".format(self.save_path, self.game.path), stdout=PIPE, stdin=PIPE)
 
-    async def send_story(self, msg, save=None):
-        """Sends the story to the game's channel, handling permissions."""
+    async def send_game_input(self, msg, save=None):
+        """Sends the game input to the game's channel, handling permissions."""
         if self.output:
             print(msg)
 
