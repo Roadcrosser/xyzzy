@@ -1,5 +1,5 @@
-from command_sys import command
-from game_channel import GameChannel, InputMode
+from modules.command_sys import command
+from modules.game_channel import GameChannel, InputMode
 from io import BytesIO
 from math import floor
 
@@ -7,7 +7,7 @@ import os
 import re
 import json
 import asyncio
-import quetzal_parser as qzl
+import modules.quetzal_parser as qzl
 
 class Main:
     def __init__(self, xyzzy):
@@ -143,11 +143,11 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
             print("Searching for " + ctx.raw)
 
-            stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
+            stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
             perfect_match = None
 
             if stories:
-                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y["aliases"] if ctx.raw.lower() == z.lower()]}
+                perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
             if not stories:
                 return await ctx.send('```diff\n-I couldn\'t find any stories matching "{}"\n```'.format(ctx.raw))
@@ -158,11 +158,9 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                                     "```".format(ctx.raw, len(stories), '"\n"'.join(sorted(stories))))
 
             if perfect_match:
-                game = list(perfect_match.items())[0]
-                game = {"name": game[0], **game[1]}
+                game = list(perfect_match.items())[0][1]
             else:
-                game = list(stories.items())[0]
-                game = {"name": game[0], **game[1]}
+                game = list(stories.items())[0][1]
         else:
             # Attempt to load a game from a possible save file.
             attach = ctx.msg.attachments[0]
@@ -183,10 +181,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                         return await ctx.send("```diff\n-{}\n```".format(str(e)))
 
                 for name, stuff in self.xyzzy.games.items():
-                    comp_res = qzl.compare_quetzal(qzl_headers, stuff["path"])
+                    comp_res = qzl.compare_quetzal(qzl_headers, stuff.path)
 
                     if comp_res:
-                        game = {"name": name, **stuff}
+                        game = stuff
                         break
 
                 if not comp_res:
@@ -199,10 +197,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                     save.write(res)
 
         if str(ctx.msg.guild.id) in self.xyzzy.server_settings:
-            if game["name"] in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
-                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```'.format(game["name"]))
+            if game.name in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
+                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```'.format(game.name))
 
-        print("Now loading {} for #{} (Server: {})".format(game["name"], ctx.msg.channel.name, ctx.msg.guild.name))
+        print("Now loading {} for #{} (Server: {})".format(game.name, ctx.msg.channel.name, ctx.msg.guild.name))
 
         chan = GameChannel(ctx.msg, game)
         self.xyzzy.channels[ctx.msg.channel.id] = chan
@@ -210,11 +208,12 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.msg.attachments:
             chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
-        await ctx.send('```py\nLoaded "{}"{}\n```'.format(chan.game, " by " + game["author"] if "author" in game and game["author"] else ""))
+        await ctx.send('```py\nLoaded "{}"{}\n```'.format(game.name, " by " + game.author if game.author else ""))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
         await self.xyzzy.update_game()
+
         if ctx.msg.channel.id in self.xyzzy.channels:
             del self.xyzzy.channels[ctx.msg.channel.id]
 
@@ -289,6 +288,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
                 await chan.force_quit()
                 chan.cleanup()
+
                 if ctx.msg.channel.id in self.xyzzy.channels:
                     del self.xyzzy.channels[ctx.msg.channel.id]
             else:
@@ -305,6 +305,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 await ctx.send("```diff\n-The game has ended.\n```")
 
             chan.cleanup()
+
             if ctx.msg.channel.id in self.xyzzy.channels:
                 del self.xyzzy.channels[ctx.msg.channel.id]
 

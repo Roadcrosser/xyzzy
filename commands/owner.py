@@ -1,4 +1,4 @@
-from command_sys import command
+from modules.command_sys import command
 import traceback as tb
 import inspect
 import asyncio

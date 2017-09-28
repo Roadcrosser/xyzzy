@@ -48,9 +48,7 @@ class GameChannel:
         self.last = msg.created_at
         self.owner = msg.author
         self.channel = msg.channel
-        self.game = game["name"]
-        self.file = game["path"]
-        self.url = game.get("url", None)
+        self.game = game
         self.process = None
         self.playing = False
         self.save_path = "./saves/" + str(self.channel.id)
@@ -221,9 +219,9 @@ class GameChannel:
             os.makedirs(self.save_path)
 
         if self.save:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} -L {} {}".format(self.save_path, self.save, self.file), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} -L {} {}".format(self.save_path, self.save, self.game.path), stdout=PIPE, stdin=PIPE)
         else:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} {}".format(self.save_path, self.file), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} {}".format(self.save_path, self.game.path), stdout=PIPE, stdin=PIPE)
 
     async def send_story(self, msg, save=None):
         """Sends the story to the game's channel, handling permissions."""

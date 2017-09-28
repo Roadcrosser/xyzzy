@@ -1,14 +1,15 @@
 import sys # Checking if host platform is Windows
 
-if sys.platform == "win32":
-    raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
+#if sys.platform == "win32":
+#    raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
 
 import shutil # Check if dfrotz is in PATH
 
-if not shutil.which("dfrotz"):
-    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
+#if not shutil.which("dfrotz"):
+#    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
 
-from command_sys import Context, Holder
+from modules.command_sys import Context, Holder
+from modules.game import Game
 from datetime import datetime
 from glob import glob
 from random import randint
@@ -81,13 +82,15 @@ class Xyzzy(discord.Client):
 
         print("Reading story database...")
 
-        with open("./stories.json") as stories:
-            self.games = json.load(stories)
-        
-        for name, stuff in self.games.items():
-            if not os.path.exists(stuff["path"]):
-                print("Path for {} is invalid. Delisting.")
-                self.games.pop(name)
+        with open("./games.json") as games:
+            games = json.load(games)
+            self.games = {}
+
+            for name, data in games.items():
+                if not os.path.exists(data["path"]):
+                    print("Path for {} is invalid. Delisting.".format(name))
+                else:
+                    self.games[name] = Game(name, data)
 
         if not os.path.exists("./bot-data/"):
             print('Creating bot data directory at "./bot-data/"')
@@ -225,7 +228,7 @@ class Xyzzy(discord.Client):
 
                 self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
                 self.gist_story_cache = json.loads(res["files"]["xyzzy_stories.json"]["content"])
-                gist_story = sorted([[k, v["url"] or None] for k, v in self.games.items()], key=lambda x: x[0])
+                gist_story = sorted([[k, v.url] for k, v in self.games.items()], key=lambda x: x[0])
 
                 if self.gist_story_cache != gist_story:
                     gist_story = json.dumps({

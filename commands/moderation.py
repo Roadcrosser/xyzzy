@@ -1,4 +1,4 @@
-from command_sys import command
+from modules.command_sys import command
 import json
 
 class Moderation:
@@ -75,11 +75,11 @@ class Moderation:
 
                 return await ctx.send("```asciidoc\n.Blocked Games.\n{}\n```".format("\n".join("* '{}'".format(x) for x in sorted(games))))
 
-        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y["aliases"] if ctx.raw.lower() in z.lower()]}
+        stories = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
         perfect_match = None
 
         if stories:
-            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y["aliases"] if ctx.raw.lower() == z.lower()]}
+            perfect_match = {x: y for x, y in stories.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
         if not stories:
             return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))

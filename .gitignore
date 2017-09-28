@@ -1,7 +1,8 @@
 .vscode/
 options.cfg
 bot-data/
-stories.json
+games.json
+games/
 stories/
 __pycache__/
 saves/
