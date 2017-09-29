@@ -161,6 +161,7 @@ class GameChannel:
 
         if self.last_save:
             file_dir = "{}/{}".format(self.save_path, self.last_save)
+
             if os.path.isfile(file_dir):
                 end_kwargs = {"file": discord.File(file_dir, self.last_save)}
                 end_msg += "+Here is your most recent save from the game.\n"
