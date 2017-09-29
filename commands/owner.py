@@ -1,9 +1,13 @@
 from modules.command_sys import command
+
 import traceback as tb
 import inspect
 import asyncio
 import discord
 import re
+import sys
+import importlib
+import os.path
 
 class Owner:
     def __init__(self, xyzzy):
@@ -85,7 +89,16 @@ class Owner:
         if not ctx.args:
             return await ctx.send("```diff\n-No module to reload.\n```")
 
-        self.xyzzy.commands.reload_module('commands.' + ctx.args[0].lower())
+        if os.path.exists('commands/{}.py'.format(ctx.args[0].lower())):
+            self.xyzzy.commands.reload_module('commands.' + ctx.args[0].lower())
+        elif os.path.exists('modules/{}.py'.format(ctx.args[0].lower())) and 'modules.{}'.format(ctx.args[0].lower()) in sys.modules:
+            del sys.modules['modules.{}'.format(ctx.args[0].lower())]
+            importlib.import_module('modules.{}'.format(ctx.args[0].lower()))
+        elif os.path.exists('modules/{}.py'.format(ctx.args[0].lower())):
+            return await ctx.send("```diff\n-Module is not loaded.\n```")
+        else:
+            return await ctx.send("```diff\n-Unknown thing to reload.\n```")
+
         await ctx.send('```diff\n+Reloaded module "{}".\n```'.format(ctx.args[0].lower()))
 
     @command(owner=True)
