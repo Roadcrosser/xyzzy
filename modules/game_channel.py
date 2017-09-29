@@ -156,11 +156,15 @@ class GameChannel:
 
         self.playing = False
 
+        end_msg = "```diff\n-The game has ended.\n"
+        end_kwargs = {}
         if self.last_save:
-            file = discord.File("{}/{}".format(self.save_path, self.last_save), self.last_save)
-            await self.channel.send("```diff\n-The game has ended.\n+Here is your most recent save from the game.\n```", file=file)
-        else:
-            await self.channel.send("```diff\n-The game has ended.\n```")
+            file_dir = "{}/{}".format(self.save_path, self.last_save)
+            if os.path.isfile(file_dir):
+                end_kwargs = {"file": discord.File(file_dir, self.last_save)}
+                end_msg += "+Here is your most recent save from the game.\n"
+        end_msg += "```"
+        await self.channel.send(end_msg, **end_kwargs)
 
         self.cleanup()
 
