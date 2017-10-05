@@ -239,7 +239,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not os.path.isfile(file_dir):
             return await ctx.send("```diff\n-File not found.\n```")
 
-        print("Now loading test file {} for #{} (Server: {})".format(ctx.args, ctx.msg.channel.name, ctx.msg.guild.name))
+        print("Now loading test file {} for #{} (Server: {})".format(ctx.raw, ctx.msg.channel.name, ctx.msg.guild.name))
 
         chan = GameChannel(ctx.msg, Game(ctx.args, {"path":file_dir, "debug":True}))
         self.xyzzy.channels[ctx.msg.channel.id] = chan
