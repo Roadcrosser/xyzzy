@@ -232,7 +232,7 @@ class GameChannel:
             self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} {}".format(self.save_path, self.game.path), stdout=PIPE, stdin=PIPE)
 
     async def send_game_output(self, msg, save=None):
-        """Sends the game input to the game's channel, handling permissions."""
+        """Sends the game output to the game's channel, handling permissions."""
         if self.output:
             print(msg)
 
