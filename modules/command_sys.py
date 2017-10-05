@@ -49,11 +49,11 @@ class Context:
         if content and len(content) > 2000:
             if content.find('```') == -1 or content.find('```', content.find('```') + 3) == -1:
                 await self._send(content[:2000], dest, embed=embed, file=file, files=files)
-                await self.send(content[2000:], dest=dest)
+                msg = await self.send(content[2000:], dest=dest)
             elif content.find('```', content.find('```') + 3) + 2 < 2000:
                 await self._send(content[:content.find('```', content.find('```') + 3) + 3], dest,
                                  embed=embed, file=file, files=files)
-                await self.send(content[content.find('```', content.find('```') + 3) + 3:], dest=dest)
+                msg = await self.send(content[content.find('```', content.find('```') + 3) + 3:], dest=dest)
             else:
                 start_block = content[content.find('```'):content.find('\n', content.find('```')) + 1]
 
@@ -64,7 +64,7 @@ class Context:
                     split_cont = content[:content.rfind('\n', 0, content.rfind('\n', 0, 2000) + 1)][:1996] + '\n```'
                     content = start_block + content[len(split_cont) - 4:]
 
-                await self.send(split_cont + content, dest=dest, embed=embed, file=file, files=files)
+                msg = await self.send(split_cont + content, dest=dest, embed=embed, file=file, files=files)
         else:
             msg = await self._send(content, dest, embed=embed, file=file, files=files)
 
