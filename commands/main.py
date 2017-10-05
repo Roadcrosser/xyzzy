@@ -136,7 +136,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
 
         if ctx.msg.channel.id in self.xyzzy.channels:
-            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
+            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game.name))
 
         if not ctx.msg.attachments:
             if not ctx.args:
@@ -229,7 +229,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
 
         if ctx.msg.channel.id in self.xyzzy.channels:
-            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
+            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game.name))
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please provide a game to play.\n```")
