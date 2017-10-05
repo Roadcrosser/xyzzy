@@ -266,10 +266,10 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         if chan.output:
             chan.output = False
-            await ctx.send('```basic\n"Terminal Output" is now OFF.\n```'.format(chan.indent))
+            await ctx.send('```basic\n"Terminal Output" is now OFF.\n```')
         else:
             chan.output = True
-            await ctx.send('```basic\n"Terminal Output" is now ON\n```'.format(chan.indent))
+            await ctx.send('```basic\n"Terminal Output" is now ON\n```')
 
     @command(usage="[ indent level ]")
     async def indent(self, ctx):
@@ -290,7 +290,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             chan.indent = int(ctx.args[0])
             await ctx.send('```basic\n"Indent Level" is now {}.\n```'.format(chan.indent))
         except ValueError:
-            await ctx.send("```diff\n!ERROR: Valid number not supplied.\n```".format(chan.indent))
+            await ctx.send("```diff\n!ERROR: Valid number not supplied.\n```")
 
     @command(aliases=["mortim"])
     async def forcequit(self, ctx):
