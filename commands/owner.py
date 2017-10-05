@@ -7,6 +7,7 @@ import discord
 import re
 import sys
 import importlib
+import subprocess
 import os.path
 
 class Owner:
@@ -188,6 +189,34 @@ class Owner:
                     pass
                 except discord.HTTPException as e:
                     await ctx.send("Unexpected error: `{}`".format(e))
+
+    @command(owner=True, has_site_help=False)
+    async def git(self, ctx):
+        """Runs some git commands in Discord."""
+        if not ctx.args or ctx.args[0] not in ("status", "pull", "gud"):
+            return await ctx.send("```\n"
+                                  "usage: git <command> [<args>]\n\n"
+                                  "   pull     Fetches latest updates from a remote repository\n"
+                                  "   status   Show the working tree status\n"
+                                  "   gud      Gits gud\n"
+                                  "```")
+
+        if ctx.args[0] == "status":
+            res = subprocess.run(["git", "status"], stdout=subprocess.PIPE).stdout.decode("utf8")
+
+            return await ctx.send("```{}```".format(res))
+
+        if ctx.args[0] == "pull":
+            async with ctx.typing():
+                res = subprocess.run(["git", "pull"], stdout=subprocess.PIPE).stdout.decode("utf8")
+
+            return await ctx.send("```{}```".format(res))
+
+        if ctx.args[0] == "gud":
+            if not ctx.args[1:]:
+                return await ctx.send("```You are now so gud!```")
+            else:
+                return await ctx.send("```{} is now so gud!```".format(ctx.raw.split(" ", 1)[1]))
 
 def setup(xyzzy):
     return Owner(xyzzy)
