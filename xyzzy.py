@@ -244,7 +244,7 @@ class Xyzzy(discord.Client):
 
             while True:
                 guilds = len(self.guilds)
-                sessions = sum(1 for i in self.channels if not i.debug)
+                sessions = sum(1 for i in self.channels.values() if not i.debug)
 
                 if self.carbon_key:
                     url = "https://www.carbonitex.net/discord/data/botdata.php" # PHP SUCKS
