@@ -234,7 +234,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not ctx.args:
             return await ctx.send("```diff\n-Please provide a game to play.\n```")
         
-        file_dir = "./tests/" + ctx.args
+        file_dir = "./tests/" + ctx.raw
 
         if not os.path.isfile(file_dir):
             return await ctx.send("```diff\n-File not found.\n```")
