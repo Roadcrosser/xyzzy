@@ -244,7 +244,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         chan = GameChannel(ctx.msg, Game(ctx.args, {"path":file_dir, "debug":True}))
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
-        await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.args))
+        await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.raw))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
