@@ -74,7 +74,7 @@ class Owner:
         if not ctx.args:
             return await ctx.send("```diff\n-Nothing to announce.\n```")
 
-        for _, chan in self.xyzzy.channels:
+        for chan in self.xyzzy.channels.values():
             try:
                 await chan.channel.send("```{}```".format(ctx.raw))
             except:
