@@ -241,7 +241,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         print("Now loading test file {} for #{} (Server: {})".format(ctx.raw, ctx.msg.channel.name, ctx.msg.guild.name))
 
-        chan = GameChannel(ctx.msg, Game(ctx.args, {"path":file_dir, "debug":True}))
+        chan = GameChannel(ctx.msg, Game(ctx.raw, {"path":file_dir, "debug":True}))
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
         await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.raw))
