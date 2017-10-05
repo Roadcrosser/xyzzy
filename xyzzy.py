@@ -22,6 +22,7 @@ import asyncio
 import traceback
 import aiohttp
 import discord
+import modules.posts as posts
 
 OPTIONAL_CONFIG_OPTIONS = ("home_channel_id", "owner_ids", "carbon_key", "dbots_key", "gist_key", "gist_id")
 REQUIRED_CONFIG_OPTIONS = {
@@ -243,67 +244,7 @@ class Xyzzy(discord.Client):
                         print("[{}]".format(r.status))
 
             while True:
-                guilds = len(self.guilds)
-                sessions = sum(1 for i in self.channels.values() if not i.debug)
-
-                if self.carbon_key:
-                    url = "https://www.carbonitex.net/discord/data/botdata.php" # PHP SUCKS
-                    data = {
-                        "key": self.carbon_key,
-                        "servercount": guilds
-                    }
-
-                    print("\nPosting to Carbonitex...")
-
-                    async with self.session.post(url, data=data) as r:
-                        text = await r.text()
-
-                    print("[{}] {}".format(r.status, text))
-
-                if self.dbots_key:
-                    url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
-                    data = json.dumps({"server_count": guilds})
-                    headers = {
-                        "Authorization": self.dbots_key,
-                        "content-type": "application/json"
-                    }
-
-                    print("\nPosting to Discord Bots...")
-
-                    async with self.session.post(url, data=data, headers=headers) as r:
-                        text = await r.text()
-
-                    print("[{}] {}".format(r.status, text))
-
-                if self.gist_key and self.gist_id:
-                    url = "https://api.github.com/gists/" + self.gist_id
-                    data = {
-                        "server_count": guilds,
-                        "session_count": sessions,
-                        "token": "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
-                    }
-
-                    if self.gist_data_cache != data:
-                        self.gist_data_cache = data
-                        data = json.dumps({
-                            "files": {
-                                "xyzzy_data.json": {
-                                    "content": json.dumps(data)
-                                }
-                            }
-                        })
-                        headers = {
-                            "Accept": "application/vnd.github.v3+json",
-                            "Authorization": "token " + self.gist_key
-                        }
-
-                        print("\nPosting to GitHub...")
-
-                        async with self.session.patch(url, data=data, headers=headers) as r:
-                            print("[{}]".format(r.status))
-                    else:
-                        print("\nGitHub posting skipped.")
-
+                await posts.post_all(self)
                 await asyncio.sleep(3600) # Post stuff every hour
 
     async def on_guild_join(self, guild):
