@@ -169,8 +169,8 @@ class Xyzzy(discord.Client):
     async def update_game(self):
         game = "nothing yet!"
 
-        if self.channels:
-            game = "{} game{}.".format(len(self.channels), "s" if len(self.channels) > 1 else "")
+        if sum(1 for i in self.channels if not i.debug):
+            game = "{} game{}.".format(sum(1 for i in self.channels if not i.debug), "s" if len(self.channels) > 1 else "")
 
         await self.change_presence(game=discord.Game(name=game))
 
@@ -244,7 +244,7 @@ class Xyzzy(discord.Client):
 
             while True:
                 guilds = len(self.guilds)
-                sessions = len(self.channels)
+                sessions = sum(1 for i in self.channels if not i.debug)
 
                 if self.carbon_key:
                     url = "https://www.carbonitex.net/discord/data/botdata.php" # PHP SUCKS

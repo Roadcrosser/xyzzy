@@ -5,3 +5,4 @@ class Game:
         self.url = data.get("url")
         self.aliases = data.get("aliases", [])
         self.author = data.get("author")
+        self.debug = data.get("debug", False)

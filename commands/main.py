@@ -1,5 +1,6 @@
 from modules.command_sys import command
 from modules.game_channel import GameChannel, InputMode
+from modules.game import Game
 from io import BytesIO
 from math import floor
 
@@ -209,6 +210,41 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
 
         await ctx.send('```py\nLoaded "{}"{}\n```'.format(game.name, " by " + game.author if game.author else ""))
+        await chan.init_process()
+        await self.xyzzy.update_game()
+        await chan.game_loop()
+        await self.xyzzy.update_game()
+
+        if ctx.msg.channel.id in self.xyzzy.channels:
+            del self.xyzzy.channels[ctx.msg.channel.id]
+
+    @command(usage="[ filename ]")
+    async def debugload(self, ctx):
+        """
+        Tells xyzzy to load a [filename] from the test folder in the current channel.
+        The game will not count towards any statistics.
+        """
+        # Don't do DMs kids.
+        if ctx.is_dm():
+            return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
+
+        if ctx.msg.channel.id in self.xyzzy.channels:
+            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game))
+
+        if not ctx.args:
+            return await ctx.send("```diff\n-Please provide a game to play.\n```")
+        
+        file_dir = "./tests/" + ctx.args
+
+        if not os.path.isfile(file_dir):
+            return await ctx.send("```diff\n-File not found.\n```")
+
+        print("Now loading test file {} for #{} (Server: {})".format(ctx.args, ctx.msg.channel.name, ctx.msg.guild.name))
+
+        chan = GameChannel(ctx.msg, Game(ctx.args, {"path":file_dir, "debug":True}))
+        self.xyzzy.channels[ctx.msg.channel.id] = chan
+
+        await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.args))
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()

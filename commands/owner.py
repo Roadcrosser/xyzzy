@@ -14,7 +14,7 @@ class Owner:
         self.xyzzy = xyzzy
 
     @command(aliases=["eval"], usage="[ python ]", owner=True)
-    async def debug(self, ctx):
+    async def evaluate(self, ctx):
         """
         Executes arbitrary Python code.
         [This command may only be used by trusted individuals.]
