@@ -28,7 +28,7 @@ class Context:
         self.raw = self.clean.split(" ", 1)[1] if len(self.clean.split(" ")) > 1 else ""
 
     async def _send(self, content, dest, *, embed=None, file=None, files=None):
-        """Internal send function, not actually ment to be used by anyone."""
+        """Internal send function, not actually meant to be used by anyone."""
         if dest == "channel":
             return await self.msg.channel.send(content, embed=embed, file=file, files=files)
         elif dest == "author":
