@@ -233,7 +233,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please provide a game to play.\n```")
-        
+
         file_dir = "./tests/" + ctx.raw
 
         if not os.path.isfile(file_dir):
@@ -246,9 +246,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.raw))
         await chan.init_process()
-        await self.xyzzy.update_game()
         await chan.game_loop()
-        await self.xyzzy.update_game()
 
         if ctx.msg.channel.id in self.xyzzy.channels:
             del self.xyzzy.channels[ctx.msg.channel.id]
