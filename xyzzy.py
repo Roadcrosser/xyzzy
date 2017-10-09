@@ -305,6 +305,8 @@ class Xyzzy(discord.Client):
             channel.last = msg.created_at
 
             return await channel.handle_input(msg, clean[1:])
+        elif not clean.startswith(self.invoker * 2):
+            return
 
         if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
