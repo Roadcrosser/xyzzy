@@ -119,6 +119,9 @@ class GameChannel:
 
                     msg = line[self.indent:]
 
+            if not msg.strip():
+                return
+
             msg = msg.strip()
             saves = self.check_saves()
 
@@ -143,6 +146,7 @@ class GameChannel:
                 buffer += output
             except asyncio.TimeoutError:
                 await self.parse_output(buffer)
+
                 buffer = b""
 
                 if os.path.exists(self.save_path):
@@ -158,7 +162,6 @@ class GameChannel:
                             latest = mod_time
 
         self.playing = False
-
         end_msg = "```diff\n-The game has ended.\n"
         end_kwargs = {}
 
