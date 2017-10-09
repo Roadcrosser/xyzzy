@@ -161,6 +161,10 @@ class GameChannel:
                         elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                             latest = mod_time
 
+        last = await self.process.stdout.read()
+
+        await self.parse_output(last)
+
         self.playing = False
         end_msg = "```diff\n-The game has ended.\n"
         end_kwargs = {}
