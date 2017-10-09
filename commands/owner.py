@@ -1,5 +1,4 @@
 from modules.command_sys import command
-from modules.process_helpers import handle_process_output
 from subprocess import PIPE
 
 import traceback as tb
@@ -205,20 +204,16 @@ class Owner:
 
         if ctx.args[0] == "status":
             process = await asyncio.create_subprocess_shell("git status", stdout=PIPE)
+            res = await process.stdout.read()
 
-            async def runner(buffer):
-                await ctx.send("```{}```".format(buffer.decode("utf8")))
-
-            return await handle_process_output(process, runner, runner)
+            return await ctx.send("```{}```".format(res.decode("utf8")))
 
         if ctx.args[0] == "pull":
             async with ctx.typing():
                 process = await asyncio.create_subprocess_shell("git pull", stdout=PIPE)
+                res = await process.stdout.read()
 
-                async def runner(buffer):
-                    await ctx.send("```{}```".format(buffer.decode("utf8")))
-
-                return await handle_process_output(process, runner, runner)
+                await ctx.send("```{}```".format(res.decode("utf8")))
 
         if ctx.args[0] == "gud":
             if not ctx.args[1:]:
