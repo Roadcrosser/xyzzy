@@ -140,7 +140,7 @@ class GameChannel:
         self.first_time = True
         self.playing = True
 
-        def looper(buffer):
+        async def looper(buffer):
             await self.parse_output(buffer)
 
             if os.path.exists(self.save_path):
