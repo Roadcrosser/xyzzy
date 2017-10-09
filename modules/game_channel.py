@@ -140,7 +140,7 @@ class GameChannel:
         self.first_time = True
         self.playing = True
 
-        def after(buffer):
+        def looper(buffer):
             if os.path.exists(self.save_path):
                 files = os.listdir(self.save_path)
                 latest = 0
