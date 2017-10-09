@@ -243,8 +243,6 @@ class GameChannel:
         else:
             await self.channel.send("```{}```".format(msg), file=save)
 
-
-
     def check_saves(self):
         """Checks if the user saved the game."""
         if os.path.exists(self.save_path):
@@ -268,4 +266,3 @@ class GameChannel:
         # Check if cleanup has already been done.
         if os.path.isdir(self.save_path):
             shutil.rmtree(self.save_path)
-
