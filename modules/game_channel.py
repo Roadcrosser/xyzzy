@@ -161,6 +161,17 @@ class GameChannel:
                         elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                             latest = mod_time
 
+        while True:
+            try:
+                output = await asyncio.wait_for(self.process.stdout.read(1), 0.5)
+                buffer += output
+            except asyncio.TimeoutError:
+                await self.parse_output(buffer)
+
+                buffer = b""
+
+                break
+
         self.playing = False
         end_msg = "```diff\n-The game has ended.\n"
         end_kwargs = {}
