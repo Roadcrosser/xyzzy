@@ -51,7 +51,7 @@ async def post_gist(xyzzy):
             })
             headers = {
                 "Accept": "application/vnd.github.v3+json",
-                "Authorization": "token " + self.gist_key
+                "Authorization": "token " + xyzzy.gist_key
             }
 
             print("\nPosting to GitHub...")
