@@ -141,6 +141,8 @@ class GameChannel:
         self.playing = True
 
         def looper(buffer):
+            await self.parse_output(buffer)
+
             if os.path.exists(self.save_path):
                 files = os.listdir(self.save_path)
                 latest = 0
