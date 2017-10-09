@@ -1,5 +1,6 @@
 from subprocess import PIPE
 from enum import Enum
+from modules.process_helpers import handle_process_output
 
 import re
 import shutil
@@ -136,34 +137,23 @@ class GameChannel:
         if not self.process:
             await self.init_process()
 
-        buffer = b""
         self.first_time = True
         self.playing = True
 
-        while self.process.returncode is None:
-            try:
-                output = await asyncio.wait_for(self.process.stdout.read(1), 0.5)
-                buffer += output
-            except asyncio.TimeoutError:
-                await self.parse_output(buffer)
+        def after(buffer):
+            if os.path.exists(self.save_path):
+                files = os.listdir(self.save_path)
+                latest = 0
 
-                buffer = b""
+                for file in os.listdir(self.save_path):
+                    mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
 
-                if os.path.exists(self.save_path):
-                    files = os.listdir(self.save_path)
-                    latest = 0
+                    if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
+                        os.unlink("{}/{}".format(self.save_path, file))
+                    elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
+                        latest = mod_time
 
-                    for file in os.listdir(self.save_path):
-                        mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
-
-                        if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
-                            os.unlink("{}/{}".format(self.save_path, file))
-                        elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
-                            latest = mod_time
-
-        last = await self.process.stdout.read()
-
-        await self.parse_output(last)
+        await handle_process_output(self.process, looper, self.parse_output)
 
         self.playing = False
         end_msg = "```diff\n-The game has ended.\n"
