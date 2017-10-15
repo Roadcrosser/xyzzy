@@ -1,12 +1,12 @@
 import sys # Checking if host platform is Windows
 
-if sys.platform == "win32":
-    raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
+#if sys.platform == "win32":
+#    raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
 
 import shutil # Check if dfrotz is in PATH
 
-if not shutil.which("dfrotz"):
-    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
+#if not shutil.which("dfrotz"):
+#    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
 
 from modules.command_sys import Context, Holder
 from modules.game import Game
@@ -260,7 +260,7 @@ class Xyzzy(discord.Client):
             await self.home_channel.send('I have been removed from "{0.name}" (ID: {0.id}).'.format(guild))
 
     async def on_message(self, msg):
-        if msg.author.bot or msg.author.id == self.user.id or not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.author.bot or msg.author.id == self.user.id or (msg.guild and not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
 
         # Hopefully a not so fucky version of the old conditional here.
