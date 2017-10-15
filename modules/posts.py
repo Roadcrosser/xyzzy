@@ -8,7 +8,7 @@ async def post_carbon(xyzzy):
             "servercount": len(xyzzy.guilds)
         }
 
-        print("\Posting to Carbonitex...")
+        print("\nPosting to Carbonitex...")
 
         async with xyzzy.session.post(url, data=data) as r:
             text = await r.text()
