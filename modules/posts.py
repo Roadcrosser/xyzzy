@@ -1,4 +1,5 @@
 import json
+import asyncio
 
 async def post_carbon(xyzzy):
     if xyzzy.carbon_key:
@@ -65,3 +66,11 @@ async def post_all(xyzzy):
     await post_carbon(xyzzy)
     await post_dbots(xyzzy)
     await post_gist(xyzzy)
+
+def task_loop(xyzzy):
+    async def loopy_doodle():
+        while True:
+            await post_all(xyzzy)
+            await asyncio.sleep(3600)
+
+    return xyzzy.loop.create_task(loopy_doodle())

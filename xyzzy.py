@@ -243,9 +243,7 @@ class Xyzzy(discord.Client):
                     async with self.session.patch(url, data=gist_game, headers=headers) as r:
                         print("[{}]".format(r.status))
 
-            while True:
-                await posts.post_all(self)
-                await asyncio.sleep(3600) # Post stuff every hour
+            self.post_loop = await posts.task_loop(self)
 
     async def on_guild_join(self, guild):
         print('I have been added to "{}".'.format(guild.name))
