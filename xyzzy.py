@@ -260,7 +260,7 @@ class Xyzzy(discord.Client):
             await self.home_channel.send('I have been removed from "{0.name}" (ID: {0.id}).'.format(guild))
 
     async def on_message(self, msg):
-        if msg.author.bot or msg.author.id == self.user.id or not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.author.bot or msg.author.id == self.user.id or (msg.guild and not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
 
         # Hopefully a not so fucky version of the old conditional here.
