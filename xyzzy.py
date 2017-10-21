@@ -167,11 +167,14 @@ class Xyzzy(discord.Client):
 
         super().__init__()
 
+    def game_count():
+        return sum(1 for i in self.channels.values() if i.game and not i.game.debug)
+
     async def update_game(self):
         game = "nothing yet!"
 
-        if sum(1 for i in self.channels.values() if not i.game.debug):
-            game = "{} game{}.".format(sum(1 for i in self.channels.values() if not i.game.debug), "s" if len(self.channels) > 1 else "")
+        if game_count():
+            game = "{} game{}.".format(game_count(), "s" if len(self.channels) > 1 else "")
 
         await self.change_presence(game=discord.Game(name=game))
 

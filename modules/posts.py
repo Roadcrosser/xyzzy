@@ -36,7 +36,7 @@ async def post_gist(xyzzy):
         url = "https://api.github.com/gists/" + xyzzy.gist_id
         data = {
             "server_count": len(xyzzy.guilds),
-            "session_count": sum(1 for i in xyzzy.channels.values() if not i.game.debug),
+            "session_count": xyzzy.game_count(),
             "token": "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
         }
 
