@@ -68,6 +68,7 @@ async def post_all(xyzzy):
     await post_gist(xyzzy)
 
 def task_loop(xyzzy):
+    # 10/10 would make dumb function names again
     async def loopy_doodle():
         while True:
             await post_all(xyzzy)

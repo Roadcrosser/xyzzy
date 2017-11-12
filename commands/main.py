@@ -8,6 +8,7 @@ import os
 import re
 import json
 import asyncio
+import random
 import modules.quetzal_parser as qzl
 
 class Main:
@@ -469,6 +470,14 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
 
         await ctx.send('```diff\n+Transferred the "wheel" to {}.\n```'.format(ctx.msg.mentions[0]))
+
+    @command(has_site_help=False)
+    async def jump(self, ctx):
+        """Wheeeeeeeeee!!!!!"""
+        await ctx.send(random.choice(["Wheeeeeeeeee!!!!!", "Are you enjoying yourself?", "Do you expect me to applaud?",
+                       "Very good. Now you can go to the second grade.", "Have you tried hopping around the dungeon, too?"
+                       "You jump on the spot.", "You jump on the spot, fruitlessly."]))
+
 
 def setup(xyzzy):
     return Main(xyzzy)
