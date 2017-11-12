@@ -475,7 +475,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
     async def jump(self, ctx):
         """Wheeeeeeeeee!!!!!"""
         await ctx.send(random.choice(["Wheeeeeeeeee!!!!!", "Are you enjoying yourself?", "Do you expect me to applaud?",
-                       "Very good. Now you can go to the second grade.", "Have you tried hopping around the dungeon, too?"
+                       "Very good. Now you can go to the second grade.", "Have you tried hopping around the dungeon, too?",
                        "You jump on the spot.", "You jump on the spot, fruitlessly."]))
 
 
