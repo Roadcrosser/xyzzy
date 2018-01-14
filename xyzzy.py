@@ -174,7 +174,7 @@ class Xyzzy(discord.Client):
         game = "nothing yet!"
 
         if self.game_count():
-            game = f"{self.game_count()} game{'s' if len(self.channels > 1 else '')}."
+            game = f"{self.game_count()} game{'s' if len(self.channels) > 1 else ''}."
 
         await self.change_presence(game=discord.Game(name=game))
 
