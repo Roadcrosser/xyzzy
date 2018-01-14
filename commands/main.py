@@ -21,25 +21,26 @@ class Main:
         if not ctx.args:
             return await ctx.send("```inform\n"
                                   "Detailed help can be found at the link below.\n"
-                                  'For quick information on a command, type "{}help (command)"\n'
+                                  f'For quick information on a command, type "{self.xyzzy.invoker * 2}help (command)"\n'
                                   "```\n"
-                                  "http://xyzzy.roadcrosser.xyz/help/".format(self.xyzzy.invoker * 2))
+                                  "http://xyzzy.roadcrosser.xyz/help/")
         elif self.xyzzy.commands.get_command(ctx.args[0].lower()):
             cmd = self.xyzzy.commands.get_command(ctx.args[0].lower())
-            msg = '```inform7\n"{}{}{}{}"\n```'.format(self.xyzzy.invoker * 2, cmd.name, " " + cmd.usage + " " if cmd.usage else "", cmd.description)
+            msg = f'```inform7\n"{self.xyzzy.invoker * 2}{cnd.name}{f" {cmd.usage} " if cmd.usage else ''}{cmd.description}"\n```'
 
             if cmd.has_site_help:
-                msg += "\nMore information: http://xyzzy.roadcrosser.xyz/help/#{}".format(cmd.name)
+                msg += f"\nMore information: http://xyzzy.roadcrosser.xyz/help/#{cmd.name}"
 
             return await ctx.send(msg)
         else:
-            return await ctx.send('```diff\n-No information found on "{}".\n```'.format(ctx.args[0].lower()))
+            return await ctx.send(f'```diff\n-No information found on "{ctx.args[0].lower()}".\n```')
 
     @command(has_site_help=False)
     async def ping(self, ctx):
         msg = await ctx.send("Pong!")
+        time = floor(msg.created_at.timestamp() * 1000 - ctx.msg.created_at.timestamp() * 1000) # python times are dum
 
-        await msg.edit(content="Pong! `{}ms`".format(floor(msg.created_at.timestamp() * 1000 - ctx.msg.created_at.timestamp() * 1000)))
+        await msg.edit(content=f"Pong! `{time}ms`")
 
     @command(has_site_help=False)
     async def about(self, ctx):
@@ -54,11 +55,10 @@ class Main:
     @command(has_site_help=False)
     async def list(self, ctx):
         """Sends you a direct message containing all games in xyzzy's library."""
-        msg = """```md
-# Here are all of the games I have available: #
-{}
-```
-Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list""".format("\n".join(sorted(self.xyzzy.games)))
+        msg = ("```md\n"
+               "# Here are all of the games I have available: #\n"
+               "\n".join(sorted(self.xyzzy.games)) + '\n'
+               "Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xyz/list")
 
         if ctx.args and ctx.args[0] == "here":
             await ctx.send(msg)
@@ -80,16 +80,16 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if ctx.args[0] == "on":
             if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["backticks"]:
                 self.xyzzy.user_preferences["backticks"].append(str(ctx.msg.author.id))
-                await ctx.send("```diff\n+Commands from you now require backticks. (They should look `{}like this`)\n```".format(self.xyzzy.invoker))
+                await ctx.send(f"```diff\n+Commands from you now require backticks. (They should look `{self.xyzzy.invoker}like this`)\n```"
             else:
                 return await ctx.send("```glsl\n#Your preferences are already set to require backticks for commands.\n```")
         else:
             if str(ctx.msg.author.id) in self.xyzzy.user_preferences["backticks"]:
                 self.xyzzy.user_preferences["backticks"].remove(str(ctx.msg.author.id))
                 await ctx.send("```diff\n"
-                               "+Commands from you no longer require backticks. (They should look {}like this)\n"
+                               f"+Commands from you no longer require backticks. (They should look {self.xyzzy.invoker}like this)\n"
                                "+XYZZY will still accept backticked commands."
-                               "\n```".format(self.xyzzy.invoker))
+                               "\n```")
             else:
                 return await ctx.send("```diff\n!Your preferences are already set such that backticks are not required for commands\n```")
 
@@ -137,7 +137,9 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
 
         if ctx.msg.channel.id in self.xyzzy.channels:
-            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game.name))
+            return await ctx.send("```accesslog\n"
+                                  f'Sorry, but #{ctx.msg.channel.name} is currently playing "{self.xyzzy.channels[ctx.msg.channel.id].game.name}". Please try again after the game has finished.\n'
+                                  "```")
 
         if not ctx.msg.attachments:
             if not ctx.args:
@@ -152,12 +154,12 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
             if not games:
-                return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
+                return await ctx.send(f'```diff\n-I couldn\'t find any games matching "{ctx.raw}"\n```')
             elif len(games) > 1 and not perfect_match:
                 return await ctx.send("```accesslog\n"
-                                    'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
-                                    '"{}"\n'
-                                    "```".format(ctx.raw, len(games), '"\n"'.join(sorted(games))))
+                                    f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
+                                    f'"{"\n".join(sorted(games))}"\n'
+                                    "```")
 
             if perfect_match:
                 game = list(perfect_match.items())[0][1]
@@ -180,7 +182,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                     if str(e) == "Invalid file format.":
                         return await ctx.send("```diff\n-Invalid file format.\n```")
                     else:
-                        return await ctx.send("```diff\n-{}\n```".format(str(e)))
+                        return await ctx.send(f"```diff\n-{str(e)}\n```")
 
                 for name, stuff in self.xyzzy.games.items():
                     comp_res = qzl.compare_quetzal(qzl_headers, stuff.path)
@@ -192,25 +194,25 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 if not comp_res:
                     return await ctx.send("```diff\n-No games matching your save file could be found.\n```")
 
-                if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
-                    os.makedirs("./saves/{}".format(ctx.msg.channel.id))
+                if not os.path.exists(f"./saves/{ctx.msg.channel.id}"):
+                    os.makedirs(f"./saves/{ctx.msg.channel.id}")
 
-                with open("./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id), "wb") as save:
+                with open(f"./saves/{ctx.msg.channel.id}/__UPLOADED__.qzl", "wb") as save:
                     save.write(res)
 
         if str(ctx.msg.guild.id) in self.xyzzy.server_settings:
             if game.name in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
-                return await ctx.send('```diff\n- "{}" has been blocked on this server.\n```'.format(game.name))
+                return await ctx.send(f'```diff\n- "{game.name}" has been blocked on this server.\n```')
 
-        print("Now loading {} for #{} (Server: {})".format(game.name, ctx.msg.channel.name, ctx.msg.guild.name))
+        print(f"Now loading {game.name} for #{ctx.msg.channel.name} (Server: {ctx.msg.guild.name})")
 
         chan = GameChannel(ctx.msg, game)
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
         if ctx.msg.attachments:
-            chan.save = "./saves/{}/__UPLOADED__.qzl".format(ctx.msg.channel.id)
+            chan.save = f"./saves/{ctx.msg.channel.id}/__UPLOADED__.qzl"
 
-        await ctx.send('```py\nLoaded "{}"{}\n```'.format(game.name, " by " + game.author if game.author else ""))
+        await ctx.send(f'```py\nLoaded "{game.name}"{f" by {game.author}" if game.author else ""}\n```')
         await chan.init_process()
         await self.xyzzy.update_game()
         await chan.game_loop()
@@ -230,7 +232,9 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send("```accesslog\nSorry, but games cannot be played in DMs. Please try again in a server.```")
 
         if ctx.msg.channel.id in self.xyzzy.channels:
-            return await ctx.send('```accesslog\nSorry, but #{} is currently playing "{}". Please try again after the game has finished.\n```'.format(ctx.msg.channel.name, self.xyzzy.channels[ctx.msg.channel.id].game.name))
+            return await ctx.send("```accesslog\n"
+                                  f'Sorry, but #{ctx.msg.channel.name} is currently playing "{self.xyzzy.channels[ctx.msg.channel.id].game.name}". Please try again after the game has finished.\n'
+                                  "```")
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please provide a game to play.\n```")
@@ -240,12 +244,12 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not os.path.isfile(file_dir):
             return await ctx.send("```diff\n-File not found.\n```")
 
-        print("Now loading test file {} for #{} (Server: {})".format(ctx.raw, ctx.msg.channel.name, ctx.msg.guild.name))
+        print(f"Now loading test file {ctx.raw} for #{ctx.msg.channel.name} (Server: {ctx.msg.guild.name})")
 
-        chan = GameChannel(ctx.msg, Game(ctx.raw, {"path":file_dir, "debug":True}))
+        chan = GameChannel(ctx.msg, Game(ctx.raw, {"path": file_dir, "debug": True}))
         self.xyzzy.channels[ctx.msg.channel.id] = chan
 
-        await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.raw))
+        await ctx.send(f'```py\nLoaded "{ctx.raw}"\n```')
         await chan.init_process()
         await chan.game_loop()
 
@@ -287,7 +291,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         try:
             chan.indent = int(ctx.args[0])
-            await ctx.send('```basic\n"Indent Level" is now {}.\n```'.format(chan.indent))
+            await ctx.send(f'```basic\n"Indent Level" is now {chan.indent}.\n```')
         except ValueError:
             await ctx.send("```diff\n!ERROR: Valid number not supplied.\n```")
 
@@ -365,19 +369,19 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 if str(e) == "Invalid file format.":
                     return await ctx.send("```diff\n-Invalid file format.\n```")
                 else:
-                    return await ctx.send("```diff\n-{}\n```".format(str(e)))
+                    return await ctx.send(f"```diff\n-{str(e)}\n```")
 
-            if not os.path.exists("./saves/{}".format(ctx.msg.channel.id)):
-                os.makedirs("./saves/{}".format(ctx.msg.channel.id))
+            if not os.path.exists(f"./saves/{ctx.msg.channel.id}"):
+                os.makedirs(f"./saves/{ctx.msg.channel.id}")
 
-            with open("./saves/{}/{}.qzl".format(ctx.msg.channel.id, attach.filename.rsplit(".")[0]), "wb") as save:
+            with open(f"./saves/{ctx.msg.channel.id}/{attach.filename.rsplit('.')[0]}.qzl", "wb") as save:
                 save.write(res)
 
         await ctx.send("```diff\n"
-                       "+Saved file as '{}.qzl'.\n"
+                       f"+Saved file as '{attach.filename.split('.')[0]}.qzl'.\n"
                        "+You can load it by playing the relevant game and using the RESTORE command.\n"
                        "-Note that this will get removed during the next game played if it is not loaded, or after the next reboot.\n"
-                       "```".format(attach.filename.split(".")[0]))
+                       "```")
 
     @command()
     async def modes(self, ctx):
@@ -425,7 +429,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         channel = self.xyzzy.channels[ctx.msg.channel.id]
 
         if res == channel.mode:
-            return await ctx.send('```diff\n-The current mode is already "{}".\n```'.format(ctx.args[0].lower()))
+            return await ctx.send(f'```diff\n-The current mode is already "{ctx.args[0].lower()}".\n```')
 
         channel.mode = res
 
@@ -444,9 +448,9 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         else:
             await ctx.send("```diff\n"
                            "-Driver mode is now on.\n"
-                           "Only {} will be able to submit commands.\n"
+                           f"Only {channel.owner} will be able to submit commands.\n"
                            'You can transfer the "wheel" with >>transfer [user]\n'
-                           "```".format(channel.owner))
+                           "```")
 
     @command(usage="[ @User Mentions#1234 ]")
     async def transfer(self, ctx):
@@ -469,7 +473,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
 
-        await ctx.send('```diff\n+Transferred the "wheel" to {}.\n```'.format(ctx.msg.mentions[0]))
+        await ctx.send(f'```diff\n+Transferred the "wheel" to {ctx.msg.mentions[0]}.\n```')
 
     @command(has_site_help=False)
     async def jump(self, ctx):

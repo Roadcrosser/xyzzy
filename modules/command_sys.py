@@ -39,7 +39,7 @@ class Context:
     async def send(self, content: str=None, *, dest: str="channel", embed: discord.Embed=None, file: discord.File=None, files: List[discord.File]=None):
         """Sends a message to the context origin, can either be the channel or author."""
         if content is None and not embed and not file and not files:
-            content = "```ERROR at memory location {}\n  No content.\n```".format(hex(randint(2 ** 4, 2 ** 32)))
+            content = f"```ERROR at memory location {hex(randint(2 ** 4, 2 ** 32))}\n  No content.\n```"
         elif content:
             # Escape bad mentions
             content = str(content).replace("@everyone", "@\u200Beveryone").replace("@here", "@\u200Bhere")
@@ -131,7 +131,7 @@ class Holder:
     def load_module(self, module_name: str) -> None:
         """Loads a module by name, and registers all its commands."""
         if module_name in self.modules:
-            raise Exception("Module `{}` is already loaded.".format(module_name))
+            raise Exception(f"Module `{module_name}` is already loaded.")
 
         module = importlib.import_module(module_name)
 
@@ -186,7 +186,7 @@ class Holder:
     def unload_module(self, module_name: str) -> None:
         """Unloads a module by name, and unregisters all its commands."""
         if module_name not in self.modules:
-            raise Exception("Module `{}` is not loaded.".format(module_name))
+            raise Exception(f"Module `{module_name}` is not loaded.")
 
         # Walk through the commands and remove them from the command and aliases dicts
         for cmd in self.modules[module_name]:

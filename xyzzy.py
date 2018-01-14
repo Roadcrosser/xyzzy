@@ -89,7 +89,7 @@ class Xyzzy(discord.Client):
 
             for name, data in games.items():
                 if not os.path.exists(data["path"]):
-                    print("Path for {} is invalid. Delisting.".format(name))
+                    print(f"Path for {name} is invalid. Delisting.")
                 else:
                     self.games[name] = Game(name, data)
 
@@ -153,7 +153,7 @@ class Xyzzy(discord.Client):
         self.queue = None
         self.channels = {}
 
-        self.content_regex = re.compile(r"`{}.+`".format(self.invoker))
+        self.content_regex = re.compile(rf"`{self.invoker}.+`")
         self.session = aiohttp.ClientSession()
         self.commands = Holder(self)
 
@@ -174,32 +174,32 @@ class Xyzzy(discord.Client):
         game = "nothing yet!"
 
         if self.game_count():
-            game = "{} game{}.".format(self.game_count(), "s" if len(self.channels) > 1 else "")
+            game = f"{self.game_count()} game{'s' if len(self.channels > 1 else '')}."
 
         await self.change_presence(game=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):
         trace = "".join(traceback.format_tb(exc.__traceback__))
-        err = "Traceback (most recent call last):\n{}{}: {}".format(trace, type(exc).__name__, exc)
+        err = f"Traceback (most recent call last):\n{trace}{type(exc).__name__}: {exc}"
 
         print("\n" + ConsoleColours.FAIL + "An error has occured!")
         print(err + ConsoleColours.END)
 
         if ctx.is_dm():
-            print('This was caused by a DM with "{}".\n'.format(ctx.msg.author.name))
+            print(f'This was caused by a DM with "{ctx.msg.author.name}".\n')
         else:
-            print('This was caused by a message.\nServer: "{}"\nChannel: #{}'.format(ctx.msg.guild.name, ctx.msg.channel.name))
+            print(f'This was caused by a message.\nServer: "{ctx.msg.guild.name}"\nChannel: #{ctx.msg.channel.name}')
 
         if self.home_channel:
-            await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
+            await self.home_channel.send(f"User: `{ctx.msg.author.name}`\nInput: `{ctx.clean}`\n```py\n{err}\n```")
 
-        await ctx.send('```py\nERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+        await ctx.send(f'```py\nERROR at memory location {hex(randint(2 ** 4, 2 ** 32))}\n  {type(exc).__name__}: {exc}\n\nInput: "{ctx.clean}"\n```')
 
     async def on_ready(self):
         print("======================\n"
-              "{0.user.name} is online.\n"
-              "Connected with ID {0.user.id}\n"
-              "Accepting commands with the syntax `{0.invoker}command`".format(self))
+              f"{self.user.name} is online.\n"
+              f"Connected with ID {self.user.id}\n"
+              f"Accepting commands with the syntax `{self.invoker}command`")
 
         self.home_channel = self.get_channel(self.home_channel_id)
 
@@ -209,7 +209,7 @@ class Xyzzy(discord.Client):
             try:
                 self.commands.load_module(mod)
             except Exception as e:
-                print(ConsoleColours.FAIL + 'Error loading module "{}"\n{}'.format(mod, e) + ConsoleColours.END)
+                print(ConsoleColours.FAIL + f'Error loading module "{mod}"\n{e}' + ConsoleColours.END)
 
         await self.update_game()
         
@@ -228,7 +228,7 @@ class Xyzzy(discord.Client):
                 async with self.session.get(url, headers=headers) as r:
                     res = await r.json()
 
-                print("[{}]".format(r.status))
+                print(f"[{r.status}]")
 
                 self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
                 self.gist_game_cache = json.loads(res["files"]["xyzzy_games.json"]["content"])
@@ -244,21 +244,21 @@ class Xyzzy(discord.Client):
                     })
 
                     async with self.session.patch(url, data=gist_game, headers=headers) as r:
-                        print("[{}]".format(r.status))
+                        print(f"[{r.status}]")
 
             self.post_loop = await posts.task_loop(self)
 
     async def on_guild_join(self, guild):
-        print('I have been added to "{}".'.format(guild.name))
+        print(f'I have been added to "{guild.name}".')
 
         if self.home_channel:
-            await self.home_channel.send('I have been added to "{0.name}" (ID: {0.id}).'.format(guild))
+            await self.home_channel.send(f'I have been added to "{guild.name}" (ID: {guild.id}).')
 
     async def on_guild_remove(self, guild):
-        print('I have been removed from "{}".'.format(guild.name))
+        print(f'I have been removed from "{guild.name}".')
 
         if self.home_channel:
-            await self.home_channel.send('I have been removed from "{0.name}" (ID: {0.id}).'.format(guild))
+            await self.home_channel.send(f'I have been removed from "{guild.name}" (ID: {guild.id}).')
 
     async def on_message(self, msg):
         if msg.author.bot or msg.author.id == self.user.id or (msg.guild and not msg.channel.permissions_for(msg.guild.me).send_messages):
@@ -278,8 +278,8 @@ class Xyzzy(discord.Client):
          str(msg.author.id) in self.blocked_users[str(msg.guild.id)]) or ("global" in self.blocked_users and
          str(msg.author.id) in self.blocked_users["global"])):
             return await msg.author.send("```diff\n"
-                                         '!An administrator has disabled your ability to submit commands in "{}"\n'
-                                         "```".format(msg.guild.name))
+                                         f'!An administrator has disabled your ability to submit commands in "{msg.guild.name}"\n'
+                                         "```")
 
         clean = msg.content[1:-1] if re.match(r"^`.*`$", msg.content) else msg.content
 

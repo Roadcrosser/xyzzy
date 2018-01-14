@@ -18,7 +18,7 @@ class HeaderData:
         self.checksum = checksum
 
     def __str__(self):
-        return "HeaderData(release={}, serial={}, checksum={})".format(self.release, self.serial, self.checksum)
+        return f"HeaderData(release={self.release}, serial={self.serial}, checksum={self.checksum})"
 
     def __repr__(self):
         return self.__str__()

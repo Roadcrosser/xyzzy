@@ -14,11 +14,11 @@ async def post_carbon(xyzzy):
         async with xyzzy.session.post(url, data=data) as r:
             text = await r.text()
 
-        print("[{}] {}".format(r.status, text))
+        print(f"[{r.status}] {text}")
 
 async def post_dbots(xyzzy):
     if xyzzy.dbots_key:
-        url = "https://bots.discord.pw/api/bots/{}/stats".format(xyzzy.user.id)
+        url = f"https://bots.discord.pw/api/bots/{xyzzy.user.id}/stats"
         data = json.dumps({"server_count": len(xyzzy.guilds)})
         headers = {
             "Authorization": xyzzy.dbots_key,
@@ -30,7 +30,7 @@ async def post_dbots(xyzzy):
         async with xyzzy.session.post(url, data=data, headers=headers) as r:
             text = await r.text()
 
-        print("[{}] {}".format(r.status, text))
+        print(f"[{r.status}] {text}")
 
 async def post_gist(xyzzy):
     if xyzzy.gist_key and xyzzy.gist_id:
@@ -58,7 +58,7 @@ async def post_gist(xyzzy):
             print("\nPosting to GitHub...")
 
             async with xyzzy.session.patch(url, data=data, headers=headers) as r:
-                print("[{}]".format(r.status))
+                print(f"[{r.status}]")
         else:
             print("\nGitHub posting skipped.")
 

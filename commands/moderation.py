@@ -24,7 +24,7 @@ class Moderation:
 
         for men in ctx.msg.mentions:
             self.xyzzy.blocked_users[str(ctx.msg.guild.id)].append(str(men.id))
-            await ctx.send('```diff\n+ "{}" has been restricted from entering commands in this server.\n```'.format(men.display_name))
+            await ctx.send(f'```diff\n+ "{men.display_name}" has been restricted from entering commands in this server.\n```')
 
         with open("./bot-data/blocked_users.json", "w") as blck:
             json.dump(self.xyzzy.blocked_users, blck)
@@ -49,7 +49,7 @@ class Moderation:
         for men in ctx.msg.mentions:
             if str(men.id) in self.xyzzy.blocked_users[str(ctx.msg.guild.id)]:
                 self.xyzzy.blocked_users[str(ctx.msg.guild.id)].remove(str(men.id))
-                await ctx.send('```diff\n+ "{}" is now allowed to submit commands.\n```'.format(men.display_name))
+                await ctx.send(f'```diff\n+ "{men.display_name}" is now allowed to submit commands.\n```')
 
         with open("./bot-data/blocked_users.json", "w") as blck:
             json.dump(self.xyzzy.blocked_users, blck)
@@ -73,7 +73,7 @@ class Moderation:
             else:
                 games = self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]
 
-                return await ctx.send("```asciidoc\n.Blocked Games.\n{}\n```".format("\n".join("* '{}'".format(x) for x in sorted(games))))
+                return await ctx.send(f"```asciidoc\n.Blocked Games.\n{'\n'.join(f"* \"{x}\"" for x in sorted(games))}\n```")
 
         games = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
         perfect_match = None
@@ -82,12 +82,12 @@ class Moderation:
             perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
         if not games:
-            return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
+            return await ctx.send(f'```diff\n-I couldn\'t find any games matching "{ctx.raw}"\n```')
         elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
-                                  'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
-                                  '"{}"\n'
-                                  "```".format(ctx.raw, len(games), '"\n"'.join(sorted(games))))
+                                  f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
+                                  f'"{"\n".join(sorted(games))}"\n'
+                                  "```")
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]
@@ -100,9 +100,9 @@ class Moderation:
             if game not in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
                 self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"].append(game)
             else:
-                return await ctx.send('```diff\n- "{}" has already been blocked on this server.\n```'.format(game))
+                return await ctx.send(f'```diff\n- "{game}" has already been blocked on this server.\n```')
 
-        await ctx.send('```diff\n+ "{}" has been blocked and will no longer be able to be played on this server.\n```'.format(game))
+        await ctx.send(f'```diff\n+ "{game}" has been blocked and will no longer be able to be played on this server.\n```')
 
         with open("./bot-data/server_settings.json", "w") as srv:
             json.dump(self.xyzzy.server_settings, srv)
@@ -126,12 +126,12 @@ class Moderation:
             perfect_match = {x: y for x, y in games.items() if ctx.raw.lower() == x.lower() or [z for z in y.aliases if ctx.raw.lower() == z.lower()]}
 
         if not games:
-            return await ctx.send('```diff\n-I couldn\'t find any games matching "{}"\n```'.format(ctx.raw))
+            return await ctx.send(f'```diff\n-I couldn\'t find any games matching "{ctx.raw}"\n```')
         elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
-                                  'I couldn\'t find any games with that name, but I found "{}" in {} other games. Did you mean one of these?\n'
-                                  '"{}"\n'
-                                  "```".format(ctx.raw, len(games), "\n".join(sorted(games))))
+                                  f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
+                                  f'"{"\n".join(sorted(games))}"\n'
+                                  "```")
 
         if perfect_match:
             game = list(perfect_match.items())[0][0]
@@ -145,9 +145,9 @@ class Moderation:
         if game in self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]:
             self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"].remove(game)
         else:
-            return await ctx.send('```diff\n- "{}" has not been blocked on this server.\n```'.format(game))
+            return await ctx.send(f'```diff\n- "{game}" has not been blocked on this server.\n```')
 
-        await ctx.send('```diff\n+ "{}" has been unblocked and can be played again on this server.\n```'.format(game))
+        await ctx.send(f'```diff\n+ "{game}" has been unblocked and can be played again on this server.\n```')
 
         with open("./bot-data/server_settings.json", "w") as srv:
             json.dump(self.xyzzy.server_settings, srv)

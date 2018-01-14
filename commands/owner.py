@@ -34,7 +34,7 @@ class Owner:
         except Exception as e:
             out = str(e)
 
-        await ctx.send("```py\n{}\n```".format(out))
+        await ctx.send(f"```py\n{out}\n```")
 
     @command(owner=True)
     async def shutdown(self, ctx):
@@ -44,9 +44,9 @@ class Owner:
         """
         if self.xyzzy.channels:
             await ctx.send("```diff\n"
-                           "!There are currently {} games running on my system.\n"
+                           f"!There are currently {len(self.xyzzy.channels)} games running on my system.\n"
                            "-If you shut me down now, all unsaved data regarding these games could be lost!\n"
-                           "(Use `{}nowplaying` for a list of currently running games.)\n```".format(len(self.xyzzy.channels), self.xyzzy.invoker * 2))
+                           f"(Use `{self.xyzzy.invoker * 2}nowplaying` for a list of currently running games.)\n```")
 
         await ctx.send("```md\n## Are you sure you want to shut down the bot? ##\n[y/n]:\n```")
 
@@ -55,10 +55,10 @@ class Owner:
                 check = lambda x: x.channel == ctx.msg.channel and x.author == ctx.msg.author
                 msg = await self.xyzzy.wait_for("message", check=check, timeout=30)
 
-                if re.match(r"^`?({})?y(es)?`?$".format(self.xyzzy.invoker * 2), msg.content.lower()):
+                if re.match(rf"^`?({self.xyzzy.invoker * 2})?y(es)?`?$", msg.content.lower()):
                     await ctx.send("```asciidoc\n.Xyzzy.\n// Now shutting down...\n```")
                     await self.xyzzy.logout()
-                elif re.match(r"^`?({})?no?`?$".format(self.xyzzy.invoker * 2), msg.content.lower()):
+                elif re.match(rf"^`?({self.xyzzy.invoker * 2})?no?`?$", msg.content.lower()):
                     return await ctx.send("```css\nShutdown aborted.\n```")
                 else:
                     await ctx.send("```md\n# Invalid response. #\n```")
@@ -76,7 +76,7 @@ class Owner:
 
         for chan in self.xyzzy.channels.values():
             try:
-                await chan.channel.send("```{}```".format(ctx.raw))
+                await chan.channel.send(f"```{ctx.raw}```")
             except:
                 pass
 
@@ -90,17 +90,17 @@ class Owner:
         if not ctx.args:
             return await ctx.send("```diff\n-No module to reload.\n```")
 
-        if os.path.exists('commands/{}.py'.format(ctx.args[0].lower())):
+        if os.path.exists(f'commands/{ctx.args[0].lower()}.py'):
             self.xyzzy.commands.reload_module('commands.' + ctx.args[0].lower())
-        elif os.path.exists('modules/{}.py'.format(ctx.args[0].lower())) and 'modules.{}'.format(ctx.args[0].lower()) in sys.modules:
-            del sys.modules['modules.{}'.format(ctx.args[0].lower())]
-            importlib.import_module('modules.{}'.format(ctx.args[0].lower()))
-        elif os.path.exists('modules/{}.py'.format(ctx.args[0].lower())):
+        elif os.path.exists(f'modules/{ctx.args[0].lower()}.py') and f'modules.{ctx.args[0].lower()}' in sys.modules:
+            del sys.modules[f'modules.{ctx.args[0].lower()}']
+            importlib.import_module(f'modules.{ctx.args[0].lower()}')
+        elif os.path.exists(f'modules/{ctx/args[0].lower()}.py'):
             return await ctx.send("```diff\n-Module is not loaded.\n```")
         else:
             return await ctx.send("```diff\n-Unknown thing to reload.\n```")
 
-        await ctx.send('```diff\n+Reloaded module "{}".\n```'.format(ctx.args[0].lower()))
+        await ctx.send(f'```diff\n+Reloaded module "{ctx.args[0].lower()}".\n```')
 
     @command(owner=True)
     async def nowplaying(self, ctx):
@@ -112,9 +112,10 @@ class Owner:
             return await ctx.send("```md\n## Nothing is currently being played. ##\n```", dest="author")
 
         msg = "```md\n## Currently playing games: ##\n"
+        time = (ctx.msg.created_at - chan.last).total_seconds() // 60
 
         for chan in self.xyzzy.channels.values():
-            msg += "[{0.channel.guild.name}]({0.channel.name}) {0.game.name} {{{1} minutes ago}}\n".format(chan, (ctx.msg.created_at - chan.last).total_seconds() // 60)
+            msg += f"[{chan.channel.guild.name}]({chan.channel.name}) {chan.game.name} {{{time} minutes ago}}\n"
 
         msg += '```'
 
@@ -160,9 +161,9 @@ class Owner:
                     res = compile(clean, "<repl>", "exec")
                 except SyntaxError as e:
                     if e.text is None:
-                        await ctx.send("```py\n{0.__class__.__name__}: {0}\n```".format(e))
+                        await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
                     else:
-                        await ctx.send("```py\n{0.text}{1:>{0.offset}}\n{0.__class__.__name__}: {0}\n```".format(e, "^"))
+                        await ctx.send(f"```py\n{e.text}{'^':>{e.offset}}\n{e.__class__.__name__}: {e}\n```")
 
                     continue
 
@@ -176,11 +177,11 @@ class Owner:
                     res = await res
 
                 if res:
-                    msg = "```py\n{}\n```".format(res)
+                    msg = f"```py\n{res}\n```"
                 else:
                     msg = "```Nothing happens.```"
             except Exception as e:
-                msg = "```py\n{}\n```".format(tb.format_exc())
+                msg = f"```py\n{tb.format_exc()}\n```"
 
             if msg:
                 try:
@@ -188,7 +189,7 @@ class Owner:
                 except discord.Forbidden:
                     pass
                 except discord.HTTPException as e:
-                    await ctx.send("Unexpected error: `{}`".format(e))
+                    await ctx.send(f"Unexpected error: `{e}`")
 
     @command(owner=True, has_site_help=False)
     async def git(self, ctx):
@@ -206,26 +207,26 @@ class Owner:
             process = await asyncio.create_subprocess_shell("git status", stdout=PIPE)
             res = await process.stdout.read()
 
-            return await ctx.send("```{}```".format(res.decode("utf8")))
+            return await ctx.send(f"```{res.decode('utf8')}```")
 
         if ctx.args[0] == "pull":
             async with ctx.typing():
                 process = await asyncio.create_subprocess_shell("git pull", stdout=PIPE)
                 res = await process.stdout.read()
 
-                await ctx.send("```{}```".format(res.decode("utf8")))
+                await ctx.send(f"```{res.decode('utf8')}```")
 
         if ctx.args[0] == "gud":
             if not ctx.args[1:]:
                 return await ctx.send("```You are now so gud!```")
             else:
-                return await ctx.send("```{} is now so gud!```".format(ctx.raw.split(" ", 1)[1]))
+                return await ctx.send(f"```{ctx.raw.split(' ', 1)[1]} is now so gud!```")
 
         if ctx.args[0] == "rekt":
             if not ctx.args[1:]:
                 return await ctx.send("```You got #rekt!```")
             else:
-                return await ctx.send("```{} got #rekt!```".format(ctx.raw.split(" ", 1)[1]))
+                return await ctx.send(f"```{ctx.raw.split(' ', 1)[1]} got #rekt!```")
 
 
 def setup(xyzzy):

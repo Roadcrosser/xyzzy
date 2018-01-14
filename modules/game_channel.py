@@ -59,6 +59,7 @@ class GameChannel:
         self.votes = {}
         self.timer = None
         self.voting = True
+        self.users = []
 
     async def _democracy_loop(self):
         try:
@@ -73,14 +74,14 @@ class GameChannel:
             # Discard draws
             if len(highest) > 1:
                 highest = [x[0] for x in highest]
-                draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
+                draw_join = f'"{", ".join(highest[:-1])}" and "{highest[-1]}"'
 
-                await self.channel.send("```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```".format(draw_join))
+                await self.channel.send(f"```py\n@ VOTING DRAW @\nDraw between {draw_join}\nDitching all current votes and starting fresh.```")
             else:
                 cmd = highest[0][0]
                 amt = len(highest[0][1])
 
-                await self.channel.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
+                await self.channel.send(f'```py\n@ VOTING RESULTS @\nRunning command "{cmd}" with {amt} vote(s).\n```')
                 self._send_input(cmd)
 
             self.votes = {}
@@ -148,10 +149,11 @@ class GameChannel:
                 latest = 0
 
                 for file in os.listdir(self.save_path):
-                    mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
+                    path = f"{self.save_path}/{file}"
+                    mod_time = os.stat(path).st_mtime_ns
 
                     if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
-                        os.unlink("{}/{}".format(self.save_path, file))
+                        os.unlink(path)
                     elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                         latest = mod_time
 
@@ -162,7 +164,7 @@ class GameChannel:
         end_kwargs = {}
 
         if self.last_save:
-            file_dir = "{}/{}".format(self.save_path, self.last_save)
+            file_dir = f"{self.save_path}/{self.last_path}"
 
             if os.path.isfile(file_dir):
                 end_kwargs = {"file": discord.File(file_dir, self.last_save)}
@@ -207,7 +209,7 @@ class GameChannel:
             else:
                 self.votes[action] = [msg.author.id]
 
-            await self.channel.send("{} has voted for `{}`".format(msg.author.mention, action))
+            await self.channel.send(f"{msg.author.mention} has voted for `{action}`")
 
             if not self.timer:
                 self.timer = self.loop.create_task(self._democracy_loop())
@@ -217,7 +219,7 @@ class GameChannel:
             if msg.author.id == self.owner.id:
                 self._send_input(input)
         else:
-            raise ValueError("Currently in unknown input state: {}".format(self.mode))
+            raise ValueError(f"Currently in unknown input state: {self.mode}")
 
     async def init_process(self):
         """Sets up the channel's game process."""
@@ -229,9 +231,9 @@ class GameChannel:
             os.makedirs(self.save_path)
 
         if self.save:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} -L {} '{}'".format(self.save_path, self.save, self.game.path), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell(f"dfrotz -h 80 -w 5000 -m -R {self.save_path} -L {self.save} '{self.game.path}'", stdout=PIPE, stdin=PIPE)
         else:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} '{}'".format(self.save_path, self.game.path), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell(f"dfrotz -h 80 -w 5000 -m -R {self.save_path} '{self.game.path}'", stdout=PIPE, stdin=PIPE)
 
     async def send_game_output(self, msg, save=None):
         """Sends the game output to the game's channel, handling permissions."""
@@ -241,7 +243,7 @@ class GameChannel:
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
             await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), file=save)
         else:
-            await self.channel.send("```{}```".format(msg), file=save)
+            await self.channel.send(f"```{msg}```", file=save)
 
     def check_saves(self):
         """Checks if the user saved the game."""
@@ -250,14 +252,14 @@ class GameChannel:
             latest = [0, None]
 
             for file in files:
-                mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
+                mod_time = os.stat(f"{self.save_path}/{file}").st_mtime_ns
 
                 if mod_time > latest[0]:
                     latest = [mod_time, file]
 
             if latest[1] and latest[1] != self.last_save:
                 self.last_save = latest[1]
-                return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
+                return discord.File(f"{self.save_path}/{latest[1]}", latest[1])
             return None
 
     def cleanup(self):
