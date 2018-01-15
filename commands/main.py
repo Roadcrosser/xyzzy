@@ -399,7 +399,9 @@ class Main:
                        "  Commands are voted on by players. After 15 seconds, the highest voted command is run.\n"
                        "  More info: http://helixpedia.wikia.com/wiki/Democracy\n\n"
                        "* Driver\n"
-                       "  Only one person can control the game at a time, but can transfer ownership at any time.\n"
+                       "  Only one person can control the game at a time, but can transfer ownership at any time.\n\n"
+                       "* Round Robin\n"
+                       "  Players opt-in and take turns to submit a command to the game, and will be skipped if they take too long.\n"
                        "```")
 
     @command(usage="[ mode ] or list")
@@ -418,20 +420,20 @@ class Main:
         if not ctx.args:
             return await ctx.send("```diff\n-Please tell me a mode to switch to.\n```")
 
-        if ctx.args[0].lower() == "list":
+        if ctx.clean.lower() == "list":
             return await self.modes.run(ctx)
 
-        if ctx.args[0].lower() not in ("democracy", "anarchy", "driver"):
+        if ctx.clean.lower() not in ("democracy", "anarchy", "driver", "round robin"):
             return await ctx.send("```diff\n"
                                   "Please select a valid mode.\n"
                                   "You can run >>modes to view all the currently available modes.\n"
                                   "```")
 
-        res = [x for x in InputMode if ctx.args[0].lower() == x.name.lower()][0]
+        res = [x for x in InputMode if ctx.clean.replace(' ', '_').lower() == x.name.lower()][0]
         channel = self.xyzzy.channels[ctx.msg.channel.id]
 
         if res == channel.mode:
-            return await ctx.send(f'```diff\n-The current mode is already "{ctx.args[0].lower()}".\n```')
+            return await ctx.send(f'```diff\n-The current mode is already "{ctx.clean.lower()}".\n```')
 
         channel.mode = res
 
@@ -447,11 +449,17 @@ class Main:
                            "On ties, the command will be scrapped and no input will be sent.\n"
                            "More info: http://helixpedia.wikia.com/wiki/Democracy\n"
                            "```")
-        else:
+        elif res == InputMode.DRIVER:
             await ctx.send("```diff\n"
                            "-Driver mode is now on.\n"
                            f"Only {channel.owner} will be able to submit commands.\n"
                            'You can transfer the "wheel" with >>transfer [user]\n'
+                           "```")
+        else:
+            await ctx.send("```md\n"
+                           "#Round Robin mode is now on.\n"
+                           "Opted-in players will take turns to submit a command to the game, and will be skipped if they take too long.\n"
+                           "Players can opt-in with >>optin, and can opt-out with >>optout\n"
                            "```")
 
     @command(usage="[ @User Mentions#1234 ]")
@@ -484,6 +492,13 @@ class Main:
                        "Very good. Now you can go to the second grade.", "Have you tried hopping around the dungeon, too?",
                        "You jump on the spot.", "You jump on the spot, fruitlessly."]))
 
+    @command(has_site_help=False, usage="[ spell ]")
+    async def cast(self, ctx):
+        """Casts a magical spell of your choice."""
+        if not ctx.args:
+            return await ctx.send("Please say a spell you want to cast.")
+
+        await ctx.send("You don't know that spell.")
 
 def setup(xyzzy):
     return Main(xyzzy)

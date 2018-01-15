@@ -39,6 +39,7 @@ class InputMode(Enum):
     ANARCHY = 1
     DEMOCRACY = 2
     DRIVER = 3
+    ROUND_ROBIN = 4
 
 class GameChannel:
     """Represents a channel that is prepped for playing a game through Xyzzy."""
