@@ -1,6 +1,9 @@
 from modules.command_sys import command
 import json
 
+NL = "\n"
+QUOTE = "\""
+
 class Moderation:
     def __init__(self, xyzzy):
         self.xyzzy = xyzzy
@@ -73,7 +76,7 @@ class Moderation:
             else:
                 games = self.xyzzy.server_settings[str(ctx.msg.guild.id)]["blocked_games"]
 
-                return await ctx.send(f"```asciidoc\n.Blocked Games.\n{'\n'.join(f"* \"{x}\"" for x in sorted(games))}\n```")
+                return await ctx.send(f"```asciidoc\n.Blocked Games.\n{NL.join(f'* {QUOTE}{x}{QUOTE}' for x in sorted(games))}{NL}```")
 
         games = {x: y for x, y in self.xyzzy.games.items() if ctx.raw.lower() in x.lower() or [z for z in y.aliases if ctx.raw.lower() in z.lower()]}
         perfect_match = None
@@ -86,7 +89,7 @@ class Moderation:
         elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
                                   f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
-                                  f'"{"\n".join(sorted(games))}"\n'
+                                  f'"{NL.join(sorted(games))}"\n'
                                   "```")
 
         if perfect_match:
@@ -130,7 +133,7 @@ class Moderation:
         elif len(games) > 1 and not perfect_match:
             return await ctx.send("```accesslog\n"
                                   f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
-                                  f'"{"\n".join(sorted(games))}"\n'
+                                  f'"{NL.join(sorted(games))}"\n'
                                   "```")
 
         if perfect_match:

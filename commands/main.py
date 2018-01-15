@@ -11,6 +11,8 @@ import asyncio
 import random
 import modules.quetzal_parser as qzl
 
+NL = "\n" # Python complains about backslashes in format strings.
+
 class Main:
     def __init__(self, xyzzy):
         self.xyzzy = xyzzy
@@ -26,7 +28,7 @@ class Main:
                                   "http://xyzzy.roadcrosser.xyz/help/")
         elif self.xyzzy.commands.get_command(ctx.args[0].lower()):
             cmd = self.xyzzy.commands.get_command(ctx.args[0].lower())
-            msg = f'```inform7\n"{self.xyzzy.invoker * 2}{cnd.name}{f" {cmd.usage} " if cmd.usage else ''}{cmd.description}"\n```'
+            msg = f'```inform7\n"{self.xyzzy.invoker * 2}{cmd.name}{f" {cmd.usage} " if cmd.usage else ""}{cmd.description}"\n```'
 
             if cmd.has_site_help:
                 msg += f"\nMore information: http://xyzzy.roadcrosser.xyz/help/#{cmd.name}"
@@ -80,7 +82,7 @@ class Main:
         if ctx.args[0] == "on":
             if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["backticks"]:
                 self.xyzzy.user_preferences["backticks"].append(str(ctx.msg.author.id))
-                await ctx.send(f"```diff\n+Commands from you now require backticks. (They should look `{self.xyzzy.invoker}like this`)\n```"
+                await ctx.send(f"```diff\n+Commands from you now require backticks. (They should look `{self.xyzzy.invoker}like this`)\n```")
             else:
                 return await ctx.send("```glsl\n#Your preferences are already set to require backticks for commands.\n```")
         else:
@@ -158,7 +160,7 @@ class Main:
             elif len(games) > 1 and not perfect_match:
                 return await ctx.send("```accesslog\n"
                                     f'I couldn\'t find any games with that name, but I found "{ctx.raw}" in {len(games)} other games. Did you mean one of these?\n'
-                                    f'"{"\n".join(sorted(games))}"\n'
+                                    f'"{NL.join(sorted(games))}"\n'
                                     "```")
 
             if perfect_match:
