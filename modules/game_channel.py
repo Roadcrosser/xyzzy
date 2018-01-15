@@ -176,7 +176,9 @@ class GameChannel:
 
     async def force_quit(self):
         """Forces the channel's game process to end."""
-        self.process.terminate()
+        if self.process is not None:
+            self.process.terminate()
+
         self.playing = False
 
         if self.timer:
