@@ -240,10 +240,25 @@ class GameChannel:
         if self.output:
             print(msg)
 
+        can_attach = self.channel.permissions_for(self.channel.guild.me).attach_files
+        opts = {}
+
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
-            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), file=save)
+            opts["embed"] = discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour)
         else:
-            await self.channel.send("```{}```".format(msg), file=save)
+            opts["content"] = "```{}```".format(msg)
+
+        if save and can_attach:
+            opts["file"] = save
+        elif save and not can_attach:
+            if "content" in opts:
+                opts["content"] += ("\nI was unable to attach the save game due to not having permission to attach files.\n"
+                                    "If you wish to have saves available, please give me the `Attach Files` permission.")
+            else:
+                opts["embed"].add_field(name="\u200b", value="I was unable to attach the save game due to not having permission to attach files.\n"
+                                        "If you wish to have saves available, pleease give me the `Attach Files` permission.")
+
+        await self.channel.send(**opts)
 
     def check_saves(self):
         """Checks if the user saved the game."""
