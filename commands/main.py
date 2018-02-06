@@ -17,6 +17,8 @@ class Main:
     def __init__(self, xyzzy):
         self.xyzzy = xyzzy
 
+    # Misc. commands
+
     @command(usage="[ command ]", has_site_help=False)
     async def help(self, ctx):
         """Show help for commands."""
@@ -69,6 +71,8 @@ class Main:
                 await ctx.send(msg, dest="author")
             except:
                 await ctx.send("I cannot PM you, as you seem to have private messages disabled. However, an up-to-date list is available at: http://xyzzy.roadcrosser.xyz/list")
+
+    # User settings commands
 
     @command(usage="[ on|off ]")
     async def backticks(self, ctx):
@@ -125,6 +129,7 @@ class Main:
         with open('./bot-data/userprefs.json', 'w') as x:
             json.dump(self.xyzzy.user_preferences, x)
 
+    # Game commands
 
     @command(usage="[ game ]")
     async def play(self, ctx):
@@ -436,6 +441,7 @@ class Main:
             return await ctx.send(f'```diff\n-The current mode is already "{ctx.clean.lower()}".\n```')
 
         channel.mode = res
+        channel.timer = None # Reset any currently running timer.
 
         if res == InputMode.ANARCHY:
             await ctx.send("```glsl\n"
@@ -472,18 +478,64 @@ class Main:
         if ctx.msg.channel.id not in self.xyzzy.channels:
             return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
 
-        if self.xyzzy.channels[ctx.msg.channel.id].mode == InputMode.ANARCHY:
-            return await ctx.send("```diff\n->>transfer may only be used in driver or anarchy mode.\n```")
+        channel = self.xyzzy.channels[ctx.msg.channel.id]
 
-        if str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != self.xyzzy.channels[ctx.msg.channel.id].owner:
+        if channel.mode == InputMode.ANARCHY:
+            return await ctx.send("```diff\n->>transfer may only be used in driver or democracy mode.\n```")
+
+        if str(ctx.msg.author.id) not in self.xyzzy.owner_ids and ctx.msg.author != channel.owner:
             return await ctx.send("```diff\n-Only the current owner of the game can use this command.\n```")
 
         if not ctx.msg.mentions:
             return await ctx.send('```diff\n-Please give me a user to pass the "wheel" to.\n```')
 
-        self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
+        channel.owner = ctx.msg.mentions[0]
 
         await ctx.send(f'```diff\n+Transferred the "wheel" to {ctx.msg.mentions[0]}.\n```')
+
+    @command(aliases=["opt-in"])
+    async def optin(self, ctx):
+        """
+        Opt-in to play the current game.
+        NOTE: only works during round robin mode.
+        """
+        if ctx.msg.channel.id not in self.xyzzy.channels:
+            return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
+
+        channel = self.xyzzy.channels[ctx.msg.channel.id]
+
+        if channel.mode != InputMode.ROUND_ROBIN:
+            return await ctx.send("```diff\n->>optin may only be used in round robin mode.\n```")
+
+        if ctx.msg.author in channel.players:
+            return await ctx.send("```diff\n-You are already opted-in to play.\n```")
+
+        channel.players += [ctx.msg.author]
+
+        await ctx.send("```diff\n+You have successfully opted-in to play.\n```")
+
+    @command(aliases=["opt-out"])
+    async def optout(self, ctx):
+        """
+        Opt-out of playing the bot.
+        NOTE: only works during round robin mode.
+        """
+        if ctx.msg.channel.id not in self.xyzzy.channels:
+            return await ctx.send("```diff\n-Nothing is being played in this channel.\n```")
+
+        channel = self.xyzzy.channels[ctx.msg.channel.id]
+
+        if channel.mode != InputMode.ROUND_ROBIN:
+            return await ctx.send("```diff\n->>optout may only be used in round robin mode.\n```")
+
+        if ctx.msg.author not in channel.players:
+            return await ctx.send("```diff\n-You haven't opted-in to play.\n```")
+
+        channel.players.remove(ctx.msg.author)
+
+        await ctx.send("```diff\n+You have successfully opted-out to play.```")
+
+    # Silly-ish commands
 
     @command(has_site_help=False)
     async def jump(self, ctx):

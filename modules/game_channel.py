@@ -60,12 +60,16 @@ class GameChannel:
         self.votes = {}
         self.timer = None
         self.voting = True
-        self.users = []
+        self.players = []
+        self.current_player = None
+        self._current_player_index = 0
 
     async def _democracy_loop(self):
         try:
             await asyncio.sleep(10)
-            await self.channel.send("```py\n@ 5 seconds of voting remaining. @\n```")
+            await self.channel.send("```py\n"
+                                    "@ 5 seconds of voting remaining. @\n"
+                                    "```")
             await asyncio.sleep(5)
 
             self.voting = False
@@ -77,16 +81,46 @@ class GameChannel:
                 highest = [x[0] for x in highest]
                 draw_join = f'"{", ".join(highest[:-1])}" and "{highest[-1]}"'
 
-                await self.channel.send(f"```py\n@ VOTING DRAW @\nDraw between {draw_join}\nDitching all current votes and starting fresh.```")
+                await self.channel.send("```py\n"
+                                        "@ VOTING DRAW @\n"
+                                        f"Draw between {draw_join}\n"
+                                        "Ditching all current votes and starting fresh.\n"
+                                        "```")
             else:
                 cmd = highest[0][0]
                 amt = len(highest[0][1])
 
-                await self.channel.send(f'```py\n@ VOTING RESULTS @\nRunning command "{cmd}" with {amt} vote(s).\n```')
+                await self.channel.send("```py\n"
+                                        "@ VOTING RESULTS @\n"
+                                        f'Running command "{cmd}" with {amt} vote(s).\n'
+                                        "```")
                 self._send_input(cmd)
 
             self.votes = {}
             self.voting = True
+            self.timer = None
+        except Exception as e:
+            print(e)
+            raise e
+
+    async def _round_robin_loop(self):
+        try:
+            await asyncio.sleep(5)
+
+            if self.current_player is None:
+                return
+
+            await self.channel.send("```py\n"
+                                    f">>> {self.current_player.display_name} failed to send a command in 5 seconds.\n"
+                                    "Skipping...\n"
+                                    "```")
+
+            self._current_player_index += 1
+
+            if self._current_player_index >= len(self.players):
+                self._current_player_index = 0
+
+            self.current_player =  self.players[self._current_player_index]
             self.timer = None
         except Exception as e:
             print(e)
@@ -205,6 +239,8 @@ class GameChannel:
             if msg.author.id in voters:
                 return
 
+            # Try coerce input to something that can be stored in the votes without having duplicate entries.
+            # e.g. "north", "go north" and "n" all both become "n"
             action = parse_action(input)
 
             if action in self.votes:
@@ -221,6 +257,22 @@ class GameChannel:
             # Only the "driver" can send input. They can pass the "wheel" to other people.
             if msg.author.id == self.owner.id:
                 self._send_input(input)
+        elif self.mode == InputMode.ROUND_ROBIN:
+            # Only the current player can send input.
+            if msg.author.id != self.current_player.id:
+                return
+
+            self.timer = None
+
+            self._send_input(input)
+
+            self._current_player_index += 1
+
+            if self._current_player_index >= len(self.players):
+                self._current_player_index = 0
+
+            self.current_player =  self.players[self._current_player_index]
+            self.timer = self.loop.create_task(self._round_robin_loop())
         else:
             raise ValueError(f"Currently in unknown input state: {self.mode}")
 
