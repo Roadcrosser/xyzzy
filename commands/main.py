@@ -467,7 +467,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not ctx.msg.mentions:
             return await ctx.send('```diff\n-Please give me a user to pass the "wheel" to.\n```')
 
-        self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
+        self.xyzzy.channels[ctx.msg.channel.id].owner = ctx.msg.mentions[0]
 
         await ctx.send('```diff\n+Transferred the "wheel" to {}.\n```'.format(ctx.msg.mentions[0]))
 
