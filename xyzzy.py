@@ -167,11 +167,14 @@ class Xyzzy(discord.Client):
 
         super().__init__()
 
+    def game_count(self):
+        return sum(1 for i in self.channels.values() if i.game and not i.game.debug)
+
     async def update_game(self):
         game = "nothing yet!"
 
-        if sum(1 for i in self.channels.values() if not i.game.debug):
-            game = "{} game{}.".format(sum(1 for i in self.channels.values() if not i.game.debug), "s" if len(self.channels) > 1 else "")
+        if self.game_count():
+            game = "{} game{}.".format(self.game_count(), "s" if len(self.channels) > 1 else "")
 
         await self.change_presence(activity=discord.Game(name=game))
 
@@ -243,9 +246,7 @@ class Xyzzy(discord.Client):
                     async with self.session.patch(url, data=gist_game, headers=headers) as r:
                         print("[{}]".format(r.status))
 
-            while True:
-                await posts.post_all(self)
-                await asyncio.sleep(3600) # Post stuff every hour
+            self.post_loop = await posts.task_loop(self)
 
     async def on_guild_join(self, guild):
         print('I have been added to "{}".'.format(guild.name))
@@ -260,7 +261,7 @@ class Xyzzy(discord.Client):
             await self.home_channel.send('I have been removed from "{0.name}" (ID: {0.id}).'.format(guild))
 
     async def on_message(self, msg):
-        if msg.author.bot or msg.author.id == self.user.id or not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.author.bot or msg.author.id == self.user.id or (msg.guild and not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
 
         # Hopefully a not so fucky version of the old conditional here.
@@ -305,6 +306,8 @@ class Xyzzy(discord.Client):
             channel.last = msg.created_at
 
             return await channel.handle_input(msg, clean[1:])
+        elif not clean.startswith(self.invoker * 2):
+            return
 
         if clean == self.invoker * 2 + "get ye flask":
             return await msg.channel.send("You can't get ye flask!")

@@ -1,5 +1,6 @@
 from subprocess import PIPE
 from enum import Enum
+from modules.process_helpers import handle_process_output
 
 import re
 import shutil
@@ -119,6 +120,9 @@ class GameChannel:
 
                     msg = line[self.indent:]
 
+            if not msg.strip():
+                return
+
             msg = msg.strip()
             saves = self.check_saves()
 
@@ -133,32 +137,27 @@ class GameChannel:
         if not self.process:
             await self.init_process()
 
-        buffer = b""
         self.first_time = True
         self.playing = True
 
-        while self.process.returncode is None:
-            try:
-                output = await asyncio.wait_for(self.process.stdout.read(1), 0.5)
-                buffer += output
-            except asyncio.TimeoutError:
-                await self.parse_output(buffer)
-                buffer = b""
+        async def looper(buffer):
+            await self.parse_output(buffer)
 
-                if os.path.exists(self.save_path):
-                    files = os.listdir(self.save_path)
-                    latest = 0
+            if os.path.exists(self.save_path):
+                files = os.listdir(self.save_path)
+                latest = 0
 
-                    for file in os.listdir(self.save_path):
-                        mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
+                for file in os.listdir(self.save_path):
+                    mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
 
-                        if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
-                            os.unlink("{}/{}".format(self.save_path, file))
-                        elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
-                            latest = mod_time
+                    if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
+                        os.unlink("{}/{}".format(self.save_path, file))
+                    elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
+                        latest = mod_time
+
+        await handle_process_output(self.process, looper, self.parse_output)
 
         self.playing = False
-
         end_msg = "```diff\n-The game has ended.\n"
         end_kwargs = {}
 
@@ -177,7 +176,9 @@ class GameChannel:
 
     async def force_quit(self):
         """Forces the channel's game process to end."""
-        self.process.terminate()
+        if self.process is not None:
+            self.process.terminate()
+
         self.playing = False
 
         if self.timer:
@@ -239,12 +240,25 @@ class GameChannel:
         if self.output:
             print(msg)
 
+        can_attach = self.channel.permissions_for(self.channel.guild.me).attach_files
+        opts = {}
+
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
-            await self.channel.send(embed=discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour), file=save)
+            opts["embed"] = discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour)
         else:
-            await self.channel.send("```{}```".format(msg), file=save)
+            opts["content"] = "```{}```".format(msg)
 
+        if save and can_attach:
+            opts["file"] = save
+        elif save and not can_attach:
+            if "content" in opts:
+                opts["content"] += ("\nI was unable to attach the save game due to not having permission to attach files.\n"
+                                    "If you wish to have saves available, please give me the `Attach Files` permission.")
+            else:
+                opts["embed"].add_field(name="\u200b", value="I was unable to attach the save game due to not having permission to attach files.\n"
+                                        "If you wish to have saves available, pleease give me the `Attach Files` permission.")
 
+        await self.channel.send(**opts)
 
     def check_saves(self):
         """Checks if the user saved the game."""
@@ -269,4 +283,3 @@ class GameChannel:
         # Check if cleanup has already been done.
         if os.path.isdir(self.save_path):
             shutil.rmtree(self.save_path)
-

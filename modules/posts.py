@@ -1,4 +1,5 @@
 import json
+import asyncio
 
 async def post_carbon(xyzzy):
     if xyzzy.carbon_key:
@@ -8,7 +9,7 @@ async def post_carbon(xyzzy):
             "servercount": len(xyzzy.guilds)
         }
 
-        print("\Posting to Carbonitex...")
+        print("\nPosting to Carbonitex...")
 
         async with xyzzy.session.post(url, data=data) as r:
             text = await r.text()
@@ -36,7 +37,7 @@ async def post_gist(xyzzy):
         url = "https://api.github.com/gists/" + xyzzy.gist_id
         data = {
             "server_count": len(xyzzy.guilds),
-            "session_count": sum(1 for i in xyzzy.channels.values() if not i.debug),
+            "session_count": xyzzy.game_count(),
             "token": "MTcxMjg4MjM4NjU5NjAwMzg0.Bqwo2M.YJGwHHKzHqRcqCI2oGRl-tlRpn"
         }
 
@@ -51,7 +52,7 @@ async def post_gist(xyzzy):
             })
             headers = {
                 "Accept": "application/vnd.github.v3+json",
-                "Authorization": "token " + self.gist_key
+                "Authorization": "token " + xyzzy.gist_key
             }
 
             print("\nPosting to GitHub...")
@@ -65,3 +66,12 @@ async def post_all(xyzzy):
     await post_carbon(xyzzy)
     await post_dbots(xyzzy)
     await post_gist(xyzzy)
+
+def task_loop(xyzzy):
+    # 10/10 would make dumb function names again
+    async def loopy_doodle():
+        while True:
+            await post_all(xyzzy)
+            await asyncio.sleep(3600)
+
+    return xyzzy.loop.create_task(loopy_doodle())

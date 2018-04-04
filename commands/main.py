@@ -8,6 +8,7 @@ import os
 import re
 import json
 import asyncio
+import random
 import modules.quetzal_parser as qzl
 
 class Main:
@@ -233,7 +234,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         if not ctx.args:
             return await ctx.send("```diff\n-Please provide a game to play.\n```")
-        
+
         file_dir = "./tests/" + ctx.raw
 
         if not os.path.isfile(file_dir):
@@ -246,9 +247,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         await ctx.send('```py\nLoaded "{}"\n```'.format(ctx.raw))
         await chan.init_process()
-        await self.xyzzy.update_game()
         await chan.game_loop()
-        await self.xyzzy.update_game()
 
         if ctx.msg.channel.id in self.xyzzy.channels:
             del self.xyzzy.channels[ctx.msg.channel.id]
@@ -468,9 +467,17 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         if not ctx.msg.mentions:
             return await ctx.send('```diff\n-Please give me a user to pass the "wheel" to.\n```')
 
-        self.xyzzy.channels[ctx.msg.channel.id] = ctx.msg.mentions[0]
+        self.xyzzy.channels[ctx.msg.channel.id].owner = ctx.msg.mentions[0]
 
         await ctx.send('```diff\n+Transferred the "wheel" to {}.\n```'.format(ctx.msg.mentions[0]))
+
+    @command(has_site_help=False)
+    async def jump(self, ctx):
+        """Wheeeeeeeeee!!!!!"""
+        await ctx.send(random.choice(["Wheeeeeeeeee!!!!!", "Are you enjoying yourself?", "Do you expect me to applaud?",
+                       "Very good. Now you can go to the second grade.", "Have you tried hopping around the dungeon, too?",
+                       "You jump on the spot.", "You jump on the spot, fruitlessly."]))
+
 
 def setup(xyzzy):
     return Main(xyzzy)

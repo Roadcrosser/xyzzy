@@ -1,4 +1,5 @@
 from modules.command_sys import command
+from subprocess import PIPE
 
 import traceback as tb
 import inspect
@@ -7,7 +8,6 @@ import discord
 import re
 import sys
 import importlib
-import subprocess
 import os.path
 
 class Owner:
@@ -193,30 +193,40 @@ class Owner:
     @command(owner=True, has_site_help=False)
     async def git(self, ctx):
         """Runs some git commands in Discord."""
-        if not ctx.args or ctx.args[0] not in ("status", "pull", "gud"):
+        if not ctx.args or ctx.args[0] not in ("status", "pull", "gud", "rekt"):
             return await ctx.send("```\n"
                                   "usage: git <command> [<args>]\n\n"
                                   "   pull     Fetches latest updates from a remote repository\n"
                                   "   status   Show the working tree status\n"
                                   "   gud      Gits gud\n"
+                                  "   rekt     Gits rekt\n"
                                   "```")
 
         if ctx.args[0] == "status":
-            res = subprocess.run(["git", "status"], stdout=subprocess.PIPE).stdout.decode("utf8")
+            process = await asyncio.create_subprocess_shell("git status", stdout=PIPE)
+            res = await process.stdout.read()
 
-            return await ctx.send("```{}```".format(res))
+            return await ctx.send("```{}```".format(res.decode("utf8")))
 
         if ctx.args[0] == "pull":
             async with ctx.typing():
-                res = subprocess.run(["git", "pull"], stdout=subprocess.PIPE).stdout.decode("utf8")
+                process = await asyncio.create_subprocess_shell("git pull", stdout=PIPE)
+                res = await process.stdout.read()
 
-            return await ctx.send("```{}```".format(res))
+                await ctx.send("```{}```".format(res.decode("utf8")))
 
         if ctx.args[0] == "gud":
             if not ctx.args[1:]:
                 return await ctx.send("```You are now so gud!```")
             else:
                 return await ctx.send("```{} is now so gud!```".format(ctx.raw.split(" ", 1)[1]))
+
+        if ctx.args[0] == "rekt":
+            if not ctx.args[1:]:
+                return await ctx.send("```You got #rekt!```")
+            else:
+                return await ctx.send("```{} got #rekt!```".format(ctx.raw.split(" ", 1)[1]))
+
 
 def setup(xyzzy):
     return Owner(xyzzy)
