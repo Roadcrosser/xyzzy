@@ -173,7 +173,7 @@ class Xyzzy(discord.Client):
         if sum(1 for i in self.channels.values() if not i.game.debug):
             game = "{} game{}.".format(sum(1 for i in self.channels.values() if not i.game.debug), "s" if len(self.channels) > 1 else "")
 
-        await self.change_presence(game=discord.Game(name=game))
+        await self.change_presence(activity=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):
         trace = "".join(traceback.format_tb(exc.__traceback__))
