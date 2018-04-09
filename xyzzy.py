@@ -176,7 +176,7 @@ class Xyzzy(discord.Client):
         if self.game_count():
             game = f"{self.game_count()} game{'s' if len(self.channels) > 1 else ''}."
 
-        await self.change_presence(game=discord.Game(name=game))
+        await self.change_presence(activity=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):
         trace = "".join(traceback.format_tb(exc.__traceback__))
