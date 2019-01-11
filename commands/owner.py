@@ -74,11 +74,16 @@ class Owner:
         if not ctx.args:
             return await ctx.send("```diff\n-Nothing to announce.\n```")
 
-        for chan in self.xyzzy.channels.values():
-            try:
-                await chan.channel.send("```{}```".format(ctx.raw))
-            except:
-                pass
+        count = 0
+        with ctx.msg.channel.typing():
+            for chan in self.xyzzy.channels.values():
+                try:
+                    await chan.channel.send("```{}```".format(ctx.raw))
+                    count += 1
+                except:
+                    pass
+
+        return await ctx.send(f"```diff\n+ Announcement as been sent to {count} channels. (Failed in {len(self.xyzzy.channels) - count})\n```")
 
     @command(usage="[ module ]", owner=True, has_site_help=False)
     async def reload(self, ctx):
