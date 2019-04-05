@@ -425,20 +425,20 @@ class Main:
         if not ctx.args:
             return await ctx.send("```diff\n-Please tell me a mode to switch to.\n```")
 
-        if ctx.clean.lower() == "list":
+        if ctx.raw.lower() == "list":
             return await self.modes.run(ctx)
 
-        if ctx.clean.lower() not in ("democracy", "anarchy", "driver", "round robin"):
+        if ctx.raw.lower() not in ("democracy", "anarchy", "driver", "round robin"):
             return await ctx.send("```diff\n"
                                   "Please select a valid mode.\n"
                                   "You can run >>modes to view all the currently available modes.\n"
                                   "```")
 
-        res = [x for x in InputMode if ctx.clean.replace(' ', '_').lower() == x.name.lower()][0]
+        res = [x for x in InputMode if ctx.raw.replace(' ', '_').lower() == x.name.lower()][0]
         channel = self.xyzzy.channels[ctx.msg.channel.id]
 
         if res == channel.mode:
-            return await ctx.send(f'```diff\n-The current mode is already "{ctx.clean.lower()}".\n```')
+            return await ctx.send(f'```diff\n-The current mode is already "{ctx.raw.lower()}".\n```')
 
         channel.mode = res
         channel.timer = None # Reset any currently running timer.
