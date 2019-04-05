@@ -6,7 +6,9 @@ if sys.platform == "win32":
 import shutil # Check if dfrotz is in PATH
 
 if not shutil.which("dfrotz"):
-    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
+    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, '
+                    'refer to "https://gitlab.com/DavidGriffith/frotz/blob/master/INSTALL#L117", '
+                    'and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
 
 from modules.command_sys import Context, Holder
 from modules.game import Game
