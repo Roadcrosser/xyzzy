@@ -246,7 +246,7 @@ class GameChannel:
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
             opts["embed"] = discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour)
         else:
-            opts["content"] = "```{}```".format(msg)
+            opts["content"] = ">>> {}".format(msg)
 
         if save and can_attach:
             opts["file"] = save
