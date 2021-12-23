@@ -6,7 +6,7 @@ import re
 import shutil
 import os
 import asyncio
-import discord
+import disnake as discord
 
 SCRIPT_OR_RECORD = re.compile(r"(?i).*(?:\.rec|\.scr)$")
 

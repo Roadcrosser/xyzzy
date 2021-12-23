@@ -21,7 +21,7 @@ import re
 import asyncio
 import traceback
 import aiohttp
-import discord
+import disnake as discord
 import modules.posts as posts
 
 OPTIONAL_CONFIG_OPTIONS = ("home_channel_id", "owner_ids", "carbon_key", "dbots_key", "gist_key", "gist_id")

@@ -4,7 +4,7 @@ Totally not "stolen" from Amethyst and stripped down.
 
 from typing import Callable, List, Union, Tuple
 from random import randint
-import discord
+import disnake as discord
 import inspect
 import re
 import sys
@@ -15,7 +15,7 @@ PERMS = [x for x in dir(discord.Permissions) if not x.startswith(("_", "is")) an
 
 class Context:
     """
-    Custom object that get's passed to commands.
+    Custom object that gets passed to commands.
     Not intended to be created manually.
     """
     def __init__(self, msg: discord.Message, xyzzy: discord.Client):

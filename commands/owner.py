@@ -4,7 +4,7 @@ from subprocess import PIPE
 import traceback as tb
 import inspect
 import asyncio
-import discord
+import disnake as discord
 import re
 import sys
 import importlib
