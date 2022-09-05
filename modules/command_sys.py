@@ -11,60 +11,116 @@ import sys
 import importlib
 import shlex
 
-PERMS = [x for x in dir(discord.Permissions) if not x.startswith(("_", "is")) and x not in ("value", "all", "all_channel", "none", "general", "text", "voice", "update")]
+PERMS = [
+    x
+    for x in dir(discord.Permissions)
+    if not x.startswith(("_", "is"))
+    and x
+    not in ("value", "all", "all_channel", "none", "general", "text", "voice", "update")
+]
+
 
 class Context:
     """
     Custom object that gets passed to commands.
     Not intended to be created manually.
     """
+
     def __init__(self, msg: discord.Message, xyzzy: discord.Client):
         self.msg = msg
         self.client = xyzzy
-        self.clean = (msg.content[1:-1] if xyzzy.content_regex.match(msg.content) else msg.content)[2:]
+        self.clean = (
+            msg.content[1:-1] if xyzzy.content_regex.match(msg.content) else msg.content
+        )[2:]
         self.cmd = self.clean.split(" ")[0]
-        self.args = shlex.split(self.clean.replace(r'\"', "\u009E").replace("'", "\u009F")) # Shlex doesn't obey escaped quotes, so lets do it ourselves.
-        self.args = [x.replace("\u009E", '"').replace("\u009F", "'") for x in self.args][1:]
+        self.args = shlex.split(
+            self.clean.replace(r"\"", "\u009E").replace("'", "\u009F")
+        )  # Shlex doesn't obey escaped quotes, so lets do it ourselves.
+        self.args = [
+            x.replace("\u009E", '"').replace("\u009F", "'") for x in self.args
+        ][1:]
         self.raw = self.clean.split(" ", 1)[1] if len(self.clean.split(" ")) > 1 else ""
 
     async def _send(self, content, dest, *, embed=None, file=None, files=None):
         """Internal send function, not actually meant to be used by anyone."""
         if dest == "channel":
-            return await self.msg.channel.send(content, embed=embed, file=file, files=files)
+            return await self.msg.channel.send(
+                content, embed=embed, file=file, files=files
+            )
         elif dest == "author":
-            return await self.msg.author.send(content, embed=embed, file=file, files=files)
+            return await self.msg.author.send(
+                content, embed=embed, file=file, files=files
+            )
         else:
             raise ValueError("Destination is not `channel` or `author`.")
 
-    async def send(self, content: str=None, *, dest: str="channel", embed: discord.Embed=None, file: discord.File=None, files: List[discord.File]=None):
+    async def send(
+        self,
+        content: str = None,
+        *,
+        dest: str = "channel",
+        embed: discord.Embed = None,
+        file: discord.File = None,
+        files: List[discord.File] = None
+    ):
         """Sends a message to the context origin, can either be the channel or author."""
         if content is None and not embed and not file and not files:
-            content = "```ERROR at memory location {}\n  No content.\n```".format(hex(randint(2 ** 4, 2 ** 32)))
+            content = "```ERROR at memory location {}\n  No content.\n```".format(
+                hex(randint(2**4, 2**32))
+            )
         elif content:
             # Escape bad mentions
-            content = str(content).replace("@everyone", "@\u200Beveryone").replace("@here", "@\u200Bhere")
+            content = (
+                str(content)
+                .replace("@everyone", "@\u200Beveryone")
+                .replace("@here", "@\u200Bhere")
+            )
 
         msg = None
 
         if content and len(content) > 2000:
-            if content.find('```') == -1 or content.find('```', content.find('```') + 3) == -1:
-                await self._send(content[:2000], dest, embed=embed, file=file, files=files)
+            if (
+                content.find("```") == -1
+                or content.find("```", content.find("```") + 3) == -1
+            ):
+                await self._send(
+                    content[:2000], dest, embed=embed, file=file, files=files
+                )
                 msg = await self.send(content[2000:], dest=dest)
-            elif content.find('```', content.find('```') + 3) + 2 < 2000:
-                await self._send(content[:content.find('```', content.find('```') + 3) + 3], dest,
-                                 embed=embed, file=file, files=files)
-                msg = await self.send(content[content.find('```', content.find('```') + 3) + 3:], dest=dest)
+            elif content.find("```", content.find("```") + 3) + 2 < 2000:
+                await self._send(
+                    content[: content.find("```", content.find("```") + 3) + 3],
+                    dest,
+                    embed=embed,
+                    file=file,
+                    files=files,
+                )
+                msg = await self.send(
+                    content[content.find("```", content.find("```") + 3) + 3 :],
+                    dest=dest,
+                )
             else:
-                start_block = content[content.find('```'):content.find('\n', content.find('```')) + 1]
+                start_block = content[
+                    content.find("```") : content.find("\n", content.find("```")) + 1
+                ]
 
-                if content.find('\n', content.find('```')) == content.rfind('\n', 0, 2000):
-                    split_cont = content[:1996] + '\n```'
+                if content.find("\n", content.find("```")) == content.rfind(
+                    "\n", 0, 2000
+                ):
+                    split_cont = content[:1996] + "\n```"
                     content = start_block + content[1996:]
                 else:
-                    split_cont = content[:content.rfind('\n', 0, content.rfind('\n', 0, 2000) + 1)][:1996] + '\n```'
-                    content = start_block + content[len(split_cont) - 4:]
+                    split_cont = (
+                        content[
+                            : content.rfind("\n", 0, content.rfind("\n", 0, 2000) + 1)
+                        ][:1996]
+                        + "\n```"
+                    )
+                    content = start_block + content[len(split_cont) - 4 :]
 
-                msg = await self.send(split_cont + content, dest=dest, embed=embed, file=file, files=files)
+                msg = await self.send(
+                    split_cont + content, dest=dest, embed=embed, file=file, files=files
+                )
         else:
             msg = await self._send(content, dest, embed=embed, file=file, files=files)
 
@@ -83,9 +139,13 @@ class Context:
             return False
 
         if who == "self":
-            return getattr(self.msg.channel.permissions_for(self.msg.guild.me), permission)
+            return getattr(
+                self.msg.channel.permissions_for(self.msg.guild.me), permission
+            )
         elif who == "author":
-            return getattr(self.msg.channel.permissions_for(self.msg.author), permission)
+            return getattr(
+                self.msg.channel.permissions_for(self.msg.author), permission
+            )
 
     def typing(self):
         """d.py `async with` shortcut for sending typing to a channel."""
@@ -94,7 +154,18 @@ class Context:
 
 class Command:
     """Represents a command."""
-    def __init__(self, func: Callable[..., None], *, name: str=None, description: str="", aliases: list=[], usage: str="", owner: bool=False, has_site_help: bool=True):
+
+    def __init__(
+        self,
+        func: Callable[..., None],
+        *,
+        name: str = None,
+        description: str = "",
+        aliases: list = [],
+        usage: str = "",
+        owner: bool = False,
+        has_site_help: bool = True
+    ):
         self.func = func
         self.name = name or func.__name__
         self.description = description or inspect.cleandoc(func.__doc__ or "")
@@ -116,6 +187,7 @@ class Command:
 
 class Holder:
     """Object that holds commands and aliases, as well as managing the loading and unloading of modules."""
+
     def __init__(self, xyzzy):
         self.commands = {}
         self.aliases = {}
@@ -145,7 +217,12 @@ class Holder:
         # Get class returned from setup.
         module = module.setup(self.xyzzy)
         # Filter all class methods to only commands and those that do not have a parent (subcommands).
-        cmds = [x for x in dir(module) if not re.match("__?.*(?:__)?", x) and isinstance(getattr(module, x), Command)]
+        cmds = [
+            x
+            for x in dir(module)
+            if not re.match("__?.*(?:__)?", x)
+            and isinstance(getattr(module, x), Command)
+        ]
         loaded_cmds = []
         loaded_aliases = []
 
@@ -201,7 +278,13 @@ class Holder:
 
     def get_command(self, cmd_name: str) -> Union[Command, None]:
         """Easily get a command via its name or alias"""
-        return self.aliases[cmd_name] if cmd_name in self.aliases else self.commands[cmd_name] if cmd_name in self.commands else None
+        return (
+            self.aliases[cmd_name]
+            if cmd_name in self.aliases
+            else self.commands[cmd_name]
+            if cmd_name in self.commands
+            else None
+        )
 
     async def run(self, ctx: Context) -> None:
         cmd = self.get_command(ctx.cmd)
@@ -227,6 +310,7 @@ class Holder:
 # Command conversion decorator
 def command(**attrs):
     """Decorator which converts a function into a command."""
+
     def decorator(func):
         if isinstance(func, Command):
             raise TypeError("Function is already a command.")

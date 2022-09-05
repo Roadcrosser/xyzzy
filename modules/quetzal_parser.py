@@ -11,6 +11,7 @@ from chunk import Chunk
 
 import os
 
+
 class HeaderData:
     def __init__(self, release, serial, checksum):
         self.release = release
@@ -18,18 +19,22 @@ class HeaderData:
         self.checksum = checksum
 
     def __str__(self):
-        return "HeaderData(release={}, serial={}, checksum={})".format(self.release, self.serial, self.checksum)
+        return "HeaderData(release={}, serial={}, checksum={})".format(
+            self.release, self.serial, self.checksum
+        )
 
     def __repr__(self):
         return self.__str__()
+
 
 def read_word(address: int, mem: List[int]) -> int:
     """Read's a 16-bit value at the specified address."""
     return (mem[address] << 8) + mem[address + 1]
 
+
 def parse_quetzal(fp) -> HeaderData:
     """Reads a Quetzal save file, and returns information about the associated game."""
-    if type(fp) != str and not hasattr(fp, 'read'):
+    if type(fp) != str and not hasattr(fp, "read"):
         raise TypeError("file is not a string or a bytes-like object.")
 
     if type(fp) == str:
@@ -37,7 +42,7 @@ def parse_quetzal(fp) -> HeaderData:
             raise Exception("File provided isn't a file, or doesn't exist.")
 
         # Open file as bytes
-        qzl = open(fp, 'rb')
+        qzl = open(fp, "rb")
     else:
         qzl = fp
 
@@ -47,7 +52,7 @@ def parse_quetzal(fp) -> HeaderData:
     if header != b"FORM":
         raise Exception("Invalid file format.")
 
-    qzl.read(4) # Skip some bytes we don't care about.
+    qzl.read(4)  # Skip some bytes we don't care about.
 
     ftype = qzl.read(4)
 
@@ -81,6 +86,7 @@ def parse_quetzal(fp) -> HeaderData:
 
     return HeaderData(release, serial, checksum)
 
+
 def parse_zcode(path: str) -> HeaderData:
     """Parses the header of a z-code game, and returns some information."""
     if type(path) != str:
@@ -95,12 +101,15 @@ def parse_zcode(path: str) -> HeaderData:
 
         # Byte magic
         release = read_word(2, mem)
-        serial = int(''.join(chr(x) for x in mem[0x12:0x18]))
+        serial = int("".join(chr(x) for x in mem[0x12:0x18]))
         checksum = read_word(0x1C, mem)
 
     return HeaderData(release, serial, checksum)
 
-def compare_quetzal(quetzal: Union[str, HeaderData], game: Union[str, HeaderData]) -> bool:
+
+def compare_quetzal(
+    quetzal: Union[str, HeaderData], game: Union[str, HeaderData]
+) -> bool:
     """Reads a Quetzal file and a game file, and determines if they match."""
     if not isinstance(quetzal, (HeaderData, str)):
         raise Exception("`quetzal` is not a HeaderData instance, or a string.")

@@ -10,17 +10,28 @@ import disnake as discord
 
 SCRIPT_OR_RECORD = re.compile(r"(?i).*(?:\.rec|\.scr)$")
 
+
 def parse_action(action):
     """Parses an action string to easily clump similar actions"""
     if action.lower() in ("n", "north", "go n", "go north", "walk north", "run north"):
         return "n"
-    elif action.lower() in ("s", "south", "go s", "go south", "walk south", "run south"):
+    elif action.lower() in (
+        "s",
+        "south",
+        "go s",
+        "go south",
+        "walk south",
+        "run south",
+    ):
         return "s"
     elif action.lower() in ("e", "east", "go e", "go east", "walk east", "run east"):
         return "e"
     elif action.lower() in ("w", "west", "go w", "go west", "walk west", "run west"):
         return "w"
-    elif action.lower() in ("[enter]", "(enter)", "{enter}", "<enter>") or action == "ENTER":
+    elif (
+        action.lower() in ("[enter]", "(enter)", "{enter}", "<enter>")
+        or action == "ENTER"
+    ):
         return "ENTER"
     elif action.lower() in ("space", "[space]", "(space)", "{space}", "<space>"):
         return "SPACE"
@@ -31,17 +42,24 @@ def parse_action(action):
     elif action.lower() in ("i", "inventory", "inv"):
         return "inventory"
     if re.match(r"l(?:ook)(?: .*)?", action.lower()):
-        return "look " + action.lower().split(" ", 1)[1].strip() if len(action.lower().split(" ")) > 1 else "look"
+        return (
+            "look " + action.lower().split(" ", 1)[1].strip()
+            if len(action.lower().split(" ")) > 1
+            else "look"
+        )
     else:
         return action.lower()
+
 
 class InputMode(Enum):
     ANARCHY = 1
     DEMOCRACY = 2
     DRIVER = 3
 
+
 class GameChannel:
     """Represents a channel that is prepped for playing a game through Xyzzy."""
+
     def __init__(self, msg, game):
         self.loop = asyncio.get_event_loop()
         self.indent = 0
@@ -67,7 +85,9 @@ class GameChannel:
             await asyncio.sleep(5)
 
             self.voting = False
-            vote_sort = sorted(self.votes.items(), key=lambda x: len(x[1]), reverse=True)
+            vote_sort = sorted(
+                self.votes.items(), key=lambda x: len(x[1]), reverse=True
+            )
             highest = sorted(x for x in vote_sort if len(x[1]) == len(vote_sort[0][1]))
 
             # Discard draws
@@ -75,12 +95,20 @@ class GameChannel:
                 highest = [x[0] for x in highest]
                 draw_join = '"{}" and "{}"'.format(", ".join(highest[:-1]), highest[-1])
 
-                await self.channel.send("```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```".format(draw_join))
+                await self.channel.send(
+                    "```py\n@ VOTING DRAW @\nDraw between {}\nDitching all current votes and starting fresh.```".format(
+                        draw_join
+                    )
+                )
             else:
                 cmd = highest[0][0]
                 amt = len(highest[0][1])
 
-                await self.channel.send('```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(cmd, amt))
+                await self.channel.send(
+                    '```py\n@ VOTING RESULTS @\nRunning command "{}" with {} vote(s).\n```'.format(
+                        cmd, amt
+                    )
+                )
                 self._send_input(cmd)
 
             self.votes = {}
@@ -113,12 +141,12 @@ class GameChannel:
 
                 line = line.replace("*", "\*").replace("_", "\_").replace("~", "\~")
 
-                if len(msg + line[self.indent:] + "\n") < 2000:
-                    msg += line[self.indent:] + "\n"
+                if len(msg + line[self.indent :] + "\n") < 2000:
+                    msg += line[self.indent :] + "\n"
                 else:
                     await self.send_game_output(msg)
 
-                    msg = line[self.indent:]
+                    msg = line[self.indent :]
 
             if not msg.strip():
                 return
@@ -150,7 +178,11 @@ class GameChannel:
                 for file in os.listdir(self.save_path):
                     mod_time = os.stat("{}/{}".format(self.save_path, file)).st_mtime_ns
 
-                    if mod_time < latest or SCRIPT_OR_RECORD.match(file) or file == "__UPLOADED__.qzl":
+                    if (
+                        mod_time < latest
+                        or SCRIPT_OR_RECORD.match(file)
+                        or file == "__UPLOADED__.qzl"
+                    ):
                         os.unlink("{}/{}".format(self.save_path, file))
                     elif mod_time > latest and not SCRIPT_OR_RECORD.match(file):
                         latest = mod_time
@@ -169,7 +201,7 @@ class GameChannel:
                 end_msg += "+Here is your most recent save from the game.\n"
 
         end_msg += "```"
-        
+
         await self.channel.send(end_msg, **end_kwargs)
 
         self.cleanup()
@@ -209,7 +241,9 @@ class GameChannel:
             else:
                 self.votes[action] = [msg.author.id]
 
-            await self.channel.send("{} has voted for `{}`".format(msg.author.mention, action))
+            await self.channel.send(
+                "{} has voted for `{}`".format(msg.author.mention, action)
+            )
 
             if not self.timer:
                 self.timer = self.loop.create_task(self._democracy_loop())
@@ -231,9 +265,21 @@ class GameChannel:
             os.makedirs(self.save_path)
 
         if self.save:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} -L {} '{}'".format(self.save_path, self.save, self.game.path), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell(
+                "dfrotz -h 80 -w 5000 -m -R {} -L {} '{}'".format(
+                    self.save_path, self.save, self.game.path
+                ),
+                stdout=PIPE,
+                stdin=PIPE,
+            )
         else:
-            self.process = await asyncio.create_subprocess_shell("dfrotz -h 80 -w 5000 -m -R {} '{}'".format(self.save_path, self.game.path), stdout=PIPE, stdin=PIPE)
+            self.process = await asyncio.create_subprocess_shell(
+                "dfrotz -h 80 -w 5000 -m -R {} '{}'".format(
+                    self.save_path, self.game.path
+                ),
+                stdout=PIPE,
+                stdin=PIPE,
+            )
 
     async def send_game_output(self, msg, save=None):
         """Sends the game output to the game's channel, handling permissions."""
@@ -244,7 +290,9 @@ class GameChannel:
         opts = {}
 
         if self.channel.permissions_for(self.channel.guild.me).embed_links:
-            opts["embed"] = discord.Embed(description=msg, colour=self.channel.guild.me.top_role.colour)
+            opts["embed"] = discord.Embed(
+                description=msg, colour=self.channel.guild.me.top_role.colour
+            )
         else:
             opts["content"] = ">>> {}".format(msg)
 
@@ -252,18 +300,27 @@ class GameChannel:
             opts["file"] = save
         elif save and not can_attach:
             if "content" in opts:
-                opts["content"] += ("\nI was unable to attach the save game due to not having permission to attach files.\n"
-                                    "If you wish to have saves available, please give me the `Attach Files` permission.")
+                opts["content"] += (
+                    "\nI was unable to attach the save game due to not having permission to attach files.\n"
+                    "If you wish to have saves available, please give me the `Attach Files` permission."
+                )
             else:
-                opts["embed"].add_field(name="\u200b", value="I was unable to attach the save game due to not having permission to attach files.\n"
-                                        "If you wish to have saves available, pleease give me the `Attach Files` permission.")
+                opts["embed"].add_field(
+                    name="\u200b",
+                    value="I was unable to attach the save game due to not having permission to attach files.\n"
+                    "If you wish to have saves available, pleease give me the `Attach Files` permission.",
+                )
 
         await self.channel.send(**opts)
 
     def check_saves(self):
         """Checks if the user saved the game."""
         if os.path.exists(self.save_path):
-            files = [x for x in os.listdir(self.save_path) if not SCRIPT_OR_RECORD.match(x) and x != "__UPLOADED__.qzl"]
+            files = [
+                x
+                for x in os.listdir(self.save_path)
+                if not SCRIPT_OR_RECORD.match(x) and x != "__UPLOADED__.qzl"
+            ]
             latest = [0, None]
 
             for file in files:
@@ -274,7 +331,9 @@ class GameChannel:
 
             if latest[1] and latest[1] != self.last_save:
                 self.last_save = latest[1]
-                return discord.File("{}/{}".format(self.save_path, latest[1]), latest[1])
+                return discord.File(
+                    "{}/{}".format(self.save_path, latest[1]), latest[1]
+                )
             return None
 
     def cleanup(self):

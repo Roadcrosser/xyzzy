@@ -1,6 +1,8 @@
 # Random stuff
 .vscode/
 __pycache__/
+.tool-versions
+venv
 
 # Config files
 options.cfg

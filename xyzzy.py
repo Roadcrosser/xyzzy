@@ -1,12 +1,16 @@
-import sys # Checking if host platform is Windows
+import sys  # Checking if host platform is Windows
 
 if sys.platform == "win32":
-    raise Exception("Xyzzy cannot run on Windows as it requires asyncios's subproccess.")
+    raise Exception(
+        "Xyzzy cannot run on Windows as it requires asyncios's subproccess."
+    )
 
-import shutil # Check if dfrotz is in PATH
+import shutil  # Check if dfrotz is in PATH
 
 if not shutil.which("dfrotz"):
-    raise Exception('dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.')
+    raise Exception(
+        'dfrotz not detected to be in PATH. If you do not have frotz in dumb mode, refer to "https://github.com/DavidGriffith/frotz/blob/master/INSTALL#L78", and then move the dfrotz executable to somewhere that is in PATH, for example /usr/bin.'
+    )
 
 from modules.command_sys import Context, Holder
 from modules.game import Game
@@ -24,13 +28,23 @@ import aiohttp
 import disnake as discord
 import modules.posts as posts
 
-OPTIONAL_CONFIG_OPTIONS = ("home_channel_id", "owner_ids", "carbon_key", "dbots_key", "gist_key", "gist_id")
+OPTIONAL_CONFIG_OPTIONS = (
+    "home_channel_id",
+    "owner_ids",
+    "carbon_key",
+    "dbots_key",
+    "gist_key",
+    "gist_id",
+)
 REQUIRED_CONFIG_OPTIONS = {
     "invoker": '"invoker" option required in configuration.\nMake sure there is a line that is something like "invoker = >".',
-    "token": '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".'
+    "token": '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".',
 }
 
-CAH_REGEX = re.compile(r"(?:can|does|is) this bot (?:play |do )?(?:cah|cards against humanity|pretend you'?re xyzzy)\??")
+CAH_REGEX = re.compile(
+    r"(?:can|does|is) this bot (?:play |do )?(?:cah|cards against humanity|pretend you'?re xyzzy)\??"
+)
+
 
 class ConsoleColours:
     HEADER = "\033[95m"
@@ -41,6 +55,7 @@ class ConsoleColours:
     END = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
 
 class Xyzzy(discord.Client):
     def __init__(self):
@@ -76,7 +91,9 @@ class Xyzzy(discord.Client):
         if self.home_channel_id:
             self.home_channel_id = int(self.home_channel_id)
 
-        self.owner_ids = [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
+        self.owner_ids = (
+            [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
+        )
         self.home_channel = None
         self.gist_data_cache = None
         self.gist_game_cache = None
@@ -109,19 +126,27 @@ class Xyzzy(discord.Client):
 
             if "unprefixed" not in self.user_preferences:
                 with open("./bot-data/userprefs.json", "w") as pref:
-                    print(ConsoleColours.OK_BLUE + 'Adding "unprefixed" array to user preferences file...' + ConsoleColours.END)
+                    print(
+                        ConsoleColours.OK_BLUE
+                        + 'Adding "unprefixed" array to user preferences file...'
+                        + ConsoleColours.END
+                    )
                     json.dump({**self.user_preferences, "unprefixed": []}, pref)
 
                     self.user_preferences["unprefixed"] = []
         except FileNotFoundError:
-            print(ConsoleColours.WARNING + "User preferences not found. Creating new user preferences file..." + ConsoleColours.END)
+            print(
+                ConsoleColours.WARNING
+                + "User preferences not found. Creating new user preferences file..."
+                + ConsoleColours.END
+            )
 
             with open("./bot-data/userprefs.json", "w") as pref:
                 pref.write('{"version": 1, "backticks": [], "unprefixed": []}')
                 self.user_preferences = {
                     "version": 1,
                     "backticks": [],
-                    "unprefixed": []
+                    "unprefixed": [],
                 }
 
         try:
@@ -130,7 +155,11 @@ class Xyzzy(discord.Client):
             with open("./bot-data/blocked_users.json") as blk:
                 self.blocked_users = json.load(blk)
         except FileNotFoundError:
-            print(ConsoleColours.WARNING + "Blocked user list not found. Creating new blocked user list..." + ConsoleColours.END)
+            print(
+                ConsoleColours.WARNING
+                + "Blocked user list not found. Creating new blocked user list..."
+                + ConsoleColours.END
+            )
 
             with open("./bot-data/blocked_users.json", "w") as blk:
                 blk.write("{}")
@@ -142,7 +171,11 @@ class Xyzzy(discord.Client):
             with open("./bot-data/server_settings.json") as srv:
                 self.server_settings = json.load(srv)
         except FileNotFoundError:
-            print(ConsoleColours.WARNING + "Server settings not found. Creating new server settings file.." + ConsoleColours.END)
+            print(
+                ConsoleColours.WARNING
+                + "Server settings not found. Creating new server settings file.."
+                + ConsoleColours.END
+            )
 
             with open("./bot-data/server_settings.json", "w") as srv:
                 srv.write("{}")
@@ -163,7 +196,11 @@ class Xyzzy(discord.Client):
             for s in os.listdir("./saves"):
                 shutil.rmtree("./saves/" + s)
 
-        print(ConsoleColours.OK_GREEN + "Initialisation complete! Connecting to Discord..." + ConsoleColours.END)
+        print(
+            ConsoleColours.OK_GREEN
+            + "Initialisation complete! Connecting to Discord..."
+            + ConsoleColours.END
+        )
 
         super().__init__()
 
@@ -174,13 +211,17 @@ class Xyzzy(discord.Client):
         game = "nothing yet!"
 
         if self.game_count():
-            game = "{} game{}.".format(self.game_count(), "s" if len(self.channels) > 1 else "")
+            game = "{} game{}.".format(
+                self.game_count(), "s" if len(self.channels) > 1 else ""
+            )
 
         await self.change_presence(activity=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):
         trace = "".join(traceback.format_tb(exc.__traceback__))
-        err = "Traceback (most recent call last):\n{}{}: {}".format(trace, type(exc).__name__, exc)
+        err = "Traceback (most recent call last):\n{}{}: {}".format(
+            trace, type(exc).__name__, exc
+        )
 
         print("\n" + ConsoleColours.FAIL + "An error has occured!")
         print(err + ConsoleColours.END)
@@ -188,18 +229,32 @@ class Xyzzy(discord.Client):
         if ctx.is_dm():
             print('This was caused by a DM with "{}".\n'.format(ctx.msg.author.name))
         else:
-            print('This was caused by a message.\nServer: "{}"\nChannel: #{}'.format(ctx.msg.guild.name, ctx.msg.channel.name))
+            print(
+                'This was caused by a message.\nServer: "{}"\nChannel: #{}'.format(
+                    ctx.msg.guild.name, ctx.msg.channel.name
+                )
+            )
 
         if self.home_channel:
-            await self.home_channel.send("User: `{}`\nInput: `{}`\n```py\n{}\n```".format(ctx.msg.author.name, ctx.clean, err))
+            await self.home_channel.send(
+                "User: `{}`\nInput: `{}`\n```py\n{}\n```".format(
+                    ctx.msg.author.name, ctx.clean, err
+                )
+            )
 
-        await ctx.send('```py\nERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(hex(randint(2 ** 4, 2 ** 32)), type(exc).__name__, exc, ctx.clean))
+        await ctx.send(
+            '```py\nERROR at memory location {}\n  {}: {}\n\nInput: "{}"\n```'.format(
+                hex(randint(2**4, 2**32)), type(exc).__name__, exc, ctx.clean
+            )
+        )
 
     async def on_ready(self):
-        print("======================\n"
-              "{0.user.name} is online.\n"
-              "Connected with ID {0.user.id}\n"
-              "Accepting commands with the syntax `{0.invoker}command`".format(self))
+        print(
+            "======================\n"
+            "{0.user.name} is online.\n"
+            "Connected with ID {0.user.id}\n"
+            "Accepting commands with the syntax `{0.invoker}command`".format(self)
+        )
 
         self.home_channel = self.get_channel(self.home_channel_id)
 
@@ -209,10 +264,14 @@ class Xyzzy(discord.Client):
             try:
                 self.commands.load_module(mod)
             except Exception as e:
-                print(ConsoleColours.FAIL + 'Error loading module "{}"\n{}'.format(mod, e) + ConsoleColours.END)
+                print(
+                    ConsoleColours.FAIL
+                    + 'Error loading module "{}"\n{}'.format(mod, e)
+                    + ConsoleColours.END
+                )
 
         await self.update_game()
-        
+
         if not self.timestamp:
             self.timestamp = datetime.utcnow().timestamp()
 
@@ -220,7 +279,7 @@ class Xyzzy(discord.Client):
                 url = "https://api.github.com/gists/" + self.gist_id
                 headers = {
                     "Accept": "application/vnd.github.v3+json",
-                    "Authorization": "token " + self.gist_key
+                    "Authorization": "token " + self.gist_key,
                 }
 
                 print("\nFetching cached GitHub data...")
@@ -230,20 +289,28 @@ class Xyzzy(discord.Client):
 
                 print("[{}]".format(r.status))
 
-                self.gist_data_cache = json.loads(res["files"]["xyzzy_data.json"]["content"])
-                self.gist_game_cache = json.loads(res["files"]["xyzzy_games.json"]["content"])
-                gist_game = sorted([[k, v.url] for k, v in self.games.items()], key=lambda x: x[0])
+                self.gist_data_cache = json.loads(
+                    res["files"]["xyzzy_data.json"]["content"]
+                )
+                self.gist_game_cache = json.loads(
+                    res["files"]["xyzzy_games.json"]["content"]
+                )
+                gist_game = sorted(
+                    [[k, v.url] for k, v in self.games.items()], key=lambda x: x[0]
+                )
 
                 if self.gist_game_cache != gist_game:
-                    gist_game = json.dumps({
-                        "files": {
-                            "xyzzy_games.json": {
-                                "content": json.dumps(gist_game)
+                    gist_game = json.dumps(
+                        {
+                            "files": {
+                                "xyzzy_games.json": {"content": json.dumps(gist_game)}
                             }
                         }
-                    })
+                    )
 
-                    async with self.session.patch(url, data=gist_game, headers=headers) as r:
+                    async with self.session.patch(
+                        url, data=gist_game, headers=headers
+                    ) as r:
                         print("[{}]".format(r.status))
 
             self.post_loop = await posts.task_loop(self)
@@ -252,40 +319,78 @@ class Xyzzy(discord.Client):
         print('I have been added to "{}".'.format(guild.name))
 
         if self.home_channel:
-            await self.home_channel.send('I have been added to "{0.name}" (ID: {0.id}).'.format(guild))
+            await self.home_channel.send(
+                'I have been added to "{0.name}" (ID: {0.id}).'.format(guild)
+            )
 
     async def on_guild_remove(self, guild):
         print('I have been removed from "{}".'.format(guild.name))
 
         if self.home_channel:
-            await self.home_channel.send('I have been removed from "{0.name}" (ID: {0.id}).'.format(guild))
+            await self.home_channel.send(
+                'I have been removed from "{0.name}" (ID: {0.id}).'.format(guild)
+            )
 
     async def on_message(self, msg):
-        if msg.author.bot or msg.author.id == self.user.id or (msg.guild and not msg.channel.permissions_for(msg.guild.me).send_messages):
+        if (
+            msg.author.bot
+            or msg.author.id == self.user.id
+            or (
+                msg.guild
+                and not msg.channel.permissions_for(msg.guild.me).send_messages
+            )
+        ):
             return
 
         # Hopefully a not so fucky version of the old conditional here.
         # Makes sure that the content actually matches something we like.
-        if (not self.content_regex.match(msg.content) and str(msg.author.id) in self.user_preferences["backticks"]) or \
-         (not (self.content_regex.match(msg.content) or (msg.content.startswith(self.invoker) and not msg.content.endswith("`"))) and
-         str(msg.author.id) not in self.user_preferences["backticks"]) and msg.channel.id not in self.channels:
+        if (
+            (
+                not self.content_regex.match(msg.content)
+                and str(msg.author.id) in self.user_preferences["backticks"]
+            )
+            or (
+                not (
+                    self.content_regex.match(msg.content)
+                    or (
+                        msg.content.startswith(self.invoker)
+                        and not msg.content.endswith("`")
+                    )
+                )
+                and str(msg.author.id) not in self.user_preferences["backticks"]
+            )
+            and msg.channel.id not in self.channels
+        ):
             # Explanation of how the above works
             # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
             # - Second line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
             return
 
-        if not isinstance(msg.channel, discord.DMChannel) and ((str(msg.guild.id) in self.blocked_users and
-         str(msg.author.id) in self.blocked_users[str(msg.guild.id)]) or ("global" in self.blocked_users and
-         str(msg.author.id) in self.blocked_users["global"])):
-            return await msg.author.send("```diff\n"
-                                         '!An administrator has disabled your ability to submit commands in "{}"\n'
-                                         "```".format(msg.guild.name))
+        if not isinstance(msg.channel, discord.DMChannel) and (
+            (
+                str(msg.guild.id) in self.blocked_users
+                and str(msg.author.id) in self.blocked_users[str(msg.guild.id)]
+            )
+            or (
+                "global" in self.blocked_users
+                and str(msg.author.id) in self.blocked_users["global"]
+            )
+        ):
+            return await msg.author.send(
+                "```diff\n"
+                '!An administrator has disabled your ability to submit commands in "{}"\n'
+                "```".format(msg.guild.name)
+            )
 
         clean = msg.content[1:-1] if re.match(r"^`.*`$", msg.content) else msg.content
 
         # Allows people who have opted in to run commands without a prefix.
-        if not clean.startswith(self.invoker) and msg.channel.id in self.channels and self.channels[msg.channel.id].playing and\
-         str(msg.author.id) in self.user_preferences["unprefixed"]:
+        if (
+            not clean.startswith(self.invoker)
+            and msg.channel.id in self.channels
+            and self.channels[msg.channel.id].playing
+            and str(msg.author.id) in self.user_preferences["unprefixed"]
+        ):
             if msg.content.startswith(("#", "//")):
                 return
 
@@ -301,7 +406,12 @@ class Xyzzy(discord.Client):
             return
 
         # Send game input if a game is running.
-        if clean[0] == self.invoker and clean[1] != self.invoker and msg.channel.id in self.channels and self.channels[msg.channel.id].playing:
+        if (
+            clean[0] == self.invoker
+            and clean[1] != self.invoker
+            and msg.channel.id in self.channels
+            and self.channels[msg.channel.id].playing
+        ):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
@@ -327,6 +437,7 @@ class Xyzzy(discord.Client):
             await self.commands.run(ctx)
         except Exception as e:
             await self.handle_error(ctx, e)
+
 
 if __name__ == "__main__":
     # Only start the bot if it is being run directly
