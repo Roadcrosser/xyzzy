@@ -10,9 +10,11 @@ import sys
 import importlib
 import os.path
 
+from xyzzy import Xyzzy
+
 
 class Owner:
-    def __init__(self, xyzzy):
+    def __init__(self, xyzzy: Xyzzy):
         self.xyzzy = xyzzy
 
     @command(aliases=["eval"], usage="[ python ]", owner=True)
@@ -45,7 +47,7 @@ class Owner:
                 "!There are currently {} games running on my system.\n"
                 "-If you shut me down now, all unsaved data regarding these games could be lost!\n"
                 "(Use `{}nowplaying` for a list of currently running games.)\n```".format(
-                    len(self.xyzzy.channels), self.xyzzy.invoker * 2
+                    len(self.xyzzy.channels), self.xyzzy.user.mention
                 )
             )
 
@@ -62,13 +64,13 @@ class Owner:
                 msg = await self.xyzzy.wait_for("message", check=check, timeout=30)
 
                 if re.match(
-                    r"^`?({})?y(es)?`?$".format(self.xyzzy.invoker * 2),
+                    r"^`?({} ?)?y(es)?`?$".format(self.xyzzy.user.mention),
                     msg.content.lower(),
                 ):
                     await ctx.send("```asciidoc\n.Xyzzy.\n// Now shutting down...\n```")
                     await self.xyzzy.logout()
                 elif re.match(
-                    r"^`?({})?no?`?$".format(self.xyzzy.invoker * 2),
+                    r"^`?({} ?)?no?`?$".format(self.xyzzy.user.mention),
                     msg.content.lower(),
                 ):
                     return await ctx.send("```css\nShutdown aborted.\n```")

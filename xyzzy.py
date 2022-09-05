@@ -24,6 +24,7 @@ import json
 import re
 import asyncio
 import traceback
+import typing
 import aiohttp
 import disnake as discord
 import modules.posts as posts
@@ -37,7 +38,6 @@ OPTIONAL_CONFIG_OPTIONS = (
     "gist_id",
 )
 REQUIRED_CONFIG_OPTIONS = {
-    "invoker": '"invoker" option required in configuration.\nMake sure there is a line that is something like "invoker = >".',
     "token": '"token" option required in configuration.\nThis is needed to connect to Discord and actually run.\nMake sure there is a line that is something like "token = hTtPSwWwyOutUBECOMW_AtcH-vdQW4W9WgXc_q".',
 }
 
@@ -58,6 +58,9 @@ class ConsoleColours:
 
 
 class Xyzzy(discord.Client):
+    home_channel: discord.TextChannel
+    prefix: re.Pattern
+
     def __init__(self):
         print(ConsoleColours.HEADER + "Welcome to Xyzzy, v2.0." + ConsoleColours.END)
 
@@ -94,7 +97,6 @@ class Xyzzy(discord.Client):
         self.owner_ids = (
             [] if not self.owner_ids else [x.strip() for x in self.owner_ids.split(",")]
         )
-        self.home_channel = None
         self.gist_data_cache = None
         self.gist_game_cache = None
 
@@ -117,37 +119,6 @@ class Xyzzy(discord.Client):
         if not os.path.exists("./save-cache/"):
             print('Creating save cache directory at "./save-cache/"')
             os.makedirs("./save-cache/")
-
-        try:
-            print("Loading user preferences...")
-
-            with open("./bot-data/userprefs.json") as pref:
-                self.user_preferences = json.load(pref)
-
-            if "unprefixed" not in self.user_preferences:
-                with open("./bot-data/userprefs.json", "w") as pref:
-                    print(
-                        ConsoleColours.OK_BLUE
-                        + 'Adding "unprefixed" array to user preferences file...'
-                        + ConsoleColours.END
-                    )
-                    json.dump({**self.user_preferences, "unprefixed": []}, pref)
-
-                    self.user_preferences["unprefixed"] = []
-        except FileNotFoundError:
-            print(
-                ConsoleColours.WARNING
-                + "User preferences not found. Creating new user preferences file..."
-                + ConsoleColours.END
-            )
-
-            with open("./bot-data/userprefs.json", "w") as pref:
-                pref.write('{"version": 1, "backticks": [], "unprefixed": []}')
-                self.user_preferences = {
-                    "version": 1,
-                    "backticks": [],
-                    "unprefixed": [],
-                }
 
         try:
             print("Loading blocked user list...")
@@ -186,7 +157,6 @@ class Xyzzy(discord.Client):
         self.queue = None
         self.channels = {}
 
-        self.content_regex = re.compile(r"`{}.+`".format(self.invoker))
         self.session = aiohttp.ClientSession()
         self.commands = Holder(self)
 
@@ -202,7 +172,7 @@ class Xyzzy(discord.Client):
             + ConsoleColours.END
         )
 
-        super().__init__()
+        super().__init__(intents=discord.Intents.all())
 
     def game_count(self):
         return sum(1 for i in self.channels.values() if i.game and not i.game.debug)
@@ -253,10 +223,15 @@ class Xyzzy(discord.Client):
             "======================\n"
             "{0.user.name} is online.\n"
             "Connected with ID {0.user.id}\n"
-            "Accepting commands with the syntax `{0.invoker}command`".format(self)
+            "Accepting commands with the syntax `@{0.user.name}#{0.user.discriminator} command`".format(
+                self
+            )
         )
 
-        self.home_channel = self.get_channel(self.home_channel_id)
+        self.prefix = re.compile(rf"^<@!?{self.user.id}>(.*)")
+        self.home_channel = typing.cast(
+            discord.TextChannel, self.get_channel(self.home_channel_id)
+        )
 
         for mod in glob("commands/*.py"):
             mod = mod.replace("/", ".").replace("\\", ".")[:-3]
@@ -315,7 +290,7 @@ class Xyzzy(discord.Client):
 
             self.post_loop = await posts.task_loop(self)
 
-    async def on_guild_join(self, guild):
+    async def on_guild_join(self, guild: discord.Guild):
         print('I have been added to "{}".'.format(guild.name))
 
         if self.home_channel:
@@ -323,7 +298,7 @@ class Xyzzy(discord.Client):
                 'I have been added to "{0.name}" (ID: {0.id}).'.format(guild)
             )
 
-    async def on_guild_remove(self, guild):
+    async def on_guild_remove(self, guild: discord.Guild):
         print('I have been removed from "{}".'.format(guild.name))
 
         if self.home_channel:
@@ -331,7 +306,10 @@ class Xyzzy(discord.Client):
                 'I have been removed from "{0.name}" (ID: {0.id}).'.format(guild)
             )
 
-    async def on_message(self, msg):
+    async def on_message(self, msg: discord.Message):
+        if msg.guild.id != 441529557691006977:
+            return
+
         if (
             msg.author.bot
             or msg.author.id == self.user.id
@@ -339,34 +317,11 @@ class Xyzzy(discord.Client):
                 msg.guild
                 and not msg.channel.permissions_for(msg.guild.me).send_messages
             )
+            or not self.prefix.match(msg.content)
         ):
             return
 
-        # Hopefully a not so fucky version of the old conditional here.
-        # Makes sure that the content actually matches something we like.
-        if (
-            (
-                not self.content_regex.match(msg.content)
-                and str(msg.author.id) in self.user_preferences["backticks"]
-            )
-            or (
-                not (
-                    self.content_regex.match(msg.content)
-                    or (
-                        msg.content.startswith(self.invoker)
-                        and not msg.content.endswith("`")
-                    )
-                )
-                and str(msg.author.id) not in self.user_preferences["backticks"]
-            )
-            and msg.channel.id not in self.channels
-        ):
-            # Explanation of how the above works
-            # - First line: If the user does have backticks needed, and the content does not have backticks and the prefix, return.
-            # - Second line: Else, if the user doesn't have backticks needed, and the content doesn't start with the prefix, or only has one backtick which is at the end, return.
-            return
-
-        if not isinstance(msg.channel, discord.DMChannel) and (
+        if msg.guild and (
             (
                 str(msg.guild.id) in self.blocked_users
                 and str(msg.author.id) in self.blocked_users[str(msg.guild.id)]
@@ -382,50 +337,31 @@ class Xyzzy(discord.Client):
                 "```".format(msg.guild.name)
             )
 
-        clean = msg.content[1:-1] if re.match(r"^`.*`$", msg.content) else msg.content
-
-        # Allows people who have opted in to run commands without a prefix.
-        if (
-            not clean.startswith(self.invoker)
-            and msg.channel.id in self.channels
-            and self.channels[msg.channel.id].playing
-            and str(msg.author.id) in self.user_preferences["unprefixed"]
-        ):
-            if msg.content.startswith(("#", "//")):
-                return
-
-            channel = self.channels[msg.channel.id]
-            channel.last = msg.created_at
-
-            return await channel.handle_input(msg, clean)
-        elif not clean.startswith(self.invoker):
-            return
+        clean = typing.cast(re.Match, self.prefix.match(msg.content))[1].strip()
+        is_game_cmd = clean.startswith(">")
 
         # Without this, an error is thrown below due to only one character.
-        if len(clean) == 1:
+        if len(clean) == 0:
             return
 
         # Send game input if a game is running.
         if (
-            clean[0] == self.invoker
-            and clean[1] != self.invoker
+            is_game_cmd
             and msg.channel.id in self.channels
             and self.channels[msg.channel.id].playing
         ):
             channel = self.channels[msg.channel.id]
             channel.last = msg.created_at
 
-            return await channel.handle_input(msg, clean[1:])
-        elif not clean.startswith(self.invoker * 2):
-            return
+            return await channel.handle_input(msg, clean[1:].strip())
 
-        if clean == self.invoker * 2 + "get ye flask":
+        if clean == "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
 
-        if clean.startswith(self.invoker * 2) and CAH_REGEX.match(clean[2:]):
+        if CAH_REGEX.match(clean):
             return await msg.channel.send("no")
 
-        if not self.commands.get_command(clean[2:].split(" ")[0]):
+        if not self.commands.get_command(clean.split(" ")[0]):
             return
 
         try:

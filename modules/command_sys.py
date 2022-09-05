@@ -10,6 +10,11 @@ import re
 import sys
 import importlib
 import shlex
+import typing
+
+if typing.TYPE_CHECKING:
+    from xyzzy import Xyzzy
+
 
 PERMS = [
     x
@@ -26,12 +31,17 @@ class Context:
     Not intended to be created manually.
     """
 
-    def __init__(self, msg: discord.Message, xyzzy: discord.Client):
+    msg: discord.Message
+    client: "Xyzzy"
+    clean: str
+    cmd: str
+    args: typing.List[str]
+    raw: str
+
+    def __init__(self, msg: discord.Message, xyzzy: "Xyzzy"):
         self.msg = msg
         self.client = xyzzy
-        self.clean = (
-            msg.content[1:-1] if xyzzy.content_regex.match(msg.content) else msg.content
-        )[2:]
+        self.clean = typing.cast(re.Match, xyzzy.prefix.match(msg.content))[1].strip()
         self.cmd = self.clean.split(" ")[0]
         self.args = shlex.split(
             self.clean.replace(r"\"", "\u009E").replace("'", "\u009F")
@@ -61,7 +71,7 @@ class Context:
         dest: str = "channel",
         embed: discord.Embed = None,
         file: discord.File = None,
-        files: List[discord.File] = None
+        files: List[discord.File] = None,
     ):
         """Sends a message to the context origin, can either be the channel or author."""
         if content is None and not embed and not file and not files:
@@ -164,7 +174,7 @@ class Command:
         aliases: list = [],
         usage: str = "",
         owner: bool = False,
-        has_site_help: bool = True
+        has_site_help: bool = True,
     ):
         self.func = func
         self.name = name or func.__name__
@@ -287,7 +297,9 @@ class Holder:
         )
 
     async def run(self, ctx: Context) -> None:
+        print(f"'{ctx.clean}'", f"'{ctx.cmd}'", ctx.args, f"'{ctx.raw}'")
         cmd = self.get_command(ctx.cmd)
+        print(cmd)
 
         if not cmd:
             return

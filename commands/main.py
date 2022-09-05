@@ -1,19 +1,20 @@
-from modules.command_sys import command
+from modules.command_sys import command, Command
 from modules.game_channel import GameChannel, InputMode
 from modules.game import Game
 from io import BytesIO
 from math import floor
+from xyzzy import Xyzzy
 
 import os
 import re
-import json
+import typing
 import asyncio
 import random
 import modules.quetzal_parser as qzl
 
 
 class Main:
-    def __init__(self, xyzzy):
+    def __init__(self, xyzzy: Xyzzy):
         self.xyzzy = xyzzy
 
     @command(usage="[ command ]", has_site_help=False)
@@ -23,14 +24,16 @@ class Main:
             return await ctx.send(
                 "```inform\n"
                 "Detailed help can be found at the link below.\n"
-                'For quick information on a command, type "{}help (command)"\n'
+                'For quick information on a command, type "@{0.name}#{0.discriminator} help (command)"\n'
                 "```\n"
-                "http://xyzzy.roadcrosser.xyz/help/".format(self.xyzzy.invoker * 2)
+                "http://xyzzy.roadcrosser.xyz/help/".format(self.xyzzy.user)
             )
         elif self.xyzzy.commands.get_command(ctx.args[0].lower()):
-            cmd = self.xyzzy.commands.get_command(ctx.args[0].lower())
+            cmd = typing.cast(
+                Command, self.xyzzy.commands.get_command(ctx.args[0].lower())
+            )
             msg = '```inform7\n"{}{}{}{}"\n```'.format(
-                self.xyzzy.invoker * 2,
+                self.xyzzy.user.mention,
                 cmd.name,
                 " " + cmd.usage + " " if cmd.usage else "",
                 cmd.description,
@@ -98,83 +101,6 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 await ctx.send(
                     "I cannot PM you, as you seem to have private messages disabled. However, an up-to-date list is available at: http://xyzzy.roadcrosser.xyz/list"
                 )
-
-    @command(usage="[ on|off ]")
-    async def backticks(self, ctx):
-        """
-        Enables or disables the requirement for Xyzzy to require backticks before and after each command. This is off by default.
-        Using this command only changes the setting for you.
-        """
-        if not ctx.args or ctx.args[0].lower() not in ("on", "off"):
-            return await ctx.send(
-                "```diff\n-You must provide whether you want to turn your backtick preferences ON or OFF.\n```"
-            )
-
-        if ctx.args[0] == "on":
-            if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["backticks"]:
-                self.xyzzy.user_preferences["backticks"].append(str(ctx.msg.author.id))
-                await ctx.send(
-                    "```diff\n+Commands from you now require backticks. (They should look `{}like this`)\n```".format(
-                        self.xyzzy.invoker
-                    )
-                )
-            else:
-                return await ctx.send(
-                    "```glsl\n#Your preferences are already set to require backticks for commands.\n```"
-                )
-        else:
-            if str(ctx.msg.author.id) in self.xyzzy.user_preferences["backticks"]:
-                self.xyzzy.user_preferences["backticks"].remove(str(ctx.msg.author.id))
-                await ctx.send(
-                    "```diff\n"
-                    "+Commands from you no longer require backticks. (They should look {}like this)\n"
-                    "+XYZZY will still accept backticked commands."
-                    "\n```".format(self.xyzzy.invoker)
-                )
-            else:
-                return await ctx.send(
-                    "```diff\n!Your preferences are already set such that backticks are not required for commands\n```"
-                )
-
-        with open("./bot-data/userprefs.json", "w") as x:
-            json.dump(self.xyzzy.user_preferences, x)
-
-    @command(usage="[ on|off ]")
-    async def unprefixed(self, ctx):
-        """
-        Enables or disable the ability to send game input without a prefix.
-        With this mode enabled, you can get the bot to ignore you by prefixing your message with either "#" or "//"
-        If you run a command while this is active and a game is running, the game won't get it as input.
-        Using this command only changes the setting for you.
-        """
-        if not ctx.args or ctx.args[0].lower() not in ("on", "off"):
-            return await ctx.send(
-                "```diff\n-You must provide whether you want to turn unprefixed game input ON or OFF.\n```"
-            )
-
-        if ctx.args[0] == "on":
-            if str(ctx.msg.author.id) not in self.xyzzy.user_preferences["unprefixed"]:
-                self.xyzzy.user_preferences["unprefixed"].append(str(ctx.msg.author.id))
-                await ctx.send(
-                    "```diff\n+You can now run commands for games without needing a prefix.\n```"
-                )
-            else:
-                return await ctx.send(
-                    "```glsl\n#You can already use game commands without a prefix.\n```"
-                )
-        else:
-            if str(ctx.msg.author.id) in self.xyzzy.user_preferences["unprefixed"]:
-                self.xyzzy.user_preferences["unprefixed"].remove(str(ctx.msg.author.id))
-                await ctx.send(
-                    "```diff\n+You can no longer run commands for games without a prefix.\n```"
-                )
-            else:
-                return await ctx.send(
-                    "```glsl\n#Your preferences are already set so that you cannot run game commands without a prefix.\n```"
-                )
-
-        with open("./bot-data/userprefs.json", "w") as x:
-            json.dump(self.xyzzy.user_preferences, x)
 
     @command(usage="[ game ]")
     async def play(self, ctx):
