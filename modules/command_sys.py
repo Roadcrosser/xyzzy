@@ -175,6 +175,7 @@ class Command:
         usage: str = "",
         owner: bool = False,
         has_site_help: bool = True,
+        hidden: bool = False,
     ):
         self.func = func
         self.name = name or func.__name__
@@ -184,6 +185,7 @@ class Command:
         self.usage = usage
         self.owner = owner
         self.has_site_help = has_site_help
+        self.hidden = hidden
 
     def __repr__(self) -> str:
         return self.name

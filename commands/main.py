@@ -28,10 +28,10 @@ class Main:
                 "```\n"
                 "http://xyzzy.roadcrosser.xyz/help/".format(self.xyzzy.user)
             )
-        elif self.xyzzy.commands.get_command(ctx.args[0].lower()):
-            cmd = typing.cast(
-                Command, self.xyzzy.commands.get_command(ctx.args[0].lower())
-            )
+
+        cmd = self.xyzzy.commands.get_command(ctx.args[0].lower())
+
+        if cmd and not cmd.hidden:
             msg = '```inform7\n"{}{}{}{}"\n```'.format(
                 self.xyzzy.user.mention,
                 cmd.name,
@@ -101,6 +101,18 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 await ctx.send(
                     "I cannot PM you, as you seem to have private messages disabled. However, an up-to-date list is available at: http://xyzzy.roadcrosser.xyz/list"
                 )
+
+    @command(has_site_help=False, hidden=True)
+    async def backticks(self, ctx):
+        await ctx.send(
+            "Unfortunately the backtick rule is no longer able to be used, due to using a mention prefix now."
+        )
+
+    @command(has_site_help=False, hidden=True)
+    async def unprefixed(self, ctx):
+        await ctx.send(
+            "Unfortunately the unprefixed option is no longner possible due to restrictions from Discord on getting message content."
+        )
 
     @command(usage="[ game ]")
     async def play(self, ctx):
