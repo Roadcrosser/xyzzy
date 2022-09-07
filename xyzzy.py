@@ -307,8 +307,11 @@ class Xyzzy(discord.Client):
             )
 
     async def on_message(self, msg: discord.Message):
-        if msg.guild.id != 441529557691006977:
-            return
+        is_reply_to_me = (
+            msg.reference
+            and isinstance(msg.reference.resolved, discord.Message)
+            and msg.reference.resolved.author.id == self.user.id
+        )
 
         if (
             msg.author.bot
@@ -317,7 +320,7 @@ class Xyzzy(discord.Client):
                 msg.guild
                 and not msg.channel.permissions_for(msg.guild.me).send_messages
             )
-            or not self.prefix.match(msg.content)
+            or (not self.prefix.match(msg.content) and not is_reply_to_me)
         ):
             return
 
@@ -337,7 +340,12 @@ class Xyzzy(discord.Client):
                 "```".format(msg.guild.name)
             )
 
-        clean = typing.cast(re.Match, self.prefix.match(msg.content))[1].strip()
+        # Take plain message content if it's a reply to us, otherwise force prefix match
+        clean = (
+            msg.content
+            if is_reply_to_me
+            else typing.cast(re.Match, self.prefix.match(msg.content))[1].strip()
+        )
         is_game_cmd = clean.startswith(">")
 
         # Without this, an error is thrown below due to only one character.
@@ -354,6 +362,10 @@ class Xyzzy(discord.Client):
             channel.last = msg.created_at
 
             return await channel.handle_input(msg, clean[1:].strip())
+
+        # Don't allow commands to be run via a reply
+        if is_reply_to_me:
+            return
 
         if clean == "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
