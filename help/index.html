@@ -37,49 +37,24 @@
             </p>
 
     <h1>User Commands</h1>
+        <p>
+            All commands need to be prefixed with a mention of the bot (<span class="mention">@xyzzy</span>) in order to work.
+        </p>
         <h2>Gameplay Commands</h2>
             <p>
                 These commands are available to most or all users of xyzzy, and assist in playing or controlling games.
-            </p>
-            <h3>The Backtick Rule</h3>
-                <p>
-                    All commands submitted should be flanked by <b><a href="https://en.wikipedia.org/wiki/Grave_accent">Grave Accent</a></b> characters, or "Backticks" as they're known to xyzzy.
-                </p>
-                <p>
-                    The grave character can be found next to the <code>1</code> key on a standard US QWERTY keyboard and on an iOS stock keyboard by holding down the apostrophe key and swiping left, looking like this: <code>`</code>. Therefore, a proper xyzzy command should look like this before you send it:
-                </p>
-                <code class="block">
-                    `>command`
-                </code>
-                <p>
-                    This backtick rule <b>is turned off by default</b> and can be enabled if you wish to enforce it for yourself.
-                </p>
-            <h3 class="xyzzy-command" id="backticks">
-                >>backticks <span class="options">[ on | off ]</span>
-            </h3>
-            <p>
-                Enables or disables the requirement for xyzzy to require backticks before and after each command. This is <b>off</b> by default.
-            </p>
-            <p>
-                Using this command only changes the setting for you.
             </p>
             <h3 class="xyzzy-command" id="input">
                 ><span class="options">input</span>
             </h3>
             <p>
-                Any command submitted with a single greater than sign will be submitted to the game running inside of xyzzy. I.E., if xyzzy was playing Zork and you wanted to pick up a lantern, you would do <code>>get lantern</code>.
-            </p>
-            <h3 class="xyzzy-command" id="unprefixed">
-                >>unprefixed <span class="options">[ on | off ]</span>
-            </h3>
-            <p>
-                Enables or disables the requirement for game inputs to require a prefix. When enabled, this means that doing <code>get lantern</code> will work as well as <code>>get lantern</code>. If you wish to speak normally without triggering the game in this mode, you can start your message with <code>#</code> or <code>//</code> for it to be ignored. This is <b>off</b> by default.
+                Any command submitted with a single greater than sign after the mention will be submitted to the game running inside of xyzzy. I.E., if xyzzy was playing Zork and you wanted to pick up a lantern, you would do <code>@xyzzy >get lantern</code>.
             </p>
             <p>
-                Using this command only changes the setting for you.
+                You can also omit the mention if you reply-ping to a message sent from xyzzy, e.g. just <code>>get lantern</code>
             </p>
             <h3 class="xyzzy-command" id="play">
-                >>play <span class="options">[ Game name ]</span>
+                play <span class="options">[ Game name ]</span>
             </h3>
             <p>
                 Tells xyzzy to start playing the game specified in <i>[Game name]</i> in the current channel. If no game is found with that name, xyzzy will show you any close matches it can find, and if there is only one, start that one.
@@ -88,13 +63,13 @@
                 Alternatively, you can also attach a save file from a game with this command, and it will attempt to match a game in its database to your save and load it.
             </p>
             <h3 class="xyzzy-command" id="upload">
-                >>upload
+                upload
             </h3>
             <p>
                 Attaching a save file with this command will upload the save file to your channel instance, allowing you to use a <code>RESTORE</code> game command to load them.
             </p>
             <h3 class="xyzzy-command" id="indent">
-                >>indent <span class="options">[ indent level ]</span>
+                indent <span class="options">[ indent level ]</span>
             </h3>
             <p>
                 Will make xyzzy scrap the first <i>[indent level]</i> characters for each line in his output. If you're noticing random spaces after each line break, use this command.
@@ -103,35 +78,35 @@
                 <i>[Indent level]</i> must be an integer between 0 and the total console width. (Usually 80.)
             </p>
             <h3 class="xyzzy-command" id="forcequit">
-                >>forcequit <span class="options">or >>mortim</span>
+                forcequit <span class="options">or `mortim`</span>
             </h3>
             <p>
                 After confirmation, terminates the process running the xyzzy game you are playing. <b>It is recommended to try to exit the game using an in-game method before using this command.</b> <code>>quit</code> usually works.
             </p>
             <p>
-                This command has an alias in <code>>>mortim</code>
+                This command has an alias in <code>mortim</code>
             </p>
             <h3 class="xyzzy-command" id="modes">
-                >>modes
+                modes
             </h3>
             <p>
                 Lists and describes all possiblle game input modes.
             </p>
             <h3 class="xyzzy-command" id="mode">
-                >>mode <span class="options">[ anarchy | democracy | driver ]</span>
+                mode <span class="options">[ anarchy | democracy | driver ]</span>
             </h3>
             <p>
                 Sets a game input mode if a game is running on the current channel.
             </p>
             <h3 class="xyzzy-command" id="transfer">
-                >>transfer <span class="options">@mention#1234</span>
+                transfer <span class="options">@mention#1234</span>
             </h3>
             <p>
                 Transfers input rights to the mentioned user. Only usable in Driver mode.
             </p>
         <h2>Bot Status and Health</h2>
             <h3 class="xyzzy-command" id="list">
-                >>list
+                list
             </h3>
             <p>
                 Sends you a direct message containing all stories in xyzzy's library.
@@ -141,7 +116,7 @@
                 These commands are only available to users that have the permission to kick other users from the Discord server they are invoked on.
             </p>
             <h3 class="xyzzy-command" id="block">
-                >>block <span class="options">[ @User Mention#1234 ] or >>plugh</span>
+                block <span class="options">[ @User Mention#1234 ] or `plugh`</span>
             </h3>
             <p>
                 For each user mentioned, disables their ability to send commands to the bot in the server this command was invoked.
@@ -150,10 +125,10 @@
                 Blocked users will be sent a Direct Message stating that they are blocked when they try to send a command.
             </p>
             <p>
-                This command has an alias in <code>>>plugh</code>
+                This command has an alias in <code>plugh</code>
             </p>
             <h3 class="xyzzy-command" id="unblock">
-                >>unblock <span class="options">[ @User Mention#1234 ]</span>
+                unblock <span class="options">[ @User Mention#1234 ]</span>
             </h3>
             <p>
                 For each user mentioned, reenables their ability to send commands to the bot in the server this command was invoked.
@@ -166,31 +141,31 @@
                 These commands are only available to a specific set of users, and can be catastrophic. They are listed here for completeness.
             </p>
             <h3 class="xyzzy-command" id="debug">
-                >>debug <span class="options">[ python ]</span>
+                debug <span class="options">[ python ]</span>
             </h3>
             <p>
                 Executes arbitrary Python code.
             </p>
             <h3 class="xyzzy-command" id="nowplaying">
-                >>nowplaying
+                nowplaying
             </h3>
             <p>
                 Sends you a direct message containing all currently running xyzzy instances across Discord.
             </p>
             <h3 class="xyzzy-command" id="announce">
-                >>announce <span class="options">[ Announcement ]</span>
+                announce <span class="options">[ Announcement ]</span>
             </h3>
             <p>
                 For each channel currently playing a game, sends the text in <i>[Announcement]</i>.
             </p>
             <h3 class="xyzzy-command" id="output">
-                >>output
+                output
             </h3>
             <p>
                 Toggles whether the text being sent to this channel from a currently playing story also should be printed to the terminal. This is functionally useless in most cases.
             </p>
             <h3 class="xyzzy-command" id="shutdown">
-                >>shutdown
+                shutdown
             </h3>
             <p>
                 After confirmation, shuts down the bot and all running games.
