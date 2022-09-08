@@ -11,7 +11,7 @@ class Moderation:
         """
         For each user mentioned, disables their ability to send commands to the bot in the server this command was invoked.
         Blocked users will be sent a Direct Message stating that they are blocked when they try to send a command.
-        This command has an alias in >>plugh
+        This command has an alias in '@xyzzy plugh'
         [A user may only use this command if they have permission to kick other users.]
         """
         if (

@@ -185,6 +185,8 @@ class Xyzzy(discord.Client):
                 self.game_count(), "s" if len(self.channels) > 1 else ""
             )
 
+        game += " | @xyzzy help"
+
         await self.change_presence(activity=discord.Game(name=game))
 
     async def handle_error(self, ctx, exc):

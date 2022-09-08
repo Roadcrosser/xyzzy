@@ -345,7 +345,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
         """
         After confirmation, terminates the process running the xyzzy game you are playing.
         [It is recommended to try to exit the game using an in-game method before using this command.] >quit usually works.
-        This command has an alias in >>mortim
+        This command has an alias in '@xyzzy mortim'
         """
         if ctx.msg.channel.id not in self.xyzzy.channels:
             return await ctx.send(
@@ -475,7 +475,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
     async def mode(self, ctx):
         """
         Changes the input mode for the currently running session to [mode].
-        If "list" is specified as the mode, a list of the supported input modes will be shown (this is also aliased to >>modes).
+        If "list" is specified as the mode, a list of the supported input modes will be shown (this is also aliased to '@xyzzy modes').
         [Only users who can manage the server, or the "owner" of the current game can change the mode.]
         """
         if ctx.msg.channel.id not in self.xyzzy.channels:
@@ -502,7 +502,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
             return await ctx.send(
                 "```diff\n"
                 "Please select a valid mode.\n"
-                "You can run >>modes to view all the currently available modes.\n"
+                "You can run '@xyzzy modes' to view all the currently available modes.\n"
                 "```"
             )
 
@@ -539,7 +539,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
                 "```diff\n"
                 "-Driver mode is now on.\n"
                 "Only {} will be able to submit commands.\n"
-                'You can transfer the "wheel" with >>transfer [user]\n'
+                "You can transfer the \"wheel\" with '@xyzzy transfer [user]'\n"
                 "```".format(channel.owner)
             )
 
@@ -557,7 +557,7 @@ Alternatively, an up-to-date list can be found here: http://xyzzy.roadcrosser.xy
 
         if self.xyzzy.channels[ctx.msg.channel.id].mode == InputMode.ANARCHY:
             return await ctx.send(
-                "```diff\n->>transfer may only be used in driver or anarchy mode.\n```"
+                "```diff\n-'transfer' may only be used in driver or anarchy mode.\n```"
             )
 
         if (
