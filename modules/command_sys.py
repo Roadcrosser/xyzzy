@@ -39,9 +39,21 @@ class Context:
     raw: str
 
     def __init__(self, msg: discord.Message, xyzzy: "Xyzzy"):
+        is_reply_to_me = (
+            msg.reference
+            and isinstance(msg.reference.resolved, discord.Message)
+            and msg.reference.resolved.author.id == xyzzy.user.id
+        )
+
         self.msg = msg
         self.client = xyzzy
-        self.clean = typing.cast(re.Match, xyzzy.prefix.match(msg.content))[1].strip()
+
+        self.clean = (
+            msg.content
+            if is_reply_to_me
+            else typing.cast(re.Match, xyzzy.prefix.match(msg.content))[1].strip()
+        )
+
         self.cmd = self.clean.split(" ")[0]
         self.args = shlex.split(
             self.clean.replace(r"\"", "\u009E").replace("'", "\u009F")
@@ -299,9 +311,7 @@ class Holder:
         )
 
     async def run(self, ctx: Context) -> None:
-        print(f"'{ctx.clean}'", f"'{ctx.cmd}'", ctx.args, f"'{ctx.raw}'")
         cmd = self.get_command(ctx.cmd)
-        print(cmd)
 
         if not cmd:
             return

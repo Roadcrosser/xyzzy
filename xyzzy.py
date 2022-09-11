@@ -172,7 +172,7 @@ class Xyzzy(discord.Client):
             + ConsoleColours.END
         )
 
-        super().__init__(intents=discord.Intents.all())
+        super().__init__()
 
     def game_count(self):
         return sum(1 for i in self.channels.values() if i.game and not i.game.debug)
@@ -364,10 +364,6 @@ class Xyzzy(discord.Client):
             channel.last = msg.created_at
 
             return await channel.handle_input(msg, clean[1:].strip())
-
-        # Don't allow commands to be run via a reply
-        if is_reply_to_me:
-            return
 
         if clean == "get ye flask":
             return await msg.channel.send("You can't get ye flask!")
