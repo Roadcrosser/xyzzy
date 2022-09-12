@@ -309,6 +309,9 @@ class Xyzzy(discord.Client):
             )
 
     async def on_message(self, msg: discord.Message):
+        # don't check message if no prefix
+        if 'prefix' not in dir(self): return
+
         is_reply_to_me = (
             msg.reference
             and isinstance(msg.reference.resolved, discord.Message)
